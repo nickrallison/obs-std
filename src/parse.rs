@@ -1,7 +1,29 @@
 use std::cmp::PartialEq;
 use std::fmt::Display;
+use lazy_static::lazy_static;
 use regex::Regex;
 use crate::traits::Verbose;
+
+lazy_static! {
+	static ref inline_latex_regex: Regex = Regex::new(r"(?m)\$\$.*?\$\$").unwrap();
+	static ref inline_code_regex: Regex = Regex::new(r"(?m)```.*?```").unwrap();
+	static ref heading_pattern: Regex = Regex::new(r"(?m)^(?P<level>#+) (?P<text>.*?)$").unwrap();
+	static ref bullet_point_pattern: Regex = Regex::new(r"(?m)^(?P<indent>[ \r\t]*)?- (?P<text>.*?)$").unwrap();
+	static ref list_item_pattern: Regex = Regex::new(r"(?m)^(?P<indent>[ \r\t]*)?(?P<number>\d+)\. (?P<text>.*?)$").unwrap();
+	static ref linebar_pattern: Regex = Regex::new(r"(?m)^---\s*?$").unwrap();
+	static ref yaml_pattern: Regex = Regex::new(r"(?m)^---([\s\S]*?)---").unwrap();
+	static ref bold_italic_pattern: Regex = Regex::new(r"^\*\*\*(.*?)\*\*\*").unwrap();
+	static ref bold_pattern: Regex = Regex::new(r"^\*\*(.*?)\*\*").unwrap();
+	static ref italic_pattern: Regex = Regex::new(r"^\*(.*?)\*").unwrap();
+	static ref inline_code_pattern: Regex = Regex::new(r"^`(.*?)`").unwrap();
+	static ref inline_block_latex_pattern: Regex = Regex::new(r"^\$\$(.*?)\$\$").unwrap();
+	static ref inline_latex_pattern: Regex = Regex::new(r"^\$(.*?)\$").unwrap();
+	static ref formatted_markdown_link_pattern: Regex = Regex::new(r"^\[\[(.+?)\|(.+?)\]\]").unwrap();
+	static ref markdown_link_pattern: Regex = Regex::new(r"^\[\[(.+?)\]\]").unwrap();
+	static ref formatted_web_link_pattern: Regex = Regex::new(r"^\[(.+?)\]\((.+?)\)").unwrap();
+	static ref web_link_pattern: Regex = Regex::new(r"^\[(.+?)\]").unwrap();
+
+}
 
 #[derive(Debug, Clone, PartialEq)]
 pub(crate) struct AST {
@@ -13,13 +35,13 @@ pub(crate) struct AST {
 impl AST {
 
 	pub(crate) fn new(contents: String) -> AST {
-
+		let mut contents = contents;
 		let line_sep: LineSep = if (&contents).contains("\r\n") {
 			LineSep::Windows
 		} else {
 			LineSep::Unix
 		};
-		let lines: Vec<&str> = contents.split("\n").collect();
+		let lines: Vec<String> = contents.split('\n').map(|x| x.to_string()).collect();
 		let blocks = parse_into_blocks(lines);
 		AST {
 			blocks,
@@ -462,20 +484,18 @@ enum  BlockParseState {
 	Unknown,
 }
 
-fn parse_into_blocks(lines: Vec<&str>) -> Vec<Block> {
-	// println!("Lines: {:?}", lines);
-	// println!("Lines Len: {:?}", lines.len());
+fn parse_into_blocks(lines: Vec<String>) -> Vec<Block> {
+	let mut lines = lines;
 	if lines.len() == 0 {
 		return vec![];
 	}
-	let inline_latex_regex = Regex::new(r"(?m)\$\$.*?\$\$").unwrap();
-	let inline_code_regex = Regex::new(r"(?m)```.*?```").unwrap();
 	let mut state = BlockParseState::Start;
 	let mut current_lines: Vec<&str> = Vec::new();
-	let mut blocks: Vec<Block> = Vec::new();
-	let mut index = 0;
+	let mut start_index: usize = 0;
+	let mut index: usize = 0;
+	let mut block_markers: Vec<(BlockParseState, usize, usize)> = Vec::new();
 	loop {
-		let line = lines[index];
+		let line: &String = &lines[index];
 		match state {
 			BlockParseState::Start => {
 				if line.starts_with("---") {
@@ -502,12 +522,8 @@ fn parse_into_blocks(lines: Vec<&str>) -> Vec<Block> {
 			BlockParseState::YAML => {
 				if line.starts_with("---") {
 					current_lines.push(line);
-					let text: String = current_lines.join("\n");
-					let yaml_pattern = Regex::new(r"(?m)^---([\s\S]*?)---").unwrap();
-					let caps = yaml_pattern.captures(&text).unwrap();
-					let inner_yaml = caps.get(1).unwrap().as_str();
-					let current_lines_string: Vec<String> = current_lines.iter().map(|x| x.to_string()).collect();
-					blocks.push(Block::YAML(serde_yaml::from_str(inner_yaml).unwrap(), current_lines_string));
+					block_markers.push((BlockParseState::YAML, start_index, index));
+					start_index = index + 1;
 					current_lines = Vec::new();
 					state = BlockParseState::Unknown;
 				}
@@ -518,8 +534,10 @@ fn parse_into_blocks(lines: Vec<&str>) -> Vec<Block> {
 			BlockParseState::CodeBlock => {
 				if line.starts_with("```") {
 					current_lines.push(line);
-					let current_lines_string: Vec<String> = current_lines.iter().map(|x| x.to_string()).collect();
-					blocks.push(Block::CodeBlock(current_lines_string));
+					// let current_lines_string: Vec<String> = current_lines.iter().map(|x| x.to_string()).collect();
+					// blocks.push(Block::CodeBlock(current_lines_string));
+					block_markers.push((BlockParseState::CodeBlock, start_index, index));
+					start_index = index + 1;
 					current_lines = Vec::new();
 					state = BlockParseState::Unknown;
 				}
@@ -530,8 +548,10 @@ fn parse_into_blocks(lines: Vec<&str>) -> Vec<Block> {
 			BlockParseState::LatexBlock => {
 				if line.starts_with("$$") {
 					current_lines.push(line);
-					let current_lines_string: Vec<String> = current_lines.iter().map(|x| x.to_string()).collect();
-					blocks.push(Block::LatexBlock(current_lines_string));
+					// let current_lines_string: Vec<String> = current_lines.iter().map(|x| x.to_string()).collect();
+					// blocks.push(Block::LatexBlock(current_lines_string));
+					block_markers.push((BlockParseState::LatexBlock, start_index, index));
+					start_index = index + 1;
 					current_lines = Vec::new();
 					state = BlockParseState::Unknown;
 				}
@@ -546,7 +566,9 @@ fn parse_into_blocks(lines: Vec<&str>) -> Vec<Block> {
 					current_lines.push(line.strip_prefix(">").unwrap());
 				}
 				else {
-					blocks.push(Block::BlockQuote(parse_into_blocks(current_lines)));
+					// blocks.push(Block::BlockQuote(parse_into_blocks(current_lines)));
+					block_markers.push((BlockParseState::BlockQuote, start_index, index - 1));
+					start_index = index;
 					index -= 1;
 					current_lines = Vec::new();
 					state = BlockParseState::Unknown;
@@ -554,28 +576,33 @@ fn parse_into_blocks(lines: Vec<&str>) -> Vec<Block> {
 			},
 			BlockParseState::TextBlock => {
 				if line.starts_with("$$") && !inline_latex_regex.is_match(line) {
-					blocks.push(Block::TextBlock(parse_into_lines(current_lines)));
+					// blocks.push(Block::TextBlock(parse_into_lines(current_lines)));
+					block_markers.push((BlockParseState::TextBlock, start_index, index - 1));
+					start_index = index;
+					start_index = index;
 					current_lines = Vec::new();
 					current_lines.push(line);
 					state = BlockParseState::LatexBlock;
 				}
 				else if line.starts_with("```") && !inline_code_regex.is_match(line) {
-					blocks.push(Block::TextBlock(parse_into_lines(current_lines)));
+					// blocks.push(Block::TextBlock(parse_into_lines(current_lines)));
+					block_markers.push((BlockParseState::TextBlock, start_index, index - 1));
+					start_index = index;
 					current_lines = Vec::new();
 					current_lines.push(line);
 					state = BlockParseState::CodeBlock;
 				}
 				else if line.starts_with(">") {
 
-					blocks.push(Block::TextBlock(parse_into_lines(current_lines)));
-
+					// blocks.push(Block::TextBlock(parse_into_lines(current_lines)));
+					block_markers.push((BlockParseState::TextBlock, start_index, index - 1));
+					start_index = index;
 					// text = line.to_string();
 					current_lines = Vec::new();
 					current_lines.push(line.strip_prefix(">").unwrap());
 					state = BlockParseState::BlockQuote;
 				}
 				else {
-
 					current_lines.push(line);
 
 				}
@@ -605,19 +632,15 @@ fn parse_into_blocks(lines: Vec<&str>) -> Vec<Block> {
 		}
 		if index == lines.len() - 1  {
 			match state {
-				BlockParseState::Start => {
-					// blocks.push(Block::TextBlock(parse_into_lines(text)));
-				},
+				BlockParseState::Start => {},
 				BlockParseState::YAML => panic!("Block Parsing Failed! YAML block not closed"),
 				BlockParseState::CodeBlock => panic!("Block Parsing Failed! Code block not closed"),
 				BlockParseState::LatexBlock => panic!("Block Parsing Failed! Latex block not closed"),
 				BlockParseState::BlockQuote => {
-
-					blocks.push(Block::BlockQuote(parse_into_blocks(current_lines)));
-
+					block_markers.push((BlockParseState::BlockQuote, start_index, index));
 				},
 				BlockParseState::TextBlock => {
-					blocks.push(Block::TextBlock(parse_into_lines(current_lines)));
+					block_markers.push((BlockParseState::TextBlock, start_index, index));
 				},
 				BlockParseState::Unknown => {}
 
@@ -627,109 +650,141 @@ fn parse_into_blocks(lines: Vec<&str>) -> Vec<Block> {
 			index += 1;
 		}
 	}
-	return match state {
-		BlockParseState::Start => blocks,
+
+	match state {
+		BlockParseState::Start => {},
 		BlockParseState::YAML => panic!("Block Parsing Failed! YAML block not closed"),
 		BlockParseState::CodeBlock => panic!("Block Parsing Failed! Code block not closed"),
 		BlockParseState::LatexBlock => panic!("Block Parsing Failed! Latex block not closed"),
-		BlockParseState::BlockQuote => blocks,
-		BlockParseState::TextBlock => blocks,
-		BlockParseState::Unknown => blocks,
+		BlockParseState::BlockQuote => {},
+		BlockParseState::TextBlock => {},
+		BlockParseState::Unknown => {},
 	}
+
+
+	let mut block_lines: Vec<(BlockParseState, Vec<String>)> = Vec::new();
+	for (state, start, end) in block_markers {
+		let mut block_lines_inner: Vec<String> = Vec::new();
+		for index in start..end + 1 {
+			block_lines_inner.push(lines.remove(0));
+		}
+		block_lines.push((state, block_lines_inner));
+	}
+
+	parse_block_lines_into_blocks(block_lines)
+
 }
 
-fn parse_into_lines(lines: Vec<&str>) -> Vec<Line> {
-	// strip the first character if it is a newline
-	// let content: String = if content.starts_with("\n") {
-	// 	(&content[1..]).to_string()
-	// } else {
-	// 	content
-	// };
+fn parse_block_lines_into_blocks(block_lines: Vec<(BlockParseState, Vec<String>)>) -> Vec<Block> {
+	let mut block_lines: Vec<(BlockParseState, Vec<String>)> = block_lines;
+	let mut blocks: Vec<Block> = Vec::new();
+
+	loop {
+		if block_lines.len() == 0 {
+			break;
+		}
+		let (state, lines) = block_lines.remove(0);
+		match state {
+			BlockParseState::YAML => {
+				let text: String = lines.join("\n");
+				let caps = yaml_pattern.captures(&text).unwrap();
+				let inner_yaml = caps.get(1).unwrap().as_str();
+				blocks.push(Block::YAML(serde_yaml::from_str(inner_yaml).unwrap(), lines));
+			},
+			BlockParseState::CodeBlock => {
+				blocks.push(Block::CodeBlock(lines));
+			},
+			BlockParseState::LatexBlock => {
+				blocks.push(Block::LatexBlock(lines));
+			},
+			BlockParseState::BlockQuote => {
+				// remove leading > character
+				let lines: Vec<String> = lines.iter().map(|x| x.strip_prefix(">").unwrap().to_string()).collect();
+				blocks.push(Block::BlockQuote(parse_into_blocks(lines)));
+			},
+			BlockParseState::TextBlock => {
+				blocks.push(Block::TextBlock(parse_into_lines(lines)));
+			},
+			BlockParseState::Unknown => {},
+			BlockParseState::Start => {},
+		}
+	}
+
+	blocks
+}
+
+
+fn parse_into_lines(lines: Vec<String>) -> Vec<Line> {
+	let lines = lines;
 	let mut line_vec: Vec<Line> = Vec::new();
 	for line in lines {
-		let heading_pattern = Regex::new(r"(?m)^(?P<level>#+) (?P<text>.*?)$").unwrap();
-		let bullet_point_pattern = Regex::new(r"(?m)^(?P<indent>[ \r\t]*)?- (?P<text>.*?)$").unwrap();
-		let list_item_pattern = Regex::new(r"(?m)^(?P<indent>[ \r\t]*)?(?P<number>\d+)\. (?P<text>.*?)$").unwrap();
-		let linebar_pattern = Regex::new(r"(?m)^---\s*?$").unwrap();
-		if heading_pattern.is_match(line) {
-			let caps = heading_pattern.captures(line).unwrap();
-			let level: u8 = (&caps["level"]).chars().count() as u8;
-			let text: &str = &caps["text"];
+
+		// if heading_pattern.is_match(&line) {
+		if line.starts_with("#") {
+			let mut chars: Vec<char> = line.chars().collect();
+			let level: u8 = chars.iter().take_while(|x| x == &&'#').count() as u8;
+			let text: String = chars.iter().skip_while(|x| x == &&'#' || x == &&' ').collect();
 			line_vec.push(Line::Heading(parse_into_nodes(text), level));
 		}
-		else if bullet_point_pattern.is_match(line) {
-			let caps = bullet_point_pattern.captures(line).unwrap();
+		else if bullet_point_pattern.is_match(&line) {
+		// else if line.starts_with("-") {
+			let caps = bullet_point_pattern.captures(&line).unwrap();
 			let indentation: &str = &caps["indent"];
 			let text: &str = &caps["text"];
-			line_vec.push(Line::BulletPoint(parse_into_nodes(text), indentation.to_string()));
+			line_vec.push(Line::BulletPoint(parse_into_nodes(text.to_string()), indentation.to_string()));
 		}
-		else if list_item_pattern.is_match(line) {
-			let caps = list_item_pattern.captures(line).unwrap();
+		else if list_item_pattern.is_match(&line) {
+			let caps = list_item_pattern.captures(&line).unwrap();
 			let indentation = &caps["indent"];
 			let number = (&caps["number"]).parse::<u32>().unwrap();
 			let text = &caps["text"];
-			line_vec.push(Line::ListItem(parse_into_nodes(text), number, indentation.to_string()));
+			line_vec.push(Line::ListItem(parse_into_nodes(text.to_string()), number, indentation.to_string()));
 		}
-		else if linebar_pattern.is_match(line) {
+		else if linebar_pattern.is_match(&line) {
 			line_vec.push(Line::Linebar);
 		}
 		else {
 			line_vec.push(Line::String(parse_into_nodes(line)));
 		}
 	}
-	// if the final line is a newline, then append an empty string to the end of the lines
-	// if content.ends_with("\n") {
-	// 	lines.push(Line::String(vec![Node::String("".to_string())]));
-	// }
 
 	return line_vec;
 }
 
+enum NodeParseState {
+	Start,
+	InlineCode,
+	InlineBlockLatex,
+	InlineLatex,
+	FormattedMarkdownLink,
+	MarkdownLink,
+	FormattedWebLink,
+	WebLink,
+	BoldItalic,
+	Bold,
+	Italic,
+	String,
+}
 
-fn parse_into_nodes(content: &str) -> Vec<Node> {
 
-	// let content = content.trim();
-	let bold_italic_pattern = Regex::new(r"^\*\*\*(.*?)\*\*\*").unwrap();
-	let bold_pattern = Regex::new(r"^\*\*(.*?)\*\*").unwrap();
-	let italic_pattern = Regex::new(r"^\*(.*?)\*").unwrap();
-	let inline_code_pattern = Regex::new(r"^`(.*?)`").unwrap();
-	let inline_block_latex_pattern = Regex::new(r"^\$\$(.*?)\$\$").unwrap();
-	let inline_latex_pattern = Regex::new(r"^\$(.*?)\$").unwrap();
-	let formatted_markdown_link_pattern = Regex::new(r"^\[\[(.+?)\|(.+?)\]\]").unwrap();
-	let markdown_link_pattern = Regex::new(r"^\[\[(.+?)\]\]").unwrap();
-	let formatted_web_link_pattern = Regex::new(r"^\[(.+?)\]\((.+?)\)").unwrap();
-	let web_link_pattern = Regex::new(r"^\[(.+?)\]").unwrap();
+fn parse_into_nodes(content: String) -> Vec<Node> {
 
 	let mut nodes: Vec<Node> = Vec::new();
 	// let mut text: String = String::new();
 	let mut start_index: usize = 0;
 	let mut index: usize = 0;
-
-	// if content[index:] matches any of the patterns add the match to nodes, and move index to the end of the match
-	// else append the next character to text
-
+	let mut node_parse_vector: Vec<(NodeParseState, usize, usize)> = Vec::new();
 	let characters: Vec<char> = content.chars().collect();
-
-
 	loop {
-		// if index >= characters.len() && start_index != index && start_index != 0 {
-		// 	nodes.push(Node::String(characters[start_index..index].into_iter().collect()));
-		// 	return nodes;
-		// } else if index >= characters.len()  && start_index == 0 {
-		// 	nodes.push(Node::String(characters[start_index..index].into_iter().collect()));
-		// 	return nodes;
-		// }
-		// else if index >= characters.len() {
-		// 	return nodes;
-		// }
 		if index >= characters.len()  {
-			nodes.push(Node::String(characters[start_index..index].into_iter().collect()));
-			return nodes;
+			node_parse_vector.push((NodeParseState::String, start_index, index));
+			break;
 		}
 
-		let loop_string: String = characters[index..].into_iter().collect();
+		let loop_string = &String::from_iter(characters[index..]);
 
-		if inline_code_pattern.is_match(&loop_string) {
+		// if inline_code_pattern.is_match(&loop_string) {
+		if inline_code_regex.is_match(loop_string) {
 			if index != start_index {
 				nodes.push(Node::String(characters[start_index..index].into_iter().collect()));
 			}
@@ -737,7 +792,6 @@ fn parse_into_nodes(content: &str) -> Vec<Node> {
 			nodes.push(Node::InlineCode(caps.get(1).unwrap().as_str().to_string()));
 			index += caps.get(0).unwrap().as_str().chars().count();
 			start_index = index;
-			// text = String::new();
 		} else if inline_block_latex_pattern.is_match(&loop_string) {
 			if index != start_index {
 				nodes.push(Node::String(characters[start_index..index].into_iter().collect()));
@@ -746,7 +800,6 @@ fn parse_into_nodes(content: &str) -> Vec<Node> {
 			nodes.push(Node::InlineBlockLatex(caps.get(1).unwrap().as_str().to_string()));
 			index += caps.get(0).unwrap().as_str().chars().count();
 			start_index = index;
-			// text = String::new();
 
 		}
 		else if inline_latex_pattern.is_match(&loop_string) {
@@ -757,7 +810,6 @@ fn parse_into_nodes(content: &str) -> Vec<Node> {
 			nodes.push(Node::InlineLatex(caps.get(1).unwrap().as_str().to_string()));
 			index += caps.get(0).unwrap().as_str().chars().count();
 			start_index = index;
-			// text = String::new();
 		} else if formatted_markdown_link_pattern.is_match(&loop_string) {
 			if index != start_index {
 				nodes.push(Node::String(characters[start_index..index].into_iter().collect()));
@@ -766,7 +818,6 @@ fn parse_into_nodes(content: &str) -> Vec<Node> {
 			nodes.push(Node::FormattedMarkdownLink(caps.get(1).unwrap().as_str().to_string(), caps.get(2).unwrap().as_str().to_string()));
 			index += caps.get(0).unwrap().as_str().chars().count();
 			start_index = index;
-			// text = String::new();
 		} else if markdown_link_pattern.is_match(&loop_string) {
 			if index != start_index {
 				nodes.push(Node::String(characters[start_index..index].into_iter().collect()));
@@ -775,7 +826,6 @@ fn parse_into_nodes(content: &str) -> Vec<Node> {
 			nodes.push(Node::MarkdownLink(caps.get(1).unwrap().as_str().to_string()));
 			index += caps.get(0).unwrap().as_str().chars().count();
 			start_index = index;
-			// text = String::new();
 		} else if formatted_web_link_pattern.is_match(&loop_string) {
 			if index != start_index {
 				nodes.push(Node::String(characters[start_index..index].into_iter().collect()));
@@ -799,7 +849,7 @@ fn parse_into_nodes(content: &str) -> Vec<Node> {
 				nodes.push(Node::String(characters[start_index..index].into_iter().collect()));
 			}
 			let caps = bold_italic_pattern.captures(&loop_string).unwrap();
-			nodes.push(Node::BoldItalic(parse_into_nodes(&caps.get(1).unwrap().as_str().to_string())));
+			nodes.push(Node::BoldItalic(parse_into_nodes(caps.get(1).unwrap().as_str().to_string())));
 			index += caps.get(0).unwrap().as_str().chars().count();
 			start_index = index;
 			// text = String::new();
@@ -808,7 +858,7 @@ fn parse_into_nodes(content: &str) -> Vec<Node> {
 				nodes.push(Node::String(characters[start_index..index].into_iter().collect()));
 			}
 			let caps = bold_pattern.captures(&loop_string).unwrap();
-			nodes.push(Node::Bold(parse_into_nodes(&caps.get(1).unwrap().as_str().to_string())));
+			nodes.push(Node::Bold(parse_into_nodes(caps.get(1).unwrap().as_str().to_string())));
 			index += caps.get(0).unwrap().as_str().chars().count();
 			start_index = index;
 			// text = String::new();
@@ -817,7 +867,7 @@ fn parse_into_nodes(content: &str) -> Vec<Node> {
 				nodes.push(Node::String(characters[start_index..index].into_iter().collect()));
 			}
 			let caps = italic_pattern.captures(&loop_string).unwrap();
-			nodes.push(Node::Italic(parse_into_nodes(&caps.get(1).unwrap().as_str().to_string())));
+			nodes.push(Node::Italic(parse_into_nodes(caps.get(1).unwrap().as_str().to_string())));
 			index += caps.get(0).unwrap().as_str().chars().count();
 			start_index = index;
 			// text = String::new();
@@ -825,6 +875,12 @@ fn parse_into_nodes(content: &str) -> Vec<Node> {
 			index += 1;
 		}
 	}
+	parse_node_lines_into_nodes(node_parse_vector)
+
+}
+
+fn parse_node_lines_into_nodes(node_parts: Vec<(NodeParseState, Vec<String>)>) -> Vec<Node> {
+	todo!()
 }
 
 pub(crate) fn add_indentation(indentation: &str, text: &str) -> String {

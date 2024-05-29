@@ -5,7 +5,6 @@ mod traits;
 #[cfg(test)]
 mod tests {
     use std::fs;
-    use std::path::PathBuf;
     use super::*;
 
     #[test]
