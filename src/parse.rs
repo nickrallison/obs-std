@@ -5,8 +5,8 @@ use regex::Regex;
 use crate::traits::Verbose;
 
 lazy_static! {
-	static ref inline_latex_regex: Regex = Regex::new(r"(?m)\$\$.*?\$\$").unwrap();
-	static ref inline_code_regex: Regex = Regex::new(r"(?m)```.*?```").unwrap();
+	static ref inline_latex_regex: Regex = Regex::new(r"(?m)^\$\$.*?\$\$").unwrap();
+	static ref inline_code_regex: Regex = Regex::new(r"(?m)^```.*?```").unwrap();
 	static ref heading_pattern: Regex = Regex::new(r"(?m)^(?P<level>#+) (?P<text>.*?)$").unwrap();
 	static ref bullet_point_pattern: Regex = Regex::new(r"(?m)^(?P<indent>[ \r\t]*)?- (?P<text>.*?)$").unwrap();
 	static ref list_item_pattern: Regex = Regex::new(r"(?m)^(?P<indent>[ \r\t]*)?(?P<number>\d+)\. (?P<text>.*?)$").unwrap();
@@ -751,6 +751,7 @@ fn parse_into_lines(lines: Vec<String>) -> Vec<Line> {
 	return line_vec;
 }
 
+#[derive(Debug, PartialEq, Copy, Clone)]
 enum NodeParseState {
 	Start,
 	InlineCode,
@@ -774,113 +775,246 @@ fn parse_into_nodes(content: String) -> Vec<Node> {
 	let mut start_index: usize = 0;
 	let mut index: usize = 0;
 	let mut node_parse_vector: Vec<(NodeParseState, usize, usize)> = Vec::new();
-	let characters: Vec<char> = content.chars().collect();
+	let mut characters: Vec<char> = content.chars().collect();
 	loop {
 		if index >= characters.len()  {
 			node_parse_vector.push((NodeParseState::String, start_index, index));
 			break;
 		}
 
-		let loop_string = &String::from_iter(characters[index..]);
+		let loop_string = &String::from_iter(&characters[index..]);
 
 		// if inline_code_pattern.is_match(&loop_string) {
 		if inline_code_regex.is_match(loop_string) {
 			if index != start_index {
-				nodes.push(Node::String(characters[start_index..index].into_iter().collect()));
+				// nodes.push(Node::String(characters[start_index..index].into_iter().collect()));
+				node_parse_vector.push((NodeParseState::String, start_index, index));
+				start_index = index;
 			}
 			let caps = inline_code_pattern.captures(&loop_string).unwrap();
-			nodes.push(Node::InlineCode(caps.get(1).unwrap().as_str().to_string()));
-			index += caps.get(0).unwrap().as_str().chars().count();
+			// nodes.push(Node::InlineCode(caps.get(1).unwrap().as_str().to_string()));
+			let length = caps.get(0).unwrap().as_str().chars().count();
+			node_parse_vector.push((NodeParseState::InlineCode, index, index + length));
+			index += length;
 			start_index = index;
 		} else if inline_block_latex_pattern.is_match(&loop_string) {
 			if index != start_index {
-				nodes.push(Node::String(characters[start_index..index].into_iter().collect()));
+				// nodes.push(Node::String(characters[start_index..index].into_iter().collect()));
+				node_parse_vector.push((NodeParseState::String, start_index, index));
+				start_index = index;
 			}
 			let caps = inline_block_latex_pattern.captures(&loop_string).unwrap();
-			nodes.push(Node::InlineBlockLatex(caps.get(1).unwrap().as_str().to_string()));
-			index += caps.get(0).unwrap().as_str().chars().count();
+			let cap_0 = caps.get(0).unwrap().as_str();
+			// println!("Cap: {}", cap_0);
+			let length =
+				cap_0.chars().count();
+			// println!("Block Latex Length: {}", length);
+			// println!("characters: {:?}", cap_0.to_string());
+			// nodes.push(Node::InlineBlockLatex(caps.get(1).unwrap().as_str().to_string()));
+			node_parse_vector.push((NodeParseState::InlineBlockLatex, index, index + length));
+			index +=  length;
 			start_index = index;
 
 		}
 		else if inline_latex_pattern.is_match(&loop_string) {
 			if index != start_index {
-				nodes.push(Node::String(characters[start_index..index].into_iter().collect()));
+				// nodes.push(Node::String(characters[start_index..index].into_iter().collect()));
+				node_parse_vector.push((NodeParseState::String, start_index, index));
 			}
 			let caps = inline_latex_pattern.captures(&loop_string).unwrap();
-			nodes.push(Node::InlineLatex(caps.get(1).unwrap().as_str().to_string()));
-			index += caps.get(0).unwrap().as_str().chars().count();
+			// nodes.push(Node::InlineLatex(caps.get(1).unwrap().as_str().to_string()));
+			let length = caps.get(0).unwrap().as_str().chars().count();
+			node_parse_vector.push((NodeParseState::InlineLatex, index, index + length));
+			index += length;
 			start_index = index;
 		} else if formatted_markdown_link_pattern.is_match(&loop_string) {
 			if index != start_index {
-				nodes.push(Node::String(characters[start_index..index].into_iter().collect()));
+				// nodes.push(Node::String(characters[start_index..index].into_iter().collect()));
+				node_parse_vector.push((NodeParseState::String, start_index, index));
 			}
 			let caps = formatted_markdown_link_pattern.captures(&loop_string).unwrap();
-			nodes.push(Node::FormattedMarkdownLink(caps.get(1).unwrap().as_str().to_string(), caps.get(2).unwrap().as_str().to_string()));
-			index += caps.get(0).unwrap().as_str().chars().count();
+			// nodes.push(Node::FormattedMarkdownLink(caps.get(1).unwrap().as_str().to_string(), caps.get(2).unwrap().as_str().to_string()));
+			let length = caps.get(0).unwrap().as_str().chars().count();
+			node_parse_vector.push((NodeParseState::FormattedMarkdownLink, index, index + length));
+			index += length;
 			start_index = index;
 		} else if markdown_link_pattern.is_match(&loop_string) {
 			if index != start_index {
-				nodes.push(Node::String(characters[start_index..index].into_iter().collect()));
+				// nodes.push(Node::String(characters[start_index..index].into_iter().collect()));
+				node_parse_vector.push((NodeParseState::String, start_index, index));
 			}
 			let caps = markdown_link_pattern.captures(&loop_string).unwrap();
-			nodes.push(Node::MarkdownLink(caps.get(1).unwrap().as_str().to_string()));
-			index += caps.get(0).unwrap().as_str().chars().count();
+			// nodes.push(Node::MarkdownLink(caps.get(1).unwrap().as_str().to_string()));
+			let length = caps.get(0).unwrap().as_str().chars().count();
+			node_parse_vector.push((NodeParseState::MarkdownLink, index, index + length));
+			index += length;
 			start_index = index;
 		} else if formatted_web_link_pattern.is_match(&loop_string) {
 			if index != start_index {
-				nodes.push(Node::String(characters[start_index..index].into_iter().collect()));
+				// nodes.push(Node::String(characters[start_index..index].into_iter().collect()));
+				node_parse_vector.push((NodeParseState::String, start_index, index));
 			}
 			let caps = formatted_web_link_pattern.captures(&loop_string).unwrap();
-			nodes.push(Node::FormattedWebLink(caps.get(2).unwrap().as_str().to_string(), caps.get(1).unwrap().as_str().to_string()));
-			index += caps.get(0).unwrap().as_str().chars().count();
+			// nodes.push(Node::FormattedWebLink(caps.get(2).unwrap().as_str().to_string(), caps.get(1).unwrap().as_str().to_string()));
+			let length = caps.get(0).unwrap().as_str().chars().count();
+			node_parse_vector.push((NodeParseState::FormattedWebLink, index, index + length));
+			index += length;
 			start_index = index;
 
 		} else if web_link_pattern.is_match(&loop_string) {
 			if index != start_index {
-				nodes.push(Node::String(characters[start_index..index].into_iter().collect()));
+				// nodes.push(Node::String(characters[start_index..index].into_iter().collect()));
+				node_parse_vector.push((NodeParseState::String, start_index, index));
 			}
 			let caps = web_link_pattern.captures(&loop_string).unwrap();
-			nodes.push(Node::WebLink(caps.get(1).unwrap().as_str().to_string()));
-			index += caps.get(0).unwrap().as_str().chars().count();
+			// nodes.push(Node::WebLink(caps.get(1).unwrap().as_str().to_string()));
+			let length = caps.get(0).unwrap().as_str().chars().count();
+			node_parse_vector.push((NodeParseState::WebLink, index, index + length));
+			index += length;
 			start_index = index;
 			// text = String::new();
 		} else if bold_italic_pattern.is_match(&loop_string) {
 			if index != start_index {
-				nodes.push(Node::String(characters[start_index..index].into_iter().collect()));
+				// nodes.push(Node::String(characters[start_index..index].into_iter().collect()));
+				node_parse_vector.push((NodeParseState::String, start_index, index));
 			}
 			let caps = bold_italic_pattern.captures(&loop_string).unwrap();
-			nodes.push(Node::BoldItalic(parse_into_nodes(caps.get(1).unwrap().as_str().to_string())));
-			index += caps.get(0).unwrap().as_str().chars().count();
+			// nodes.push(Node::BoldItalic(parse_into_nodes(caps.get(1).unwrap().as_str().to_string())));
+			let length = caps.get(0).unwrap().as_str().chars().count();
+			node_parse_vector.push((NodeParseState::BoldItalic, index, index + length));
+			index += length;
 			start_index = index;
 			// text = String::new();
 		} else if bold_pattern.is_match(&loop_string) {
 			if index != start_index {
-				nodes.push(Node::String(characters[start_index..index].into_iter().collect()));
+				// nodes.push(Node::String(characters[start_index..index].into_iter().collect()));
+				node_parse_vector.push((NodeParseState::String, start_index, index));
 			}
 			let caps = bold_pattern.captures(&loop_string).unwrap();
-			nodes.push(Node::Bold(parse_into_nodes(caps.get(1).unwrap().as_str().to_string())));
-			index += caps.get(0).unwrap().as_str().chars().count();
+			// nodes.push(Node::Bold(parse_into_nodes(caps.get(1).unwrap().as_str().to_string())));
+			let length = caps.get(0).unwrap().as_str().chars().count();
+			node_parse_vector.push((NodeParseState::Bold, index, index + length));
+			index += length;
 			start_index = index;
 			// text = String::new();
 		} else if italic_pattern.is_match(&loop_string) {
 			if index != start_index {
-				nodes.push(Node::String(characters[start_index..index].into_iter().collect()));
+				// nodes.push(Node::String(characters[start_index..index].into_iter().collect()));
+				node_parse_vector.push((NodeParseState::String, start_index, index));
 			}
 			let caps = italic_pattern.captures(&loop_string).unwrap();
-			nodes.push(Node::Italic(parse_into_nodes(caps.get(1).unwrap().as_str().to_string())));
-			index += caps.get(0).unwrap().as_str().chars().count();
+			// nodes.push(Node::Italic(parse_into_nodes(caps.get(1).unwrap().as_str().to_string())));
+			let length = caps.get(0).unwrap().as_str().chars().count();
+			node_parse_vector.push((NodeParseState::Italic, index, index + length));
+			index += length;
 			start_index = index;
 			// text = String::new();
 		} else {
 			index += 1;
 		}
 	}
-	parse_node_lines_into_nodes(node_parse_vector)
+	let mut node_parts: Vec<(NodeParseState, Vec<char>)> = Vec::new();
+	// end index is not inclusive
+	for (state, start, end) in node_parse_vector {
+		// println!("State: {:?}, Start: {}, End: {}", state, start, end);
+		let mut chars: Vec<char> = Vec::new();
+		for index in start..end {
+			chars.push(characters[index]);
+			// chars.push(characters.remove(0));
+		}
+		node_parts.push((state, chars));
+	}
+	parse_node_lines_into_nodes(node_parts)
 
 }
 
-fn parse_node_lines_into_nodes(node_parts: Vec<(NodeParseState, Vec<String>)>) -> Vec<Node> {
-	todo!()
+fn parse_node_lines_into_nodes(node_parts: Vec<(NodeParseState, Vec<char>)>) -> Vec<Node> {
+	// for (state, parts) in &node_parts {
+	// 	println!("{:?} -> {}", state, parts.iter().collect::<String>());
+	// }
+	let mut node_parts: Vec<(NodeParseState, Vec<char>)> = node_parts;
+	let mut nodes: Vec<Node> = Vec::new();
+	loop {
+		if node_parts.len() == 0 {
+			break;
+		}
+		let (state, parts) = node_parts.remove(0);
+		match state {
+			NodeParseState::InlineCode => {
+				// prune the backticks
+				// let parts = parts.strip_prefix("`").unwrap().strip_suffix("`").unwrap().to_string();
+				let parts: String = parts[1..parts.len() - 1].iter().collect();
+				nodes.push(Node::InlineCode(parts));
+			},
+			NodeParseState::InlineBlockLatex => {
+				// prune the dollar signs
+				// let parts = parts.strip_prefix("$$").unwrap().strip_suffix("$$").unwrap().to_string();
+				// println!("Parts Before: {:?}", parts.iter().collect::<String>());
+				let parts: String = parts[2..parts.len() - 2].iter().collect();
+				// println!("Parts After: {:?}", parts);
+				nodes.push(Node::InlineBlockLatex(parts));
+			},
+			NodeParseState::InlineLatex => {
+				// prune the dollar signs
+				// let parts = parts.strip_prefix("$").unwrap().strip_suffix("$").unwrap().to_string();
+				let parts: String = parts[1..parts.len() - 1].iter().collect();
+				nodes.push(Node::InlineLatex(parts));
+			},
+			NodeParseState::FormattedMarkdownLink => {
+				// prune the brackets
+				// let parts = parts.strip_prefix("[[").unwrap().strip_suffix("]]").unwrap().to_string();
+				let parts: String = parts[2..parts.len() - 2].iter().collect();
+				let parts: String = parts.chars().collect();
+				let mut parts: Vec<String> = parts.split("|").map(|x| x.to_string()).collect();
+				let part_0: String = parts.remove(0);
+				let part_1: String = parts.remove(0);
+				nodes.push(Node::FormattedMarkdownLink(part_0, part_1));
+			},
+			NodeParseState::MarkdownLink => {
+				// prune the brackets
+				// let parts = parts.strip_prefix("[[").unwrap().strip_suffix("]]").unwrap().to_string();
+				let parts: String = parts[2..parts.len() - 2].iter().collect();
+				nodes.push(Node::MarkdownLink(parts));
+			},
+			NodeParseState::FormattedWebLink => {
+				// prune the brackets
+				// let parts = parts.strip_prefix("[").unwrap().strip_suffix(")").unwrap().to_string();
+				let parts: String = parts[1..parts.len() - 1].iter().collect();
+				let parts: Vec<&str> = parts.split("](").collect();
+				nodes.push(Node::FormattedWebLink(parts[1].to_string(), parts[0].to_string()));
+			},
+			NodeParseState::WebLink => {
+				// prune the brackets
+				// let parts = parts.strip_prefix("[").unwrap().strip_suffix("]").unwrap().to_string();
+				let parts: String = parts[1..parts.len() - 1].iter().collect();
+				nodes.push(Node::WebLink(parts));
+			},
+			NodeParseState::BoldItalic => {
+				// prune the asterisks
+				// let parts = parts.strip_prefix("***").unwrap().strip_suffix("***").unwrap().to_string();
+				let parts: String = parts[3..parts.len() - 3].iter().collect();
+				nodes.push(Node::BoldItalic(parse_into_nodes(parts)));
+			},
+			NodeParseState::Bold => {
+				// prune the asterisks
+				// let parts = parts.strip_prefix("**").unwrap().strip_suffix("**").unwrap().to_string();
+				let parts: String = parts[2..parts.len() - 2].iter().collect();
+				nodes.push(Node::Bold(parse_into_nodes(parts)));
+			},
+			NodeParseState::Italic => {
+				// prune the asterisks
+				// let parts = parts.strip_prefix("*").unwrap().strip_suffix("*").unwrap().to_string();
+				let parts: String = parts[1..parts.len() - 1].iter().collect();
+				nodes.push(Node::Italic(parse_into_nodes(parts)));
+			},
+			NodeParseState::String => {
+				let parts: String = parts.iter().collect();
+				nodes.push(Node::String(parts));
+			},
+			NodeParseState::Start => {},
+		}
+	}
+	nodes
 }
 
 pub(crate) fn add_indentation(indentation: &str, text: &str) -> String {
