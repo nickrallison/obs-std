@@ -1,9 +1,6 @@
 use std::fmt::Display;
 use std::path::PathBuf;
-use crate::parse::{AST, add_indentation};
-use crate::traits::Verbose;
-
-
+use crate::parse::AST;
 
 #[allow(dead_code)]
 #[derive(Debug, Clone, PartialEq)]
@@ -33,9 +30,13 @@ impl MDFile {
 		}
 	}
 
-	pub(crate) fn lines(&self) -> Vec<String> {
-		self.ast.lines()
-	}
+	// pub(crate) fn lines(&self) -> Vec<String> {
+	// 	self.ast.lines()
+	// }
+
+	// pub(crate) fn num_lines (&self) -> usize {
+	// 	self.ast.num_lines()
+	// }
 }
 
 impl Display for MDFile {
@@ -44,9 +45,9 @@ impl Display for MDFile {
 	}
 }
 
-impl Verbose for MDFile {
-	fn verbose(&self) -> String {
-		format!("Path:\n\t{}\nTitle:\n\t{}\nAliases:\n\t{:?}\nAST:\n{}", self.path.display(), self.title, self.aliases, add_indentation("\t", &self.ast.verbose()))
-	}
-}
+// impl Verbose for MDFile {
+// 	fn verbose(&self) -> String {
+// 		format!("Path:\n\t{}\nTitle:\n\t{}\nAliases:\n\t{:?}\nAST:\n{}", self.path.display(), self.title, self.aliases, add_indentation("\t", &self.ast.verbose()))
+// 	}
+// }
 
