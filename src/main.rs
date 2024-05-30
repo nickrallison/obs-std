@@ -1,31 +1,18 @@
+use std::path::PathBuf;
+use crate::md_file::MDFile;
+
+use crate::vault::Vault;
+
 mod parse;
 mod md_file;
 mod traits;
-
-use std::fs;
-use std::path::PathBuf;
+mod vault;
 
 fn main() {
-	let filelist = fs::read_dir("vault").unwrap();
+	let path = PathBuf::from("vault");
+	let vault = Vault::new(path);
 
-	for file in filelist {
-
-		let file_path = file.unwrap().path();
-		println!("Testing file: {:?}", file_path.clone());
-		let file_contents = fs::read_to_string(&file_path).unwrap();
-		let md_file = md_file::MDFile::new(file_path.clone());
-		let result = md_file.to_string();
-		let expected = file_contents;
-		assert_eq!(result, expected, "Failed on file: {:?}", file_path);
-	}
-	println!("All stability tests passed!")
-
-	// let file_path = PathBuf::from("vault/Wave Equation.md");
-	// let file_contents = fs::read_to_string(&file_path).unwrap();
-	// let md_file = md_file::MDFile::new(file_path.clone());
-	// let result = md_file.to_string();
-	// let expected = file_contents;
-	// assert_eq!(result, expected, "Failed on file: {:?}", file_path);
-
-
+	let md_file: &MDFile = vault.random_md_file();
+	let outgoint_links = vault.get_outgoing_links(md_file);
+	println!("Outgoing links: {:?}", outgoint_links);
 }

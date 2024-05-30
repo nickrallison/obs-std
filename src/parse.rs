@@ -5,23 +5,23 @@ use regex::Regex;
 use crate::traits::Verbose;
 
 lazy_static! {
-	static ref inline_latex_regex: Regex = Regex::new(r"(?m)^\$\$.*?\$\$").unwrap();
-	static ref inline_code_regex: Regex = Regex::new(r"(?m)^```.*?```").unwrap();
-	static ref heading_pattern: Regex = Regex::new(r"(?m)^(?P<level>#+) (?P<text>.*?)$").unwrap();
-	static ref bullet_point_pattern: Regex = Regex::new(r"(?m)^(?P<indent>[ \r\t]*)?- (?P<text>.*?)$").unwrap();
-	static ref list_item_pattern: Regex = Regex::new(r"(?m)^(?P<indent>[ \r\t]*)?(?P<number>\d+)\. (?P<text>.*?)$").unwrap();
-	static ref linebar_pattern: Regex = Regex::new(r"(?m)^---\s*?$").unwrap();
-	static ref yaml_pattern: Regex = Regex::new(r"(?m)^---([\s\S]*?)---").unwrap();
-	static ref bold_italic_pattern: Regex = Regex::new(r"^\*\*\*(.*?)\*\*\*").unwrap();
-	static ref bold_pattern: Regex = Regex::new(r"^\*\*(.*?)\*\*").unwrap();
-	static ref italic_pattern: Regex = Regex::new(r"^\*(.*?)\*").unwrap();
-	static ref inline_code_pattern: Regex = Regex::new(r"^`(.*?)`").unwrap();
-	static ref inline_block_latex_pattern: Regex = Regex::new(r"^\$\$(.*?)\$\$").unwrap();
-	static ref inline_latex_pattern: Regex = Regex::new(r"^\$(.*?)\$").unwrap();
-	static ref formatted_markdown_link_pattern: Regex = Regex::new(r"^\[\[(.+?)\|(.+?)\]\]").unwrap();
-	static ref markdown_link_pattern: Regex = Regex::new(r"^\[\[(.+?)\]\]").unwrap();
-	static ref formatted_web_link_pattern: Regex = Regex::new(r"^\[(.+?)\]\((.+?)\)").unwrap();
-	static ref web_link_pattern: Regex = Regex::new(r"^\[(.+?)\]").unwrap();
+	static ref INLINE_LATEX_REGEX: Regex = Regex::new(r"(?m)^\$\$.*?\$\$").unwrap();
+	static ref INLINE_CODE_REGEX: Regex = Regex::new(r"(?m)^```.*?```").unwrap();
+	static ref HEADING_PATTERN: Regex = Regex::new(r"(?m)^(?P<level>#+) (?P<text>.*?)$").unwrap();
+	static ref BULLET_POINT_PATTERN: Regex = Regex::new(r"(?m)^(?P<indent>[ \r\t]*)?- (?P<text>.*?)$").unwrap();
+	static ref LIST_ITEM_PATTERN: Regex = Regex::new(r"(?m)^(?P<indent>[ \r\t]*)?(?P<number>\d+)\. (?P<text>.*?)$").unwrap();
+	static ref LINEBAR_PATTERN: Regex = Regex::new(r"(?m)^---\s*?$").unwrap();
+	static ref YAML_PATTERN: Regex = Regex::new(r"(?m)^---([\s\S]*?)---").unwrap();
+	static ref BOLD_ITALIC_PATTERN: Regex = Regex::new(r"^\*\*\*(.*?)\*\*\*").unwrap();
+	static ref BOLD_PATTERN: Regex = Regex::new(r"^\*\*(.*?)\*\*").unwrap();
+	static ref ITALIC_PATTERN: Regex = Regex::new(r"^\*(.*?)\*").unwrap();
+	static ref INLINE_CODE_PATTERN: Regex = Regex::new(r"^`(.*?)`").unwrap();
+	static ref INLINE_BLOCK_LATEX_PATTERN: Regex = Regex::new(r"^\$\$(.*?)\$\$").unwrap();
+	static ref INLINE_LATEX_PATTERN: Regex = Regex::new(r"^\$(.*?)\$").unwrap();
+	static ref FORMATTED_MARKDOWN_LINK_PATTERN: Regex = Regex::new(r"^\[\[(.+?)\|(.+?)\]\]").unwrap();
+	static ref MARKDOWN_LINK_PATTERN: Regex = Regex::new(r"^\[\[(.+?)\]\]").unwrap();
+	static ref FORMATTED_WEB_LINK_PATTERN: Regex = Regex::new(r"^\[(.+?)\]\((.+?)\)").unwrap();
+	static ref WEB_LINK_PATTERN: Regex = Regex::new(r"^\[(.+?)\]").unwrap();
 
 }
 
@@ -35,7 +35,7 @@ pub(crate) struct AST {
 impl AST {
 
 	pub(crate) fn new(contents: String) -> AST {
-		let mut contents = contents;
+		let contents = contents;
 		let line_sep: LineSep = if (&contents).contains("\r\n") {
 			LineSep::Windows
 		} else {
@@ -71,15 +71,9 @@ impl AST {
 		self.get_yaml("aliases").unwrap().as_sequence().unwrap().iter().map(|x| x.as_str().unwrap().to_string()).collect()
 	}
 
-	pub(crate) fn lines(&self) -> Vec<String> {
-		let mut lines: Vec<String> = Vec::new();
-		for block in &self.blocks {
-			let block_lines = block.lines();
-			for line in block_lines {
-				lines.push(format!("{}", line));
-			}
-		}
-		lines
+	pub(crate) fn get_nodes(&self) -> Vec<&Node> {
+
+		todo!()
 	}
 
 }
@@ -101,18 +95,6 @@ impl Display for AST {
 
 }
 
-// impl Verbose for AST {
-// 	fn verbose(&self) -> String {
-// 		let mut verbose: String = String::new();
-// 		for block in &self.blocks {
-//
-// 			verbose = verbose + &block.verbose();
-// 		}
-// 		verbose
-// 	}
-//
-// }
-
 #[derive(Debug, Clone, PartialEq)]
 enum LineSep {
 	Unix,
@@ -130,30 +112,7 @@ enum Block {
 
 
 impl Block {
-	pub(crate) fn lines(&self) -> Vec<String> {
-		match self {
-			Block::YAML(_, _) => vec![],
-			Block::CodeBlock(_) => vec![],
-			Block::LatexBlock(_) => vec![],
-			Block::BlockQuote(blocks) => {
-				let mut lines: Vec<String> = Vec::new();
-				for block in blocks {
-					let block_lines = block.lines();
-					for line in block_lines {
-						lines.push(format!("{}", line));
-					}
-				}
-				lines
-			},
-			Block::TextBlock(lines) => {
-				let mut lines_str: Vec<String> = Vec::new();
-				for line in lines {
-					lines_str.push(format!("{}", line.clean_line()));
-				}
-				lines_str
-			},
-		}
-	}
+
 }
 
 
@@ -224,7 +183,7 @@ impl Display for Block {
 // }
 
 #[derive(Debug, Clone, PartialEq)]
-enum Line {
+pub(crate) enum Line {
 	Heading(Vec<Node>, u8),
 	BulletPoint(Vec<Node>, String),
 	ListItem(Vec<Node>, u32, String),
@@ -374,7 +333,7 @@ impl Verbose for Line {
 }
 
 #[derive(Debug, Clone, PartialEq)]
-enum Node {
+pub(crate) enum Node {
 
 	InlineCode(String),
 	InlineBlockLatex(String),
@@ -502,11 +461,11 @@ fn parse_into_blocks(lines: Vec<String>) -> Vec<Block> {
 					current_lines.push(line);
 					state = BlockParseState::YAML;
 				}
-				else if line.starts_with("```") && !inline_code_regex.is_match(line) {
+				else if line.starts_with("```") && !INLINE_CODE_REGEX.is_match(line) {
 					current_lines.push(line);
 					state = BlockParseState::CodeBlock;
 				}
-				else if line.starts_with("$$") && !inline_latex_regex.is_match(line) {
+				else if line.starts_with("$$") && !INLINE_LATEX_REGEX.is_match(line) {
 					current_lines.push(line);
 					state = BlockParseState::LatexBlock;
 				}
@@ -575,16 +534,15 @@ fn parse_into_blocks(lines: Vec<String>) -> Vec<Block> {
 				}
 			},
 			BlockParseState::TextBlock => {
-				if line.starts_with("$$") && !inline_latex_regex.is_match(line) {
+				if line.starts_with("$$") && !INLINE_LATEX_REGEX.is_match(line) {
 					// blocks.push(Block::TextBlock(parse_into_lines(current_lines)));
 					block_markers.push((BlockParseState::TextBlock, start_index, index - 1));
-					start_index = index;
 					start_index = index;
 					current_lines = Vec::new();
 					current_lines.push(line);
 					state = BlockParseState::LatexBlock;
 				}
-				else if line.starts_with("```") && !inline_code_regex.is_match(line) {
+				else if line.starts_with("```") && !INLINE_CODE_REGEX.is_match(line) {
 					// blocks.push(Block::TextBlock(parse_into_lines(current_lines)));
 					block_markers.push((BlockParseState::TextBlock, start_index, index - 1));
 					start_index = index;
@@ -612,11 +570,11 @@ fn parse_into_blocks(lines: Vec<String>) -> Vec<Block> {
 					current_lines.push(line);
 					state = BlockParseState::YAML;
 				}
-				else if line.starts_with("```") && !inline_code_regex.is_match(line) {
+				else if line.starts_with("```") && !INLINE_CODE_REGEX.is_match(line) {
 					current_lines.push(line);
 					state = BlockParseState::CodeBlock;
 				}
-				else if line.starts_with("$$") && !inline_latex_regex.is_match(line) {
+				else if line.starts_with("$$") && !INLINE_LATEX_REGEX.is_match(line) {
 					current_lines.push(line);
 					state = BlockParseState::LatexBlock;
 				}
@@ -665,7 +623,7 @@ fn parse_into_blocks(lines: Vec<String>) -> Vec<Block> {
 	let mut block_lines: Vec<(BlockParseState, Vec<String>)> = Vec::new();
 	for (state, start, end) in block_markers {
 		let mut block_lines_inner: Vec<String> = Vec::new();
-		for index in start..end + 1 {
+		for _index in start..end + 1 {
 			block_lines_inner.push(lines.remove(0));
 		}
 		block_lines.push((state, block_lines_inner));
@@ -687,7 +645,7 @@ fn parse_block_lines_into_blocks(block_lines: Vec<(BlockParseState, Vec<String>)
 		match state {
 			BlockParseState::YAML => {
 				let text: String = lines.join("\n");
-				let caps = yaml_pattern.captures(&text).unwrap();
+				let caps = YAML_PATTERN.captures(&text).unwrap();
 				let inner_yaml = caps.get(1).unwrap().as_str();
 				blocks.push(Block::YAML(serde_yaml::from_str(inner_yaml).unwrap(), lines));
 			},
@@ -721,26 +679,26 @@ fn parse_into_lines(lines: Vec<String>) -> Vec<Line> {
 
 		// if heading_pattern.is_match(&line) {
 		if line.starts_with("#") {
-			let mut chars: Vec<char> = line.chars().collect();
+			let chars: Vec<char> = line.chars().collect();
 			let level: u8 = chars.iter().take_while(|x| x == &&'#').count() as u8;
 			let text: String = chars.iter().skip_while(|x| x == &&'#' || x == &&' ').collect();
 			line_vec.push(Line::Heading(parse_into_nodes(text), level));
 		}
-		else if bullet_point_pattern.is_match(&line) {
+		else if BULLET_POINT_PATTERN.is_match(&line) {
 		// else if line.starts_with("-") {
-			let caps = bullet_point_pattern.captures(&line).unwrap();
+			let caps = BULLET_POINT_PATTERN.captures(&line).unwrap();
 			let indentation: &str = &caps["indent"];
 			let text: &str = &caps["text"];
 			line_vec.push(Line::BulletPoint(parse_into_nodes(text.to_string()), indentation.to_string()));
 		}
-		else if list_item_pattern.is_match(&line) {
-			let caps = list_item_pattern.captures(&line).unwrap();
+		else if LIST_ITEM_PATTERN.is_match(&line) {
+			let caps = LIST_ITEM_PATTERN.captures(&line).unwrap();
 			let indentation = &caps["indent"];
 			let number = (&caps["number"]).parse::<u32>().unwrap();
 			let text = &caps["text"];
 			line_vec.push(Line::ListItem(parse_into_nodes(text.to_string()), number, indentation.to_string()));
 		}
-		else if linebar_pattern.is_match(&line) {
+		else if LINEBAR_PATTERN.is_match(&line) {
 			line_vec.push(Line::Linebar);
 		}
 		else {
@@ -770,12 +728,12 @@ enum NodeParseState {
 
 fn parse_into_nodes(content: String) -> Vec<Node> {
 
-	let mut nodes: Vec<Node> = Vec::new();
+	let _nodes: Vec<Node> = Vec::new();
 	// let mut text: String = String::new();
 	let mut start_index: usize = 0;
 	let mut index: usize = 0;
 	let mut node_parse_vector: Vec<(NodeParseState, usize, usize)> = Vec::new();
-	let mut characters: Vec<char> = content.chars().collect();
+	let characters: Vec<char> = content.chars().collect();
 	loop {
 		if index >= characters.len()  {
 			node_parse_vector.push((NodeParseState::String, start_index, index));
@@ -785,25 +743,25 @@ fn parse_into_nodes(content: String) -> Vec<Node> {
 		let loop_string = &String::from_iter(&characters[index..]);
 
 		// if inline_code_pattern.is_match(&loop_string) {
-		if inline_code_regex.is_match(loop_string) {
+		if INLINE_CODE_REGEX.is_match(loop_string) {
 			if index != start_index {
 				// nodes.push(Node::String(characters[start_index..index].into_iter().collect()));
 				node_parse_vector.push((NodeParseState::String, start_index, index));
 				start_index = index;
 			}
-			let caps = inline_code_pattern.captures(&loop_string).unwrap();
+			let caps = INLINE_CODE_PATTERN.captures(&loop_string).unwrap();
 			// nodes.push(Node::InlineCode(caps.get(1).unwrap().as_str().to_string()));
 			let length = caps.get(0).unwrap().as_str().chars().count();
 			node_parse_vector.push((NodeParseState::InlineCode, index, index + length));
 			index += length;
 			start_index = index;
-		} else if inline_block_latex_pattern.is_match(&loop_string) {
+		} else if INLINE_BLOCK_LATEX_PATTERN.is_match(&loop_string) {
 			if index != start_index {
 				// nodes.push(Node::String(characters[start_index..index].into_iter().collect()));
 				node_parse_vector.push((NodeParseState::String, start_index, index));
 				start_index = index;
 			}
-			let caps = inline_block_latex_pattern.captures(&loop_string).unwrap();
+			let caps = INLINE_BLOCK_LATEX_PATTERN.captures(&loop_string).unwrap();
 			let cap_0 = caps.get(0).unwrap().as_str();
 			// println!("Cap: {}", cap_0);
 			let length =
@@ -816,93 +774,93 @@ fn parse_into_nodes(content: String) -> Vec<Node> {
 			start_index = index;
 
 		}
-		else if inline_latex_pattern.is_match(&loop_string) {
+		else if INLINE_LATEX_PATTERN.is_match(&loop_string) {
 			if index != start_index {
 				// nodes.push(Node::String(characters[start_index..index].into_iter().collect()));
 				node_parse_vector.push((NodeParseState::String, start_index, index));
 			}
-			let caps = inline_latex_pattern.captures(&loop_string).unwrap();
+			let caps = INLINE_LATEX_PATTERN.captures(&loop_string).unwrap();
 			// nodes.push(Node::InlineLatex(caps.get(1).unwrap().as_str().to_string()));
 			let length = caps.get(0).unwrap().as_str().chars().count();
 			node_parse_vector.push((NodeParseState::InlineLatex, index, index + length));
 			index += length;
 			start_index = index;
-		} else if formatted_markdown_link_pattern.is_match(&loop_string) {
+		} else if FORMATTED_MARKDOWN_LINK_PATTERN.is_match(&loop_string) {
 			if index != start_index {
 				// nodes.push(Node::String(characters[start_index..index].into_iter().collect()));
 				node_parse_vector.push((NodeParseState::String, start_index, index));
 			}
-			let caps = formatted_markdown_link_pattern.captures(&loop_string).unwrap();
+			let caps = FORMATTED_MARKDOWN_LINK_PATTERN.captures(&loop_string).unwrap();
 			// nodes.push(Node::FormattedMarkdownLink(caps.get(1).unwrap().as_str().to_string(), caps.get(2).unwrap().as_str().to_string()));
 			let length = caps.get(0).unwrap().as_str().chars().count();
 			node_parse_vector.push((NodeParseState::FormattedMarkdownLink, index, index + length));
 			index += length;
 			start_index = index;
-		} else if markdown_link_pattern.is_match(&loop_string) {
+		} else if MARKDOWN_LINK_PATTERN.is_match(&loop_string) {
 			if index != start_index {
 				// nodes.push(Node::String(characters[start_index..index].into_iter().collect()));
 				node_parse_vector.push((NodeParseState::String, start_index, index));
 			}
-			let caps = markdown_link_pattern.captures(&loop_string).unwrap();
+			let caps = MARKDOWN_LINK_PATTERN.captures(&loop_string).unwrap();
 			// nodes.push(Node::MarkdownLink(caps.get(1).unwrap().as_str().to_string()));
 			let length = caps.get(0).unwrap().as_str().chars().count();
 			node_parse_vector.push((NodeParseState::MarkdownLink, index, index + length));
 			index += length;
 			start_index = index;
-		} else if formatted_web_link_pattern.is_match(&loop_string) {
+		} else if FORMATTED_WEB_LINK_PATTERN.is_match(&loop_string) {
 			if index != start_index {
 				// nodes.push(Node::String(characters[start_index..index].into_iter().collect()));
 				node_parse_vector.push((NodeParseState::String, start_index, index));
 			}
-			let caps = formatted_web_link_pattern.captures(&loop_string).unwrap();
+			let caps = FORMATTED_WEB_LINK_PATTERN.captures(&loop_string).unwrap();
 			// nodes.push(Node::FormattedWebLink(caps.get(2).unwrap().as_str().to_string(), caps.get(1).unwrap().as_str().to_string()));
 			let length = caps.get(0).unwrap().as_str().chars().count();
 			node_parse_vector.push((NodeParseState::FormattedWebLink, index, index + length));
 			index += length;
 			start_index = index;
 
-		} else if web_link_pattern.is_match(&loop_string) {
+		} else if WEB_LINK_PATTERN.is_match(&loop_string) {
 			if index != start_index {
 				// nodes.push(Node::String(characters[start_index..index].into_iter().collect()));
 				node_parse_vector.push((NodeParseState::String, start_index, index));
 			}
-			let caps = web_link_pattern.captures(&loop_string).unwrap();
+			let caps = WEB_LINK_PATTERN.captures(&loop_string).unwrap();
 			// nodes.push(Node::WebLink(caps.get(1).unwrap().as_str().to_string()));
 			let length = caps.get(0).unwrap().as_str().chars().count();
 			node_parse_vector.push((NodeParseState::WebLink, index, index + length));
 			index += length;
 			start_index = index;
 			// text = String::new();
-		} else if bold_italic_pattern.is_match(&loop_string) {
+		} else if BOLD_ITALIC_PATTERN.is_match(&loop_string) {
 			if index != start_index {
 				// nodes.push(Node::String(characters[start_index..index].into_iter().collect()));
 				node_parse_vector.push((NodeParseState::String, start_index, index));
 			}
-			let caps = bold_italic_pattern.captures(&loop_string).unwrap();
+			let caps = BOLD_ITALIC_PATTERN.captures(&loop_string).unwrap();
 			// nodes.push(Node::BoldItalic(parse_into_nodes(caps.get(1).unwrap().as_str().to_string())));
 			let length = caps.get(0).unwrap().as_str().chars().count();
 			node_parse_vector.push((NodeParseState::BoldItalic, index, index + length));
 			index += length;
 			start_index = index;
 			// text = String::new();
-		} else if bold_pattern.is_match(&loop_string) {
+		} else if BOLD_PATTERN.is_match(&loop_string) {
 			if index != start_index {
 				// nodes.push(Node::String(characters[start_index..index].into_iter().collect()));
 				node_parse_vector.push((NodeParseState::String, start_index, index));
 			}
-			let caps = bold_pattern.captures(&loop_string).unwrap();
+			let caps = BOLD_PATTERN.captures(&loop_string).unwrap();
 			// nodes.push(Node::Bold(parse_into_nodes(caps.get(1).unwrap().as_str().to_string())));
 			let length = caps.get(0).unwrap().as_str().chars().count();
 			node_parse_vector.push((NodeParseState::Bold, index, index + length));
 			index += length;
 			start_index = index;
 			// text = String::new();
-		} else if italic_pattern.is_match(&loop_string) {
+		} else if ITALIC_PATTERN.is_match(&loop_string) {
 			if index != start_index {
 				// nodes.push(Node::String(characters[start_index..index].into_iter().collect()));
 				node_parse_vector.push((NodeParseState::String, start_index, index));
 			}
-			let caps = italic_pattern.captures(&loop_string).unwrap();
+			let caps = ITALIC_PATTERN.captures(&loop_string).unwrap();
 			// nodes.push(Node::Italic(parse_into_nodes(caps.get(1).unwrap().as_str().to_string())));
 			let length = caps.get(0).unwrap().as_str().chars().count();
 			node_parse_vector.push((NodeParseState::Italic, index, index + length));
