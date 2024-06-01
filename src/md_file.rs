@@ -43,8 +43,8 @@ impl MDFile {
 		&self.path
 	}
 
-	pub(crate) fn get_lines(&self) -> Vec<&crate::parse::Node> {
-		self.ast.get_nodes()
+	pub(crate) fn get_lines(&self) -> Vec<&crate::parse::Line> {
+		self.ast.get_lines()
 	}
 }
 

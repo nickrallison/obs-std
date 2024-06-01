@@ -71,9 +71,14 @@ impl AST {
 		self.get_yaml("aliases").unwrap().as_sequence().unwrap().iter().map(|x| x.as_str().unwrap().to_string()).collect()
 	}
 
-	pub(crate) fn get_nodes(&self) -> Vec<&Node> {
-
-		todo!()
+	pub(crate) fn get_lines(&self) -> Vec<&Line> {
+		let mut lines: Vec<&Line> = Vec::new();
+		for block in &self.blocks {
+			for line in block.get_lines() {
+				lines.push(line);
+			}
+		}
+		lines
 	}
 
 }
@@ -112,7 +117,48 @@ enum Block {
 
 
 impl Block {
+	pub(crate) fn get_lines(&self) -> Vec<&Line> {
+		match self {
+			Block::BlockQuote(blocks) => {
+				let mut lines: Vec<&Line> = Vec::new();
+				for block in blocks {
+					for line in block.get_lines() {
+						lines.push(line);
+					}
+				}
+				lines
+			},
+			Block::TextBlock(text_lines) => {
+				let mut lines: Vec<&Line> = Vec::new();
+				for line in text_lines {
+					lines.push(line);
+				}
+				lines
+			},
+			_ => Vec::new(),
+		}
+	}
 
+	pub(crate) fn get_lines_mut(&mut self) -> Vec<&mut Line> {
+
+		match self {
+			Block::BlockQuote(blocks) => {
+				let mut lines_mut: Vec<&mut Line> = Vec::new();
+				for block in blocks {
+					lines_mut.append(&mut block.get_lines_mut());
+				}
+				lines_mut
+			},
+			Block::TextBlock(lines) => {
+				let mut lines_mut: Vec<&mut Line> = Vec::new();
+				for line in lines {
+					lines_mut.push(line);
+				}
+				lines_mut
+			},
+			_ => Vec::new(),
+		}
+	}
 }
 
 
@@ -185,56 +231,44 @@ impl Display for Block {
 #[derive(Debug, Clone, PartialEq)]
 pub(crate) enum Line {
 	Heading(Vec<Node>, u8),
-	BulletPoint(Vec<Node>, String),
-	ListItem(Vec<Node>, u32, String),
+	BulletPoint(Vec<Node>, String), // string is indentation
+	ListItem(Vec<Node>, u32, String), // string is indentation
 	String(Vec<Node>),
 	Linebar,
 }
 
 impl Line {
-	pub(crate) fn clean_line(&self) -> String {
+	pub(crate) fn iterate_strings(&self) -> Vec<&String> {
 		match self {
 			Line::Heading(nodes, _) => {
-				let mut clean_line: String = String::new();
+				let mut strings: Vec<&String> = Vec::new();
 				for node in nodes {
-					match node {
-						Node::String(content) => clean_line = clean_line + content,
-						_ => continue,
-					}
+					strings.append(&mut node.iterate_strings());
 				}
-				clean_line
+				strings
 			},
 			Line::BulletPoint(nodes, _) => {
-				let mut clean_line: String = String::new();
+				let mut strings: Vec<&String> = Vec::new();
 				for node in nodes {
-					match node {
-						Node::String(content) => clean_line = clean_line + content,
-						_ => continue,
-					}
+					strings.append(&mut node.iterate_strings());
 				}
-				clean_line
+				strings
 			},
 			Line::ListItem(nodes, _, _) => {
-				let mut clean_line: String = String::new();
+				let mut strings: Vec<&String> = Vec::new();
 				for node in nodes {
-					match node {
-						Node::String(content) => clean_line = clean_line + content,
-						_ => continue,
-					}
+					strings.append(&mut node.iterate_strings());
 				}
-				clean_line
+				strings
 			},
 			Line::String(nodes) => {
-				let mut clean_line: String = String::new();
+				let mut strings: Vec<&String> = Vec::new();
 				for node in nodes {
-					match node {
-						Node::String(content) => clean_line = clean_line + content,
-						_ => continue,
-					}
+					strings.append(&mut node.iterate_strings());
 				}
-				clean_line
+				strings
 			},
-			Line::Linebar => "---".to_string(),
+			Line::Linebar => Vec::new(),
 		}
 	}
 }
@@ -284,54 +318,6 @@ impl Display for Line {
 	}
 }
 
-impl Verbose for Line {
-	fn verbose(&self) -> String {
-		match self {
-			Line::Heading(nodes, level) => {
-				let mut verbose: String = String::new();
-				verbose = verbose + "Heading:\n";
-				verbose = verbose + &add_indentation("\t", &format!("Level: {}", level));
-				verbose = verbose + "Nodes:\n";
-				for node in nodes {
-					verbose = verbose + &add_indentation("\t", &node.verbose());
-				}
-				verbose
-			},
-			Line::BulletPoint(nodes, indentation) => {
-				let mut verbose: String = String::new();
-				verbose = verbose + "Bullet Point:\n";
-				verbose = verbose + &add_indentation("\t", &format!("Indentation: {}", indentation));
-				verbose = verbose + "Nodes:\n";
-				for node in nodes {
-					verbose = verbose + &add_indentation("\t", &node.verbose());
-				}
-				verbose
-			},
-			Line::ListItem(nodes, number, indentation) => {
-				let mut verbose: String = String::new();
-				verbose = verbose + "List Item:\n";
-				verbose = verbose + &add_indentation("\t", &format!("Number: {}", number));
-				verbose = verbose + &add_indentation("\t", &format!("Indentation: {}", indentation));
-				verbose = verbose + "Nodes:\n";
-				for node in nodes {
-					verbose = verbose + &add_indentation("\t", &node.verbose());
-				}
-				verbose
-			},
-			Line::String(nodes) => {
-				let mut verbose: String = String::new();
-				verbose = verbose + "String:\n";
-				verbose = verbose + "Nodes:\n";
-				for node in nodes {
-					verbose = verbose + &add_indentation("\t", &node.verbose());
-				}
-				verbose
-			},
-			Line::Linebar => "Linebar".to_string(),
-		}
-	}
-}
-
 #[derive(Debug, Clone, PartialEq)]
 pub(crate) enum Node {
 
@@ -351,6 +337,48 @@ pub(crate) enum Node {
 
 	String(String),
 
+}
+
+impl Node {
+	pub(crate) fn iterate_strings(&self) -> Vec<&String> {
+		match self {
+			Node::InlineCode(_) => Vec::new(),
+			Node::InlineBlockLatex(_) => Vec::new(),
+			Node::InlineLatex(_) => Vec::new(),
+			Node::FormattedMarkdownLink(_, _) => Vec::new(),
+			Node::MarkdownLink(_) => Vec::new(),
+			Node::FormattedWebLink(_, _) => Vec::new(),
+			Node::WebLink(_) => Vec::new(),
+			Node::BoldItalic(nodes) => {
+				let mut strings: Vec<&String> = Vec::new();
+				for node in nodes {
+					let mut other_strings = node.iterate_strings();
+					strings.append(&mut other_strings);
+				}
+				strings
+			},
+			Node::Bold(nodes) => {
+				let mut strings: Vec<&String> = Vec::new();
+				for node in nodes {
+					let mut other_strings = node.iterate_strings();
+					strings.append(&mut other_strings);
+				}
+				strings
+			},
+			Node::Italic(nodes) => {
+				let mut strings: Vec<&String> = Vec::new();
+				for node in nodes {
+					let mut other_strings = node.iterate_strings();
+					strings.append(&mut other_strings);
+				}
+				strings
+			},
+
+			Node::String(string) => {
+				vec![string]
+			},
+		}
+	}
 }
 
 impl Display for Node {
