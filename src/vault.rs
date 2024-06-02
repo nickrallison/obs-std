@@ -1,5 +1,6 @@
+use crate::parse::Node;
 use std::collections::HashMap;
-use std::path::PathBuf;
+use std::path::{Path, PathBuf};
 use rand::Rng;
 use walkdir::WalkDir;
 use crate::md_file::MDFile;
@@ -26,8 +27,9 @@ impl Vault {
 		}).collect();
 
 		println!("Starting to parse files");
-		let data: HashMap<PathBuf, MDFile> = entries.into_par_iter().map(|path| {
-			let md_file = MDFile::new(path.to_path_buf());
+		// let data: HashMap<PathBuf, MDFile> = entries.into_par_iter().map(|path| {
+		let data: HashMap<PathBuf, MDFile> = entries.into_iter().map(|path| {
+			let md_file = MDFile::from(path.to_path_buf()).expect(format!("Should be able to create MDFile: {}", path.display()).as_str());
 			(path, md_file)
 		}).collect();
 		println!("Done parsing files");
@@ -51,6 +53,7 @@ impl Vault {
 	pub fn get_links(&self) -> Vec<(&String, &PathBuf)> {
 		let mut links: Vec<(&String, &PathBuf)> = Vec::new();
 		for md_file in self.data.values() {
+
 			links.push((md_file.get_title(), md_file.get_path()));
 			for alias in md_file.get_aliases() {
 				links.push((alias, md_file.get_path()));
@@ -58,17 +61,6 @@ impl Vault {
 		}
 		links
 	}
-
-	// pub(crate) fn search_for_alias(&self, alias: &str) -> Option<&Vec<PathBuf>> {
-	// 	let keys: Vec<String> = alias.split_whitespace().map(|s| s.to_lowercase().to_string()).collect().iter().collect();
-	// 	let keys: Vec<&String> = keys.iter().collect();
-	// 	let mut result = self.alias_tree.get_best(keys);
-	// 	if result.is_none() {
-	// 		return None;
-	// 	}
-	// 	let (path, _) = result.unwrap();
-	// 	Some(path)
-	// }
 
 	pub(crate) fn get_outgoing_links(&self, mdfile: &MDFile) -> Vec<(PathBuf, String)> {
 		let mut outgoing_links: Vec<(PathBuf, String)> = Vec::new();
@@ -104,12 +96,19 @@ impl Vault {
 				}
 				else {
 					let (paths, fragment) = result.unwrap();
+					if paths.len() > 1 {
+						for path in paths {
+							println!("Fragment Path: {:?}", path);
+						}
+						panic!("Fragment with multiple paths: {:?}, ", fragment);
+					}
 					for path in paths {
 						let fragment_len = fragment.len();
 						let original_fragment: Vec<String> = original_whitespace_strings[index..index+fragment_len].to_vec().iter().map(|s| s.to_string()).collect();
 						let original_fragment: String = original_fragment.join(" ");
-						println!("fragment: {:?}", original_fragment);
-						outgoing_links.push((path.clone(), original_fragment));
+						// println!("fragment: {:?}", original_fragment);
+						let stripped_path = path.strip_prefix(&self.path).unwrap();
+						outgoing_links.push((PathBuf::from(stripped_path), original_fragment));
 					}
 					index += fragment.len();
 				}
@@ -119,8 +118,96 @@ impl Vault {
 		return outgoing_links;
 	}
 
-	pub(crate) fn get_md_file(&self, path: &PathBuf) -> Option<&MDFile> {
+	pub(crate) fn link_file_from_path(&mut self, path: &Path) {
+		let outgoing_links: Vec<(PathBuf, String)> = self.get_outgoing_links(self.get_md_file(path).unwrap());
+		let mut md_file  = self.get_md_file_mut(path).unwrap();
+		for (outgoing_path, fragment) in outgoing_links {
+			// let outgoing_md_file = self.get_md_file(&outgoing_path).unwrap();
+			// md_file.add_outgoing_link(outgoing_md_file.get_path(), fragment);
+			let mut lines: Vec<&mut Line> = md_file.get_lines_mut();
+
+			for line in &mut lines {
+				let mut nodes: Option<&mut Vec<Node>> = line.get_nodes_mut();
+				match nodes {
+					Some(nodes) => {
+						*nodes = add_link_to_nodes(nodes.clone(), &fragment, &outgoing_path);
+					}
+					None => {}
+				}
+			}
+		}
+
+	}
+
+	pub(crate) fn link_file_with_links(md_file: &mut MDFile, outgoing_links: Vec<(PathBuf, String)>) {
+		for (outgoing_path, fragment) in outgoing_links {
+			// let outgoing_md_file = self.get_md_file(&outgoing_path).unwrap();
+			// md_file.add_outgoing_link(outgoing_md_file.get_path(), fragment);
+			let mut lines: Vec<&mut Line> = md_file.get_lines_mut();
+
+			for line in &mut lines {
+				let mut nodes: Option<&mut Vec<Node>> = line.get_nodes_mut();
+				match nodes {
+					Some(nodes) => {
+						*nodes = add_link_to_nodes(nodes.clone(), &fragment, &outgoing_path);
+					}
+					None => {}
+				}
+			}
+		}
+
+	}
+
+	pub(crate) fn link_file(&mut self, md_file: &mut MDFile) {
+		let outgoing_links: Vec<(PathBuf, String)> = self.get_outgoing_links(md_file);
+		for (outgoing_path, fragment) in outgoing_links {
+			// let outgoing_md_file = self.get_md_file(&outgoing_path).unwrap();
+			// md_file.add_outgoing_link(outgoing_md_file.get_path(), fragment);
+			let mut lines: Vec<&mut Line> = md_file.get_lines_mut();
+
+			for line in &mut lines {
+				let mut nodes: Option<&mut Vec<Node>> = line.get_nodes_mut();
+				match nodes {
+					Some(nodes) => {
+						*nodes = add_link_to_nodes(nodes.clone(), &fragment, &outgoing_path);
+					}
+					None => {}
+				}
+			}
+		}
+
+	}
+
+	pub(crate) fn link_all_files(&mut self) {
+		let outgoing_links: HashMap<PathBuf, Vec<(PathBuf, String)>> = self.data.iter().map(|(path, md_file)| {
+			let outgoing_links = self.get_outgoing_links(md_file);
+			(path.clone(), outgoing_links)
+		}).collect();
+
+		for (path, md_file) in self.data.iter_mut() {
+			println!("Linking file: {:?}", path);
+			let outgoing_links = outgoing_links.get(path).unwrap();
+			for (outgoing_path, fragment) in outgoing_links {
+				let mut lines: Vec<&mut Line> = md_file.get_lines_mut();
+				for line in &mut lines {
+					let mut nodes: Option<&mut Vec<Node>> = line.get_nodes_mut();
+					match nodes {
+						Some(nodes) => {
+							*nodes = add_link_to_nodes(nodes.clone(), &fragment, &outgoing_path);
+						}
+						None => {}
+					}
+				}
+			}
+		}
+	}
+
+	pub(crate) fn get_md_file(&self, path: &Path) -> Option<&MDFile> {
 		self.data.get(path)
+	}
+
+	pub(crate) fn get_md_file_mut(&mut self, path: &Path) -> Option<&mut MDFile> {
+		self.data.get_mut(path)
 	}
 
 	pub(crate) fn random_md_file(&self) -> &MDFile {
@@ -227,4 +314,73 @@ impl<T: std::fmt::Debug> StringTree<T> {
 			return None;
 		}
 	}
+}
+
+
+fn add_link_to_nodes(nodes: Vec<Node>, text: &str, dest: &PathBuf) -> Vec<Node> {
+	let mut nodes = nodes;
+	let mut index = 0;
+	let mut links: Vec<(usize, Vec<Node>)> = Vec::new();
+	for node in nodes.iter_mut() {
+		match node {
+			Node::BoldItalic(inner_nodes) => {
+				*inner_nodes = crate::vault::add_link_to_nodes(inner_nodes.clone(), text, dest);
+			}
+			Node::Bold(inner_nodes) => {
+				*inner_nodes = crate::vault::add_link_to_nodes(inner_nodes.clone(), text, dest);
+			}
+			Node::Italic(inner_nodes) => {
+				*inner_nodes = crate::vault::add_link_to_nodes(inner_nodes.clone(), text, dest);
+			}
+			Node::String(string) => {
+				if string.contains(text) {
+					let mut string_clone: String = string.to_string();
+					let dest_str: String = dest.to_str().unwrap().to_string();
+					let mut split = string_clone.split(text);
+					let mut nodes_after: Vec<Node> = Vec::new();
+
+					for split_text in split {
+						if split_text.is_empty() {
+							nodes_after.push(Node::FormattedMarkdownLink(dest_str.clone(), text.to_string()));
+						} else {
+							nodes_after.push(Node::String(split_text.to_string()));
+							nodes_after.push(Node::FormattedMarkdownLink(dest_str.clone(), text.to_string()));
+						}
+					}
+					nodes_after.pop();
+					links.push((index, nodes_after));
+				} else {
+					// do nothing
+				}
+			}
+			_ => {}
+		}
+		index += 1;
+	}
+
+	let mut insertions: usize = 0;
+	for (index, nodes_vec) in links {
+		let len = nodes_vec.len();
+		nodes.remove(index + insertions);
+		nodes.splice(index + insertions..index + insertions, nodes_vec);
+		insertions += len - 1;
+	}
+
+	let mut index: usize = 0;
+	while index < nodes.len() {
+		match &nodes[index] {
+			Node::String(string) => {
+				if string.is_empty() {
+					nodes.remove(index);
+				}
+				else {
+					index += 1;
+				}
+			}
+			_ => {
+				index += 1;
+			}
+		}
+	}
+	nodes
 }

@@ -81,6 +81,15 @@ impl AST {
 		lines
 	}
 
+	pub(crate) fn get_lines_mut(&mut self) -> Vec<&mut Line> {
+		let mut lines: Vec<&mut Line> = Vec::new();
+		for block in &mut self.blocks {
+			for line in block.get_lines_mut() {
+				lines.push(line);
+			}
+		}
+		lines
+	}
 }
 
 impl Display for AST {
@@ -138,6 +147,7 @@ impl Block {
 			_ => Vec::new(),
 		}
 	}
+
 
 	pub(crate) fn get_lines_mut(&mut self) -> Vec<&mut Line> {
 
@@ -271,6 +281,59 @@ impl Line {
 			Line::Linebar => Vec::new(),
 		}
 	}
+
+	pub(crate) fn iterate_nodes(&self) -> Vec<&Node> {
+		match self {
+			Line::Heading(nodes, _) => {
+				let mut nodes_vec: Vec<&Node> = Vec::new();
+				for node in nodes {
+					nodes_vec.push(node);
+				}
+				nodes_vec
+			},
+			Line::BulletPoint(nodes, _) => {
+				let mut nodes_vec: Vec<&Node> = Vec::new();
+				for node in nodes {
+					nodes_vec.push(node);
+				}
+				nodes_vec
+			},
+			Line::ListItem(nodes, _, _) => {
+				let mut nodes_vec: Vec<&Node> = Vec::new();
+				for node in nodes {
+					nodes_vec.push(node);
+				}
+				nodes_vec
+			},
+			Line::String(nodes) => {
+				let mut nodes_vec: Vec<&Node> = Vec::new();
+				for node in nodes {
+					nodes_vec.push(node);
+				}
+				nodes_vec
+			},
+			Line::Linebar => Vec::new(),
+		}
+	}
+
+	pub(crate) fn get_nodes_mut(&mut self) -> Option<&mut Vec<Node>> {
+		match self {
+			Line::Heading(nodes, _) => {
+				Some(nodes)
+			},
+			Line::BulletPoint(nodes, _) => {
+				Some(nodes)
+			},
+			Line::ListItem(nodes, _, _) => {
+				Some(nodes)
+			},
+			Line::String(nodes) => {
+				Some(nodes)
+			},
+			Line::Linebar => None,
+		}
+	}
+
 }
 
 impl Display for Line {
@@ -632,9 +695,9 @@ fn parse_into_blocks(lines: Vec<String>) -> Vec<Block> {
 
 			}
 			break;
-		} else {
-			index += 1;
 		}
+		index += 1;
+
 	}
 
 	match state {
@@ -757,7 +820,8 @@ enum NodeParseState {
 fn parse_into_nodes(content: String) -> Vec<Node> {
 
 	let _nodes: Vec<Node> = Vec::new();
-	// let mut text: String = String::new();
+	let mut content = content.strip_suffix("\n").unwrap_or(&content).to_string();
+	let mut content = content.strip_suffix("\r").unwrap_or(&content).to_string();
 	let mut start_index: usize = 0;
 	let mut index: usize = 0;
 	let mut node_parse_vector: Vec<(NodeParseState, usize, usize)> = Vec::new();

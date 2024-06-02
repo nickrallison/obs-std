@@ -1,11 +1,11 @@
 use std::fmt::Display;
+use std::io::Error;
 use std::path::PathBuf;
 use crate::parse::AST;
 
 #[allow(dead_code)]
 #[derive(Debug, Clone, PartialEq)]
 pub struct MDFile {
-
 	path: PathBuf,
 	title: String,
 	aliases: Vec<String>,
@@ -15,21 +15,28 @@ pub struct MDFile {
 
 #[allow(dead_code)]
 impl MDFile {
-	pub(crate) fn new(path: PathBuf) -> MDFile {
-		// println!("Path: {:?}", path);
+	pub(crate) fn from(path: PathBuf) -> Result<MDFile, String> {
 		let title: String = path.file_stem().unwrap().to_str().unwrap().to_string();
-		let file_contents: String = std::fs::read_to_string(&path).unwrap();
+		let file_contents_result = std::fs::read_to_string(&path);
+		let file_contents = match file_contents_result {
+			Ok(contents) => contents,
+			Err(_) => return Err(format!("Error reading file: {}", path.display())),
+		};
 		let ast: AST = AST::new(file_contents);
 		let aliases: Vec<String> = ast.get_aliases();
-		let last_modified = std::fs::metadata(&path).expect(&format!("Can't access file or doesn't exit: {}", &path.display())).modified().unwrap();
+		let last_modified_result = std::fs::metadata(&path).expect(&format!("Can't access file or doesn't exit: {}", &path.display())).modified();
+		let last_modified = match last_modified_result {
+			Ok(time) => time,
+			Err(_) => return Err(format!("Error getting last modified time from file: {}", path.display())),
+		};
 
-		MDFile {
+		Ok(MDFile {
 			path,
 			title,
 			aliases,
 			ast,
 			last_modified,
-		}
+		})
 	}
 	pub(crate) fn get_title(&self) -> &String {
 		&self.title
@@ -45,6 +52,10 @@ impl MDFile {
 
 	pub(crate) fn get_lines(&self) -> Vec<&crate::parse::Line> {
 		self.ast.get_lines()
+	}
+
+	pub(crate) fn get_lines_mut(&mut self) -> Vec<&mut crate::parse::Line> {
+		self.ast.get_lines_mut()
 	}
 }
 
