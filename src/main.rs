@@ -19,6 +19,7 @@ fn main() {
 	};
 
 	let mut vault = Vault::new(path, ignore, linker_options);
+	vault.unlink_all_files();
 	vault.link_all_files();
 	let output = PathBuf::from("out");
 	vault.export(&output);

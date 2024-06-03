@@ -572,6 +572,14 @@ impl Vault {
 		}
 	}
 
+	pub fn unlink_all_files(&mut self) {
+		let _ = self.data.iter_mut().map(|(_, md_file)| {
+			md_file.unlink();
+		}).collect::<Vec<()>>();
+	}
+
+
+
 	pub fn export(&self, vault_path: &Path) {
 		let mut vault_path = vault_path.to_path_buf();
 		std::fs::create_dir_all(vault_path.clone()).unwrap();
