@@ -4,8 +4,10 @@ use std::path::{Path, PathBuf};
 use rand::Rng;
 use walkdir::WalkDir;
 use crate::md_file::MDFile;
-use rayon::prelude::*;
 use crate::parse::Line;
+
+#[cfg(feature = "parallel")]
+use rayon::prelude::*;
 
 pub struct Vault {
 	path: PathBuf,
@@ -14,6 +16,7 @@ pub struct Vault {
 }
 
 impl Vault {
+	#[cfg(not(feature = "parallel"))]
 	pub fn new(path: PathBuf) -> Self {
 
 		let entries: Vec<PathBuf> = WalkDir::new(&path).into_iter().filter_map(|entry| {
@@ -38,30 +41,120 @@ impl Vault {
 		let mut alias_tree: StringTree<PathBuf> = StringTree::new();
 		for md_file in data.values() {
 			let mut aliases = md_file.get_aliases();
-			aliases.push(md_file.get_title());
+			match md_file.get_title() {
+				Some(title) => {
+					aliases.push(title);
+				}
+				None => {}
+			}
 			for alias in aliases {
 				let alias = alias.to_lowercase();
 				let path = md_file.get_path().clone();
 				let keys: Vec<String> = alias.split_whitespace().map(|s| s.to_string()).collect();
-				alias_tree.insert(keys, path.clone());
+				match path {
+					Some(path) => {
+						alias_tree.insert(keys, path.clone());
+					}
+					None => {
+						panic!("Path is None for alias: {}", alias);
+					}
+				}
 			}
 		}
 		println!("Done building alias tree");
 		Self { path, data, alias_tree }
 	}
 
-	pub fn get_links(&self) -> Vec<(&String, &PathBuf)> {
-		let mut links: Vec<(&String, &PathBuf)> = Vec::new();
-		for md_file in self.data.values() {
+	#[cfg(feature = "parallel")]
+	pub fn new(path: PathBuf) -> Self {
 
-			links.push((md_file.get_title(), md_file.get_path()));
-			for alias in md_file.get_aliases() {
-				links.push((alias, md_file.get_path()));
+		let entries: Vec<PathBuf> = WalkDir::new(&path).into_iter().filter_map(|entry| {
+			let entry = entry.unwrap();
+			let path = entry.path().to_path_buf();
+			// println!("Path: {:?}", path);
+			if path.is_dir() {
+				return None;
+			}
+			Some(path)
+		}).collect();
+
+		println!("Starting to parse files");
+		// let data: HashMap<PathBuf, MDFile> = entries.into_par_iter().map(|path| {
+		let data: HashMap<PathBuf, MDFile> = entries.into_par_iter().map(|path| {
+			let md_file = MDFile::from(path.to_path_buf()).expect(format!("Should be able to create MDFile: {}", path.display()).as_str());
+			(path, md_file)
+		}).collect();
+		println!("Done parsing files");
+
+		println!("Building alias tree");
+		let mut alias_tree: StringTree<PathBuf> = StringTree::new();
+		for md_file in data.values() {
+			let mut aliases = md_file.get_aliases();
+			match md_file.get_title() {
+				Some(title) => {
+					aliases.push(title);
+				}
+				None => {}
+			}
+			for alias in aliases {
+				let alias = alias.to_lowercase();
+				let path = md_file.get_path().clone();
+				let keys: Vec<String> = alias.split_whitespace().map(|s| s.to_string()).collect();
+				match path {
+					Some(path) => {
+						alias_tree.insert(keys, path.clone());
+					}
+					None => {
+						panic!("Path is None for alias: {}", alias);
+					}
+				}
 			}
 		}
+		println!("Done building alias tree");
+		Self { path, data, alias_tree }
+	}
+
+	#[cfg(not(feature = "parallel"))]
+	pub fn get_links(&self) -> Vec<(&String, &PathBuf)> {
+		let links: Vec<(&String, &PathBuf)> = self.data.iter().map(|(path, md_file)| {
+			let title = md_file.get_title();
+			let mut links = match title {
+				Some(title) => {
+					vec![(title, path)]
+				}
+				None => {
+					vec![]
+				}
+			};
+			for alias in md_file.get_aliases() {
+				links.push((alias, path));
+			}
+			links
+		}).flatten().collect();
 		links
 	}
 
+	#[cfg(feature = "parallel")]
+	pub fn get_links(&self) -> Vec<(&String, &PathBuf)> {
+		let links: Vec<(&String, &PathBuf)> = self.data.par_iter().map(|(path, md_file)| {
+			let title = md_file.get_title();
+			let mut links = match title {
+				Some(title) => {
+					vec![(title, path)]
+				}
+				None => {
+					vec![]
+				}
+			};
+			for alias in md_file.get_aliases() {
+				links.push((alias, path));
+			}
+			links
+		}).flatten().collect();
+		links
+	}
+
+	#[cfg(not(feature = "parallel"))]
 	pub(crate) fn get_outgoing_links(&self, mdfile: &MDFile) -> Vec<(PathBuf, String)> {
 		let mut outgoing_links: Vec<(PathBuf, String)> = Vec::new();
 		let lines: Vec<&Line> = mdfile.get_lines();
@@ -118,6 +211,86 @@ impl Vault {
 		return outgoing_links;
 	}
 
+	#[cfg(feature = "parallel")]
+	pub(crate) fn get_outgoing_links(&self, mdfile: &MDFile) -> Vec<(PathBuf, String)> {
+		let mut outgoing_links: Vec<(PathBuf, String)> = Vec::new();
+		let lines: Vec<&Line> = mdfile.get_lines();
+		for line in lines {
+			let original_strings: Vec<&String> = line.iterate_strings();
+			let mut original_whitespace_strings: Vec<&str> = Vec::new();
+			for string in &original_strings {
+				let whitespace_strings: Vec<&str> = string.split_whitespace().collect();
+				for whitespace_string in &whitespace_strings {
+					let stripped = match whitespace_string.strip_suffix(",") {
+						Some(s) => s,
+						None => whitespace_string
+					};
+					original_whitespace_strings.push(stripped);
+				}
+				// original_whitespace_strings.extend(whitespace_strings);
+			}
+
+			let lowercase_strings: Vec<String> = original_whitespace_strings.iter().map(|s| s.to_lowercase()).collect();
+
+
+			let mut len = original_whitespace_strings.len();
+			let mut index = 0;
+			while index < len {
+				// println!("Index: {}", index);
+				let keys: &[String] = &lowercase_strings[index..];
+				let keys: Vec<&String> = keys.iter().collect();
+
+				let result = self.alias_tree.get_best(keys);
+				if result.is_none() {
+					index += 1;
+				}
+				else {
+					let (paths, fragment) = result.unwrap();
+					if paths.len() > 1 {
+						for path in paths {
+							println!("Fragment Path: {:?}", path);
+						}
+						panic!("Fragment with multiple paths: {:?}, ", fragment);
+					}
+					for path in paths {
+						let fragment_len = fragment.len();
+						let original_fragment: Vec<String> = original_whitespace_strings[index..index+fragment_len].to_vec().par_iter().map(|s| s.to_string()).collect();
+						let original_fragment: String = original_fragment.join(" ");
+						// println!("fragment: {:?}", original_fragment);
+						let stripped_path = path.strip_prefix(&self.path).unwrap();
+						outgoing_links.push((PathBuf::from(stripped_path), original_fragment));
+					}
+					index += fragment.len();
+				}
+			}
+		}
+
+		return outgoing_links;
+	}
+
+	#[cfg(not(feature = "parallel"))]
+	pub(crate) fn link_file_from_path(&mut self, path: &Path) {
+		let outgoing_links: Vec<(PathBuf, String)> = self.get_outgoing_links(self.get_md_file(path).unwrap());
+		let mut md_file  = self.get_md_file_mut(path).unwrap();
+		for (outgoing_path, fragment) in outgoing_links {
+			// let outgoing_md_file = self.get_md_file(&outgoing_path).unwrap();
+			// md_file.add_outgoing_link(outgoing_md_file.get_path(), fragment);
+			let mut lines: Vec<&mut Line> = md_file.get_lines_mut();
+
+			for line in &mut lines {
+				let mut nodes: Option<&mut Vec<Node>> = line.get_nodes_mut();
+				match nodes {
+					Some(nodes) => {
+						*nodes = add_link_to_nodes(nodes.clone(), &fragment, &outgoing_path);
+					}
+					None => {}
+				}
+			}
+		}
+
+	}
+
+	#[cfg(feature = "parallel")]
 	pub(crate) fn link_file_from_path(&mut self, path: &Path) {
 		let outgoing_links: Vec<(PathBuf, String)> = self.get_outgoing_links(self.get_md_file(path).unwrap());
 		let mut md_file  = self.get_md_file_mut(path).unwrap();
@@ -178,13 +351,14 @@ impl Vault {
 
 	}
 
-	pub(crate) fn link_all_files(&mut self) {
+	#[cfg(not(feature = "parallel"))]
+	pub fn link_all_files(&mut self) {
 		let outgoing_links: HashMap<PathBuf, Vec<(PathBuf, String)>> = self.data.iter().map(|(path, md_file)| {
 			let outgoing_links = self.get_outgoing_links(md_file);
 			(path.clone(), outgoing_links)
 		}).collect();
 
-		for (path, md_file) in self.data.iter_mut() {
+		let _ = self.data.iter_mut().map(|(path, md_file)| {
 			println!("Linking file: {:?}", path);
 			let outgoing_links = outgoing_links.get(path).unwrap();
 			for (outgoing_path, fragment) in outgoing_links {
@@ -199,27 +373,49 @@ impl Vault {
 					}
 				}
 			}
-		}
+		}).collect::<Vec<()>>();
 	}
 
-	pub(crate) fn get_md_file(&self, path: &Path) -> Option<&MDFile> {
+	#[cfg(feature = "parallel")]
+	pub fn link_all_files(&mut self) {
+		let outgoing_links: HashMap<PathBuf, Vec<(PathBuf, String)>> = self.data.par_iter().map(|(path, md_file)| {
+			let outgoing_links = self.get_outgoing_links(md_file);
+			(path.clone(), outgoing_links)
+		}).collect();
+
+		let _ = self.data.par_iter_mut().map(|(path, md_file)| {
+			println!("Linking file: {:?}", path);
+			let outgoing_links = outgoing_links.get(path).unwrap();
+			for (outgoing_path, fragment) in outgoing_links {
+				let mut lines: Vec<&mut Line> = md_file.get_lines_mut();
+				for line in &mut lines {
+					let mut nodes: Option<&mut Vec<Node>> = line.get_nodes_mut();
+					match nodes {
+						Some(nodes) => {
+							*nodes = add_link_to_nodes(nodes.clone(), &fragment, &outgoing_path);
+						}
+						None => {}
+					}
+				}
+			}
+		}).collect::<Vec<()>>();
+	}
+
+	pub fn get_md_file(&self, path: &Path) -> Option<&MDFile> {
 		self.data.get(path)
 	}
 
-	pub(crate) fn get_md_file_mut(&mut self, path: &Path) -> Option<&mut MDFile> {
+	pub fn get_md_file_mut(&mut self, path: &Path) -> Option<&mut MDFile> {
 		self.data.get_mut(path)
 	}
 
-	pub(crate) fn random_md_file(&self) -> &MDFile {
+	pub fn random_md_file(&self) -> &MDFile {
 		let mut rng = rand::thread_rng();
 		let index = rng.gen_range(0..self.data.len());
 		let md_file = self.data.values().nth(index).unwrap();
 		md_file
 	}
 
-	// pub(crate) fn get_best(&self, keys: Vec<&str>) {
-	// 	self.alias_tree.get_best(keys)
-	// }
 }
 
 pub(crate) struct StringTree<T> {

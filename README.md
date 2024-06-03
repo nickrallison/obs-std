@@ -29,6 +29,10 @@ Features
  - Link with condition
  - Derive common traits on public types
 
+Color Eyre
+
+RSTest
+
 ## Notes
 
 Public Structs

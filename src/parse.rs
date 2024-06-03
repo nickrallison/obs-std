@@ -2,7 +2,6 @@ use std::cmp::PartialEq;
 use std::fmt::Display;
 use lazy_static::lazy_static;
 use regex::Regex;
-use crate::traits::Verbose;
 
 lazy_static! {
 	static ref INLINE_LATEX_REGEX: Regex = Regex::new(r"(?m)^\$\$.*?\$\$").unwrap();
@@ -477,48 +476,6 @@ impl Display for Node {
 				write!(f, "*")
 			}
 			Node::String(content) => write!(f, "{}", content),
-		}
-	}
-}
-
-impl Verbose for Node {
-	fn verbose(&self) -> String {
-		match self {
-			Node::InlineCode(content) => format!("Inline Code: {}", content),
-			Node::InlineBlockLatex(content) => format!("Inline Latex Block: {}", content),
-			Node::InlineLatex(content) => format!("Inline Latex: {}", content),
-			Node::MarkdownLink(content) => format!("Markdown Link: {}", content),
-			Node::FormattedMarkdownLink(link, text) => format!("Formatted Markdown Link: {} -> {}", text, link),
-			Node::WebLink(content) => format!("Web Link: {}", content),
-			Node::FormattedWebLink(link, text) => format!("Formatted Web Link: Link: {} -> {}", text, link),
-			Node::BoldItalic(content) => {
-				let mut verbose: String = String::new();
-				verbose = verbose + "Bold Italic:\n";
-				verbose = verbose + &add_indentation("\t", "Content:\n");
-				for node in content {
-					verbose = verbose + &add_indentation("\t", &node.verbose());
-				}
-				verbose
-			},
-			Node::Bold(content) => {
-				let mut verbose: String = String::new();
-				verbose = verbose + "Bold:\n";
-				verbose = verbose + &add_indentation("\t", "Content:\n");
-				for node in content {
-					verbose = verbose + &add_indentation("\t", &node.verbose());
-				}
-				verbose
-			},
-			Node::Italic(content) => {
-				let mut verbose: String = String::new();
-				verbose = verbose + "Italic:\n";
-				verbose = verbose + &add_indentation("\t", "Content:\n");
-				for node in content {
-					verbose = verbose + &add_indentation("\t", &node.verbose());
-				}
-				verbose
-			}
-			Node::String(content) => format!("String: {}", content),
 		}
 	}
 }

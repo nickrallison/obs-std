@@ -1,6 +1,5 @@
 mod parse;
 mod md_file;
-mod traits;
 mod vault;
 
 #[cfg(test)]
