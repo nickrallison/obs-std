@@ -1,151 +1,247 @@
 mod parse;
 mod md_file;
 mod vault;
+mod linking;
+mod options;
 
 #[cfg(test)]
 mod tests {
     use std::fs;
-    use super::*;
+    use std::path::PathBuf;
+    use crate::md_file::MDFile;
 
+
+
+    // Stability Tests
     #[test]
-    fn stability_test() {
-        let filelist = fs::read_dir("vault").unwrap();
-
-        for file in filelist {
-
-            let file_path = file.unwrap().path();
-            println!("Testing file: {:?}", file_path.clone());
-            let file_contents = fs::read_to_string(&file_path).unwrap();
-            let md_file = md_file::MDFile::from(file_path.clone());
-            let result = md_file.to_string();
-            let expected = file_contents;
-            assert_eq!(result, expected, "Failed on file: {:?}", file_path);
-        }
-        println!("All stability tests passed!")
+    fn stability_tests_reference_clean_file1() {
+        let ignore: Vec<PathBuf> = vec![];
+        let linker_options = crate::options::LinkerOptions {
+            link_share_tag: false,
+            link_self: false
+        };
+        let file_path: PathBuf = PathBuf::from("test_vaults/reference_clean/file1.md");
+        assert!(file_path.is_file());
+        let file_contents = fs::read_to_string(file_path.clone()).unwrap();
+        let md_file = MDFile::from(file_path.clone()).expect(&format!("Failed to create MDFile from {}", file_path.display()));
+        let result = md_file.to_string();
+        let expected = file_contents;
+        assert_eq!(result, expected, "Failed on file: {}", file_path.display());
     }
 
-    // #[test]
-    // fn stability_test_2() {
-    //     let file_path: PathBuf = PathBuf::from("vault/A-Star Search.md");
-    //     let file_contents = fs::read_to_string(&file_path).unwrap();
-    //     let md_file = md_file::MDFile::new(file_path);
-    //     let result = md_file.to_string();
-    //     let expected = file_contents;
-    //     assert_eq!(result, expected);
-    // }
+    #[test]
+    fn stability_tests_reference_clean_file2() {
+        let ignore: Vec<PathBuf> = vec![];
+        let linker_options = crate::options::LinkerOptions {
+            link_share_tag: false,
+            link_self: false
+        };
+        let file_path: PathBuf = PathBuf::from("test_vaults/reference_clean/file2.md");
+        assert!(file_path.is_file());
+        let file_contents = fs::read_to_string(file_path.clone()).unwrap();
+        let md_file = MDFile::from(file_path.clone()).expect(&format!("Failed to create MDFile from {}", file_path.display()));
+        let result = md_file.to_string();
+        let expected = file_contents;
+        assert_eq!(result, expected, "Failed on file: {}", file_path.display());
+    }
 
-    // #[test]
-    // fn stability_test_3() {
-    //     let file_path: PathBuf = PathBuf::from("vault/AC Circuits.md");
-    //     let file_contents = fs::read_to_string(&file_path).unwrap();
-    //     let md_file = md_file::MDFile::new(file_path);
-    //     let result = md_file.to_string();
-    //     let expected = file_contents;
-    //     assert_eq!(result, expected);
-    // }
-    //
-    // #[test]
-    // fn stability_test_4() {
-    //     let file_path: PathBuf = PathBuf::from("vault/Access Clipboard History.md");
-    //     let file_contents = fs::read_to_string(&file_path).unwrap();
-    //     let md_file = md_file::MDFile::new(file_path);
-    //     let result = md_file.to_string();
-    //     let expected = file_contents;
-    //     assert_eq!(result, expected);
-    // }
-    //
-    // #[test]
-    // fn stability_test_5() {
-    //     let file_path: PathBuf = PathBuf::from("vault/Address Resolution Protocol.md");
-    //     let file_contents = fs::read_to_string(&file_path).unwrap();
-    //     let md_file = md_file::MDFile::new(file_path);
-    //     let result = md_file.to_string();
-    //     let expected = file_contents;
-    //     assert_eq!(result, expected);
-    // }
-    // #[test]
-    // fn stability_test_6() {
-    //     let file_path: PathBuf = PathBuf::from("vault/Adjacency Matrix.md");
-    //     let file_contents = fs::read_to_string(&file_path).unwrap();
-    //     let md_file = md_file::MDFile::new(file_path);
-    //     let result = md_file.to_string();
-    //     let expected = file_contents;
-    //     assert_eq!(result, expected);
-    // }
-    // #[test]
-    // fn stability_test_7() {
-    //     let file_path: PathBuf = PathBuf::from("vault/Akra-Bazzi Theorem.md");
-    //     let file_contents = fs::read_to_string(&file_path).unwrap();
-    //     let md_file = md_file::MDFile::new(file_path);
-    //     let result = md_file.to_string();
-    //     let expected = file_contents;
-    //     assert_eq!(result, expected);
-    // }
-    //
-    // #[test]
-    // fn stability_test_8() {
-    //     let file_path: PathBuf = PathBuf::from("vault/Alan Turing.md");
-    //     let file_contents = fs::read_to_string(&file_path).unwrap();
-    //     println!("{:?}", file_contents);
-    //     let md_file = md_file::MDFile::new(file_path);
-    //     let result = md_file.to_string();
-    //     let expected = file_contents;
-    //     assert_eq!(result, expected);
-    // }
-    // #[test]
-    // fn stability_test_9() {
-    //     let file_path: PathBuf = PathBuf::from("vault/Algorithm Specifications.md");
-    //     let file_contents = fs::read_to_string(&file_path).unwrap();
-    //     let md_file = md_file::MDFile::new(file_path);
-    //     let result = md_file.to_string();
-    //     let expected = file_contents;
-    //     assert_eq!(result, expected);
-    // }
-    // #[test]
-    // fn stability_test_10() {
-    //     let file_path: PathBuf = PathBuf::from("vault/Aliasing.md");
-    //     let file_contents = fs::read_to_string(&file_path).unwrap();
-    //     let md_file = md_file::MDFile::new(file_path);
-    //     let result = md_file.to_string();
-    //     let expected = file_contents;
-    //     assert_eq!(result, expected);
-    // }
-    // #[test]
-    // fn stability_test_11() {
-    //     let file_path: PathBuf = PathBuf::from("vault/Application Binary Interface.md");
-    //     let file_contents = fs::read_to_string(&file_path).unwrap();
-    //     let md_file = md_file::MDFile::new(file_path);
-    //     let result = md_file.to_string();
-    //     let expected = file_contents;
-    //     assert_eq!(result, expected);
-    // }
-    // #[test]
-    // fn stability_test_12() {
-    //     let file_path: PathBuf = PathBuf::from("vault/Associativity.md");
-    //     let file_contents = fs::read_to_string(&file_path).unwrap();
-    //     let md_file = md_file::MDFile::new(file_path);
-    //     let result = md_file.to_string();
-    //     let expected = file_contents;
-    //     assert_eq!(result, expected);
-    // }
-    // #[test]
-    // fn stability_test_13() {
-    //     let file_path: PathBuf = PathBuf::from("vault/Powerset.md");
-    //     let file_contents = fs::read_to_string(&file_path).unwrap();
-    //     let md_file = md_file::MDFile::new(file_path);
-    //     let result = md_file.to_string();
-    //     let expected = file_contents;
-    //     assert_eq!(result, expected);
-    // }
-    // #[test]
-    // fn stability_test_14() {
-    //     let file_path: PathBuf = PathBuf::from("vault/Resonance Peak.md");
-    //     let file_contents = fs::read_to_string(&file_path).unwrap();
-    //     let md_file = md_file::MDFile::new(file_path);
-    //     let result = md_file.to_string();
-    //     let expected = file_contents;
-    //     assert_eq!(result, expected);
-    // }
+    #[test]
+    fn stability_tests_reference_clean_file3() {
+        let ignore: Vec<PathBuf> = vec![];
+        let linker_options = crate::options::LinkerOptions {
+            link_share_tag: false,
+            link_self: false
+        };
+        let file_path: PathBuf = PathBuf::from("test_vaults/reference_clean/file3.md");
+        assert!(file_path.is_file());
+        let file_contents = fs::read_to_string(file_path.clone()).unwrap();
+        let md_file = MDFile::from(file_path.clone()).expect(&format!("Failed to create MDFile from {}", file_path.display()));
+        let result = md_file.to_string();
+        let expected = file_contents;
+        assert_eq!(result, expected, "Failed on file: {}", file_path.display());
+    }
+
+    #[test]
+    fn stability_tests_reference_clean_file4() {
+        let ignore: Vec<PathBuf> = vec![];
+        let linker_options = crate::options::LinkerOptions {
+            link_share_tag: true,
+            link_self: true
+        };
+        let file_path: PathBuf = PathBuf::from("test_vaults/reference_linked_noself/file4.md");
+        assert!(file_path.is_file());
+        let file_contents = fs::read_to_string(file_path.clone()).unwrap();
+        let md_file = MDFile::from(file_path.clone()).expect(&format!("Failed to create MDFile from {}", file_path.display()));
+        let result = md_file.to_string();
+        let expected = file_contents;
+        assert_eq!(result, expected, "Failed on file: {}", file_path.display());
+    }
+
+    // Linking Tests
+    #[test]
+    fn linking_tests_no_self_reference_clean_file1() {
+        let ignore: Vec<PathBuf> = vec![];
+        let linker_options = crate::options::LinkerOptions {
+            link_share_tag: false,
+            link_self: false
+        };
+        let linked_file_path: PathBuf = PathBuf::from("test_vaults/reference_linked_noself/file1.md");
+        let linked_file_path: PathBuf = linked_file_path.canonicalize().unwrap();
+        let clean_file_path: PathBuf = PathBuf::from("test_vaults/reference_clean/file1.md");
+        let clean_file_path: PathBuf = clean_file_path.canonicalize().unwrap();
+        let vault_path: PathBuf = PathBuf::from("test_vaults/reference_clean");
+        let vault_path: PathBuf = vault_path.canonicalize().unwrap();
+        assert!(linked_file_path.is_file());
+        assert!(clean_file_path.is_file());
+        let mut vault = crate::vault::Vault::new(vault_path, ignore, linker_options);
+        vault.link_all_files_no_self();
+        let md_file: &MDFile = vault.get_md_file(&clean_file_path).unwrap();
+        let result = md_file.to_string();
+        let expected = fs::read_to_string(linked_file_path.clone()).unwrap();
+        assert_eq!(result, expected, "Failed on file: {}", clean_file_path.display());
+    }
+
+    #[test]
+    fn linking_tests_no_self_reference_clean_file2() {
+        let ignore: Vec<PathBuf> = vec![];
+        let linker_options = crate::options::LinkerOptions {
+            link_share_tag: false,
+            link_self: false
+        };
+        let linked_file_path: PathBuf = PathBuf::from("test_vaults/reference_linked_noself/file2.md");
+        let linked_file_path: PathBuf = linked_file_path.canonicalize().unwrap();
+        let clean_file_path: PathBuf = PathBuf::from("test_vaults/reference_clean/file2.md");
+        let clean_file_path: PathBuf = clean_file_path.canonicalize().unwrap();
+        let vault_path: PathBuf = PathBuf::from("test_vaults/reference_clean");
+        let vault_path: PathBuf = vault_path.canonicalize().unwrap();
+        assert!(linked_file_path.is_file());
+        assert!(clean_file_path.is_file());
+        let mut vault = crate::vault::Vault::new(vault_path, ignore, linker_options);
+        vault.link_all_files_no_self();
+        let md_file: &MDFile = vault.get_md_file(&clean_file_path).unwrap();
+        let result = md_file.to_string();
+        let expected = fs::read_to_string(linked_file_path.clone()).unwrap();
+        assert_eq!(result, expected, "Failed on file: {}", clean_file_path.display());
+    }
+
+    #[test]
+    fn linking_tests_no_self_reference_clean_file3() {
+        let ignore: Vec<PathBuf> = vec![];
+        let linker_options = crate::options::LinkerOptions {
+            link_share_tag: false,
+            link_self: false
+        };
+        let linked_file_path: PathBuf = PathBuf::from("test_vaults/reference_linked_noself/file3.md");
+        let linked_file_path: PathBuf = linked_file_path.canonicalize().unwrap();
+        let clean_file_path: PathBuf = PathBuf::from("test_vaults/reference_clean/file3.md");
+        let clean_file_path: PathBuf = clean_file_path.canonicalize().unwrap();
+        let vault_path: PathBuf = PathBuf::from("test_vaults/reference_clean");
+        let vault_path: PathBuf = vault_path.canonicalize().unwrap();
+        assert!(linked_file_path.is_file());
+        assert!(clean_file_path.is_file());
+        let mut vault = crate::vault::Vault::new(vault_path, ignore, linker_options);
+        vault.link_all_files_no_self();
+        let md_file: &MDFile = vault.get_md_file(&clean_file_path).unwrap();
+        let result = md_file.to_string();
+        let expected = fs::read_to_string(linked_file_path.clone()).unwrap();
+        assert_eq!(result, expected, "Failed on file: {}", clean_file_path.display());
+    }
+
+    #[test]
+    fn linking_tests_no_self_reference_clean_file4() {
+        let ignore: Vec<PathBuf> = vec![];
+        let linker_options = crate::options::LinkerOptions {
+            link_share_tag: true,
+            link_self: true
+        };
+        let linked_file_path: PathBuf = PathBuf::from("test_vaults/reference_linked_noself/file4.md");
+        let linked_file_path: PathBuf = linked_file_path.canonicalize().unwrap();
+        let clean_file_path: PathBuf = PathBuf::from("test_vaults/reference_clean/file4.md");
+        let clean_file_path: PathBuf = clean_file_path.canonicalize().unwrap();
+        let vault_path: PathBuf = PathBuf::from("test_vaults/reference_clean");
+        let vault_path: PathBuf = vault_path.canonicalize().unwrap();
+        assert!(linked_file_path.is_file());
+        assert!(clean_file_path.is_file());
+        let mut vault = crate::vault::Vault::new(vault_path, ignore, linker_options);
+        vault.link_all_files();
+        let md_file: &MDFile = vault.get_md_file(&clean_file_path).unwrap();
+        let result = md_file.to_string();
+        let expected = fs::read_to_string(linked_file_path.clone()).unwrap();
+        assert_eq!(result, expected, "Failed on file: {}", clean_file_path.display());
+    }
+
+    // Unlinking Tests
+    #[test]
+    fn unlinking_tests_no_self_reference_linked_file1() {
+        let ignore: Vec<PathBuf> = vec![];
+        let linker_options = crate::options::LinkerOptions {
+            link_share_tag: false,
+            link_self: false
+        };
+        let linked_file_path: PathBuf = PathBuf::from("test_vaults/reference_linked_noself/file1.md");
+        let clean_file_path: PathBuf = PathBuf::from("test_vaults/reference_clean/file1.md");
+        assert!(linked_file_path.is_file());
+        assert!(clean_file_path.is_file());
+        let mut md_file: MDFile = MDFile::from(linked_file_path.clone()).unwrap();
+        md_file.unlink();
+        let result = md_file.to_string();
+        let expected = fs::read_to_string(clean_file_path.clone()).unwrap();
+        assert_eq!(result, expected, "Failed on file: {}", linked_file_path.display());
+    }
+
+    #[test]
+    fn unlinking_tests_no_self_reference_linked_file2() {
+        let ignore: Vec<PathBuf> = vec![];
+        let linker_options = crate::options::LinkerOptions {
+            link_share_tag: false,
+            link_self: false
+        };
+        let linked_file_path: PathBuf = PathBuf::from("test_vaults/reference_linked_noself/file2.md");
+        let clean_file_path: PathBuf = PathBuf::from("test_vaults/reference_clean/file2.md");
+        assert!(linked_file_path.is_file());
+        assert!(clean_file_path.is_file());
+        let mut md_file: MDFile = MDFile::from(linked_file_path.clone()).unwrap();
+        md_file.unlink();
+        let result = md_file.to_string();
+        let expected = fs::read_to_string(clean_file_path.clone()).unwrap();
+        assert_eq!(result, expected, "Failed on file: {}", linked_file_path.display());
+    }
+
+    #[test]
+    fn unlinking_tests_no_self_reference_linked_file3() {
+        let ignore: Vec<PathBuf> = vec![];
+        let linker_options = crate::options::LinkerOptions {
+            link_share_tag: false,
+            link_self: false
+        };
+        let linked_file_path: PathBuf = PathBuf::from("test_vaults/reference_linked_noself/file3.md");
+        let clean_file_path: PathBuf = PathBuf::from("test_vaults/reference_clean/file3.md");
+        assert!(linked_file_path.is_file());
+        assert!(clean_file_path.is_file());
+        let mut md_file: MDFile = MDFile::from(linked_file_path.clone()).unwrap();
+        md_file.unlink();
+        let result = md_file.to_string();
+        let expected = fs::read_to_string(clean_file_path.clone()).unwrap();
+        assert_eq!(result, expected, "Failed on file: {}", linked_file_path.display());
+    }
+
+    #[test]
+    fn unlinking_tests_no_self_reference_linked_file4() {
+        let ignore: Vec<PathBuf> = vec![];
+        let linker_options = crate::options::LinkerOptions {
+            link_share_tag: true,
+            link_self: true
+        };
+        let linked_file_path: PathBuf = PathBuf::from("test_vaults/reference_linked_noself/file4.md");
+        let clean_file_path: PathBuf = PathBuf::from("test_vaults/reference_clean/file4.md");
+        assert!(linked_file_path.is_file());
+        assert!(clean_file_path.is_file());
+        let mut md_file: MDFile = MDFile::from(linked_file_path.clone()).unwrap();
+        md_file.unlink();
+        let result = md_file.to_string();
+        let expected = fs::read_to_string(clean_file_path.clone()).unwrap();
+        assert_eq!(result, expected, "Failed on file: {}", linked_file_path.display());
+    }
 
 
 }

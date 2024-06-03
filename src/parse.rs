@@ -70,6 +70,13 @@ impl AST {
 		self.get_yaml("aliases").unwrap().as_sequence().unwrap().iter().map(|x| x.as_str().unwrap().to_string()).collect()
 	}
 
+	pub(crate) fn get_tags(&self) -> Vec<String> {
+		if self.get_yaml("tags").is_none() {
+			return vec![];
+		}
+		self.get_yaml("tags").unwrap().as_sequence().unwrap().iter().map(|x| x.as_str().unwrap().to_string()).collect()
+	}
+
 	pub(crate) fn get_lines(&self) -> Vec<&Line> {
 		let mut lines: Vec<&Line> = Vec::new();
 		for block in &self.blocks {
@@ -281,6 +288,7 @@ impl Line {
 		}
 	}
 
+	#[allow(dead_code)]
 	pub(crate) fn iterate_nodes(&self) -> Vec<&Node> {
 		match self {
 			Line::Heading(nodes, _) => {
@@ -759,7 +767,7 @@ fn parse_into_lines(lines: Vec<String>) -> Vec<Line> {
 
 #[derive(Debug, PartialEq, Copy, Clone)]
 enum NodeParseState {
-	Start,
+	// Start,
 	InlineCode,
 	InlineBlockLatex,
 	InlineLatex,
@@ -777,8 +785,8 @@ enum NodeParseState {
 fn parse_into_nodes(content: String) -> Vec<Node> {
 
 	let _nodes: Vec<Node> = Vec::new();
-	let mut content = content.strip_suffix("\n").unwrap_or(&content).to_string();
-	let mut content = content.strip_suffix("\r").unwrap_or(&content).to_string();
+	let content = content.strip_suffix("\n").unwrap_or(&content).to_string();
+	let content = content.strip_suffix("\r").unwrap_or(&content).to_string();
 	let mut start_index: usize = 0;
 	let mut index: usize = 0;
 	let mut node_parse_vector: Vec<(NodeParseState, usize, usize)> = Vec::new();
@@ -791,15 +799,12 @@ fn parse_into_nodes(content: String) -> Vec<Node> {
 
 		let loop_string = &String::from_iter(&characters[index..]);
 
-		// if inline_code_pattern.is_match(&loop_string) {
 		if INLINE_CODE_REGEX.is_match(loop_string) {
 			if index != start_index {
-				// nodes.push(Node::String(characters[start_index..index].into_iter().collect()));
 				node_parse_vector.push((NodeParseState::String, start_index, index));
-				start_index = index;
+				// start_index = index;
 			}
 			let caps = INLINE_CODE_PATTERN.captures(&loop_string).unwrap();
-			// nodes.push(Node::InlineCode(caps.get(1).unwrap().as_str().to_string()));
 			let length = caps.get(0).unwrap().as_str().chars().count();
 			node_parse_vector.push((NodeParseState::InlineCode, index, index + length));
 			index += length;
@@ -808,7 +813,7 @@ fn parse_into_nodes(content: String) -> Vec<Node> {
 			if index != start_index {
 				// nodes.push(Node::String(characters[start_index..index].into_iter().collect()));
 				node_parse_vector.push((NodeParseState::String, start_index, index));
-				start_index = index;
+				// start_index = index;
 			}
 			let caps = INLINE_BLOCK_LATEX_PATTERN.captures(&loop_string).unwrap();
 			let cap_0 = caps.get(0).unwrap().as_str();
@@ -1018,16 +1023,16 @@ fn parse_node_lines_into_nodes(node_parts: Vec<(NodeParseState, Vec<char>)>) -> 
 				let parts: String = parts.iter().collect();
 				nodes.push(Node::String(parts));
 			},
-			NodeParseState::Start => {},
+			// NodeParseState::Start => {},
 		}
 	}
 	nodes
 }
 
-pub(crate) fn add_indentation(indentation: &str, text: &str) -> String {
-	let mut indented_text: String = String::new();
-	for line in text.lines() {
-		indented_text = indented_text + indentation + line + "\n";
-	}
-	return indented_text;
-}
+// pub(crate) fn add_indentation(indentation: &str, text: &str) -> String {
+// 	let mut indented_text: String = String::new();
+// 	for line in text.lines() {
+// 		indented_text = indented_text + indentation + line + "\n";
+// 	}
+// 	return indented_text;
+// }

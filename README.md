@@ -33,11 +33,25 @@ Color Eyre
 
 RSTest
 
+Add Link Type
+ - String
+ - Target Path
+
+Make sure local vs absolute done correctly
+
+Add assert to absolute path that it is inside vault path
+
+Add Default Traits to types
+
+Tests
+ - No two Node::Strings are adjacent (Without a newline)
+
 ## Notes
 
 Public Structs
  - Vault
- - File
+ - MDFile
+ - Link
 
 Public Functions
  - Vault

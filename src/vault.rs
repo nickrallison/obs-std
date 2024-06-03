@@ -1,44 +1,76 @@
+#![allow(dead_code)]
 use crate::parse::Node;
 use std::collections::HashMap;
 use std::path::{Path, PathBuf};
 use rand::Rng;
 use walkdir::WalkDir;
-use crate::md_file::MDFile;
+use crate::md_file::{Link, MDFile};
 use crate::parse::Line;
+use crate::linking::add_link_to_nodes;
 
 #[cfg(feature = "parallel")]
 use rayon::prelude::*;
+use crate::options::LinkerOptions;
+
 
 pub struct Vault {
+	// Absolute path to the vault
 	path: PathBuf,
+
+	// Paths are relative to the vault
 	data: HashMap<PathBuf, MDFile>,
-	alias_tree: StringTree<PathBuf>
+
+	// Paths are relative to the vault
+	alias_tree: StringTree<PathBuf>,
+
+	// ignore directories
+	ignore: Vec<PathBuf>,
+
+	// link options
+	options: LinkerOptions
 }
 
 impl Vault {
 	#[cfg(not(feature = "parallel"))]
-	pub fn new(path: PathBuf) -> Self {
+	pub fn new(vault_path: PathBuf, ignore: Vec<PathBuf>, options: LinkerOptions) -> Self {
+		// if path is relative, convert to absolute
+		let vault_path = match vault_path.is_absolute() {
+			true => vault_path,
+			false => std::env::current_dir().unwrap().join(vault_path)
+		};
 
-		let entries: Vec<PathBuf> = WalkDir::new(&path).into_iter().filter_map(|entry| {
+		// entries should be relative to the vault
+		let ignore: Vec<PathBuf> = ignore.into_iter().map(|path| {
+			let path = match path.is_absolute() {
+				true => path,
+				false => std::env::current_dir().unwrap().join(path)
+			};
+			path
+		}).collect();
+
+		// entries should be relative to the vault
+		let entries: Vec<PathBuf> = WalkDir::new(&vault_path).into_iter().filter_map(|entry| {
 			let entry = entry.unwrap();
 			let path = entry.path().to_path_buf();
-			// println!("Path: {:?}", path);
 			if path.is_dir() {
 				return None;
 			}
+			for ignore_path in &ignore {
+				if path.starts_with(ignore_path) {
+					return None;
+				}
+			}
+			let path = path.strip_prefix(&vault_path).unwrap().to_path_buf();
 			Some(path)
 		}).collect();
 
-		println!("Starting to parse files");
-		// let data: HashMap<PathBuf, MDFile> = entries.into_par_iter().map(|path| {
 		let data: HashMap<PathBuf, MDFile> = entries.into_iter().map(|path| {
-			let md_file = MDFile::from(path.to_path_buf()).expect(format!("Should be able to create MDFile: {}", path.display()).as_str());
+			let md_file_path = vault_path.join(&path);
+			let md_file = MDFile::from(md_file_path.to_path_buf()).expect(format!("Should be able to create MDFile: {}", path.display()).as_str());
 			(path, md_file)
 		}).collect();
-		println!("Done parsing files");
 
-		println!("Building alias tree");
-		let mut alias_tree: StringTree<PathBuf> = StringTree::new();
+		let mut alias_tree: crate::vault::StringTree<PathBuf> = crate::vault::StringTree::new();
 		for md_file in data.values() {
 			let mut aliases = md_file.get_aliases();
 			match md_file.get_title() {
@@ -61,32 +93,54 @@ impl Vault {
 				}
 			}
 		}
-		println!("Done building alias tree");
-		Self { path, data, alias_tree }
+		Self {
+			path: vault_path,
+			data,
+			alias_tree,
+			ignore,
+			options
+		}
 	}
 
 	#[cfg(feature = "parallel")]
-	pub fn new(path: PathBuf) -> Self {
+	pub fn new(vault_path: PathBuf, ignore: Vec<PathBuf>, options: LinkerOptions) -> Self {
+		// if path is relative, convert to absolute
+		let vault_path = match vault_path.is_absolute() {
+			true => vault_path,
+			false => std::env::current_dir().unwrap().join(vault_path)
+		};
 
-		let entries: Vec<PathBuf> = WalkDir::new(&path).into_iter().filter_map(|entry| {
+		// entries should be relative to the vault
+		let ignore: Vec<PathBuf> = ignore.into_iter().map(|path| {
+			let path = match path.is_absolute() {
+				true => path,
+				false => std::env::current_dir().unwrap().join(path)
+			};
+			path
+		}).collect();
+
+		// entries should be relative to the vault
+		let entries: Vec<PathBuf> = WalkDir::new(&vault_path).into_iter().filter_map(|entry| {
 			let entry = entry.unwrap();
 			let path = entry.path().to_path_buf();
-			// println!("Path: {:?}", path);
 			if path.is_dir() {
 				return None;
 			}
+			for ignore_path in &ignore {
+				if path.starts_with(ignore_path) {
+					return None;
+				}
+			}
+			let path = path.strip_prefix(&vault_path).unwrap().to_path_buf();
 			Some(path)
 		}).collect();
 
-		println!("Starting to parse files");
-		// let data: HashMap<PathBuf, MDFile> = entries.into_par_iter().map(|path| {
 		let data: HashMap<PathBuf, MDFile> = entries.into_par_iter().map(|path| {
-			let md_file = MDFile::from(path.to_path_buf()).expect(format!("Should be able to create MDFile: {}", path.display()).as_str());
+			let md_file_path = vault_path.join(&path);
+			let md_file = MDFile::from(md_file_path.to_path_buf()).expect(format!("Should be able to create MDFile: {}", path.display()).as_str());
 			(path, md_file)
 		}).collect();
-		println!("Done parsing files");
 
-		println!("Building alias tree");
 		let mut alias_tree: StringTree<PathBuf> = StringTree::new();
 		for md_file in data.values() {
 			let mut aliases = md_file.get_aliases();
@@ -110,24 +164,31 @@ impl Vault {
 				}
 			}
 		}
-		println!("Done building alias tree");
-		Self { path, data, alias_tree }
+		Self {
+			path: vault_path,
+			data,
+			alias_tree,
+			ignore,
+			options
+		}
 	}
 
 	#[cfg(not(feature = "parallel"))]
-	pub fn get_links(&self) -> Vec<(&String, &PathBuf)> {
-		let links: Vec<(&String, &PathBuf)> = self.data.iter().map(|(path, md_file)| {
+	pub fn get_links(&self) -> Vec<Link> {
+		let links: Vec<Link> = self.data.iter().map(|(path, md_file)| {
 			let title = md_file.get_title();
 			let mut links = match title {
 				Some(title) => {
-					vec![(title, path)]
+					let link = Link::new(title.to_string(), path.to_owned());
+					vec![link]
 				}
 				None => {
 					vec![]
 				}
 			};
 			for alias in md_file.get_aliases() {
-				links.push((alias, path));
+				let link = Link::new(alias.to_string(), path.to_owned());
+				links.push(link);
 			}
 			links
 		}).flatten().collect();
@@ -135,19 +196,21 @@ impl Vault {
 	}
 
 	#[cfg(feature = "parallel")]
-	pub fn get_links(&self) -> Vec<(&String, &PathBuf)> {
-		let links: Vec<(&String, &PathBuf)> = self.data.par_iter().map(|(path, md_file)| {
+	pub fn get_links(&self) -> Vec<Link> {
+		let links: Vec<Link> = self.data.par_iter().map(|(path, md_file)| {
 			let title = md_file.get_title();
 			let mut links = match title {
 				Some(title) => {
-					vec![(title, path)]
+					let link = Link::new(title.to_string(), path.to_owned());
+					vec![link]
 				}
 				None => {
 					vec![]
 				}
 			};
 			for alias in md_file.get_aliases() {
-				links.push((alias, path));
+				let link = Link::new(alias.to_string(), path.to_owned());
+				links.push(link);
 			}
 			links
 		}).flatten().collect();
@@ -155,8 +218,8 @@ impl Vault {
 	}
 
 	#[cfg(not(feature = "parallel"))]
-	pub(crate) fn get_outgoing_links(&self, mdfile: &MDFile) -> Vec<(PathBuf, String)> {
-		let mut outgoing_links: Vec<(PathBuf, String)> = Vec::new();
+	pub(crate) fn get_outgoing_links(&self, mdfile: &MDFile) -> Vec<Link> {
+		let mut outgoing_links: Vec<Link> = Vec::new();
 		let lines: Vec<&Line> = mdfile.get_lines();
 		for line in lines {
 			let original_strings: Vec<&String> = line.iterate_strings();
@@ -176,10 +239,9 @@ impl Vault {
 			let lowercase_strings: Vec<String> = original_whitespace_strings.iter().map(|s| s.to_lowercase()).collect();
 
 
-			let mut len = original_whitespace_strings.len();
+			let len = original_whitespace_strings.len();
 			let mut index = 0;
 			while index < len {
-				// println!("Index: {}", index);
 				let keys: &[String] = &lowercase_strings[index..];
 				let keys: Vec<&String> = keys.iter().collect();
 
@@ -199,21 +261,47 @@ impl Vault {
 						let fragment_len = fragment.len();
 						let original_fragment: Vec<String> = original_whitespace_strings[index..index+fragment_len].to_vec().iter().map(|s| s.to_string()).collect();
 						let original_fragment: String = original_fragment.join(" ");
-						// println!("fragment: {:?}", original_fragment);
 						let stripped_path = path.strip_prefix(&self.path).unwrap();
-						outgoing_links.push((PathBuf::from(stripped_path), original_fragment));
+						let link: Link = Link::new(original_fragment, PathBuf::from(stripped_path));
+						outgoing_links.push(link);
 					}
 					index += fragment.len();
 				}
 			}
 		}
 
+		// options filter link to self
+		let outgoing_links: Vec<Link> = match self.options.link_self {
+			true => outgoing_links,
+			false => {
+				outgoing_links.into_iter().filter(|link| {
+					link.get_path() != mdfile.get_path().unwrap()
+				}).collect()
+			}
+		};
+
+		// options filter tag share
+		let outgoing_links: Vec<Link> = match self.options.link_share_tag {
+			false => outgoing_links,
+			true => {
+				outgoing_links.into_iter().filter(|link| {
+					let path = link.get_path();
+					let link_md_file = self.get_md_file(path).unwrap();
+					let link_tags = link_md_file.get_tags();
+					let self_tags = mdfile.get_tags();
+					let intersection: Vec<&String> = link_tags.iter().filter(|tag| self_tags.contains(tag)).collect();
+					intersection.len() != 0
+				}).collect()
+			}
+		};
+
+
 		return outgoing_links;
 	}
 
 	#[cfg(feature = "parallel")]
-	pub(crate) fn get_outgoing_links(&self, mdfile: &MDFile) -> Vec<(PathBuf, String)> {
-		let mut outgoing_links: Vec<(PathBuf, String)> = Vec::new();
+	pub(crate) fn get_outgoing_links(&self, mdfile: &MDFile) -> Vec<Link> {
+		let mut outgoing_links: Vec<Link> = Vec::new();
 		let lines: Vec<&Line> = mdfile.get_lines();
 		for line in lines {
 			let original_strings: Vec<&String> = line.iterate_strings();
@@ -233,10 +321,9 @@ impl Vault {
 			let lowercase_strings: Vec<String> = original_whitespace_strings.iter().map(|s| s.to_lowercase()).collect();
 
 
-			let mut len = original_whitespace_strings.len();
+			let len = original_whitespace_strings.len();
 			let mut index = 0;
 			while index < len {
-				// println!("Index: {}", index);
 				let keys: &[String] = &lowercase_strings[index..];
 				let keys: Vec<&String> = keys.iter().collect();
 
@@ -256,93 +343,116 @@ impl Vault {
 						let fragment_len = fragment.len();
 						let original_fragment: Vec<String> = original_whitespace_strings[index..index+fragment_len].to_vec().par_iter().map(|s| s.to_string()).collect();
 						let original_fragment: String = original_fragment.join(" ");
-						// println!("fragment: {:?}", original_fragment);
 						let stripped_path = path.strip_prefix(&self.path).unwrap();
-						outgoing_links.push((PathBuf::from(stripped_path), original_fragment));
+						let link: Link = Link::new(original_fragment, PathBuf::from(stripped_path));
+						outgoing_links.push(link);
 					}
 					index += fragment.len();
 				}
 			}
 		}
 
+		// options filter link to self
+		let outgoing_links: Vec<Link> = match self.options.link_self {
+			true => outgoing_links,
+			false => {
+				outgoing_links.into_par_iter().filter(|link| {
+					link.get_path() != mdfile.get_path().unwrap()
+				}).collect()
+			}
+		};
+
+		// options filter tag share
+		let outgoing_links: Vec<Link> = match self.options.link_share_tag {
+			false => outgoing_links,
+			true => {
+				outgoing_links.into_iter().filter(|link| {
+					let path = link.get_path();
+					let link_md_file = self.get_md_file(path).unwrap();
+					let link_tags = link_md_file.get_tags();
+					let self_tags = mdfile.get_tags();
+					let intersection: Vec<&String> = link_tags.iter().filter(|tag| self_tags.contains(tag)).collect();
+					intersection.len() != 0
+				}).collect()
+			}
+		};
+
 		return outgoing_links;
 	}
 
-	#[cfg(not(feature = "parallel"))]
-	pub(crate) fn link_file_from_path(&mut self, path: &Path) {
-		let outgoing_links: Vec<(PathBuf, String)> = self.get_outgoing_links(self.get_md_file(path).unwrap());
-		let mut md_file  = self.get_md_file_mut(path).unwrap();
-		for (outgoing_path, fragment) in outgoing_links {
-			// let outgoing_md_file = self.get_md_file(&outgoing_path).unwrap();
-			// md_file.add_outgoing_link(outgoing_md_file.get_path(), fragment);
-			let mut lines: Vec<&mut Line> = md_file.get_lines_mut();
+	// #[cfg(not(feature = "parallel"))]
+	// pub(crate) fn link_file_from_path(&mut self, path: &Path) {
+	// 	let outgoing_links: Vec<(PathBuf, String)> = self.get_outgoing_links(self.get_md_file(path).unwrap());
+	// 	let mut md_file  = self.get_md_file_mut(path).unwrap();
+	// 	for (outgoing_path, fragment) in outgoing_links {
+	// 		// let outgoing_md_file = self.get_md_file(&outgoing_path).unwrap();
+	// 		// md_file.add_outgoing_link(outgoing_md_file.get_path(), fragment);
+	// 		let mut lines: Vec<&mut Line> = md_file.get_lines_mut();
+	//
+	// 		for line in &mut lines {
+	// 			let mut nodes: Option<&mut Vec<Node>> = line.get_nodes_mut();
+	// 			match nodes {
+	// 				Some(nodes) => {
+	// 					*nodes = add_link_to_nodes(nodes.clone(), &fragment, &outgoing_path);
+	// 				}
+	// 				None => {}
+	// 			}
+	// 		}
+	// 	}
+	//
+	// }
+	//
+	// #[cfg(feature = "parallel")]
+	// pub(crate) fn link_file_from_path(&mut self, path: &Path) {
+	// 	let outgoing_links: Vec<(PathBuf, String)> = self.get_outgoing_links(self.get_md_file(path).unwrap());
+	// 	let md_file  = self.get_md_file_mut(path).unwrap();
+	// 	for (outgoing_path, fragment) in outgoing_links {
+	// 		let mut lines: Vec<&mut Line> = md_file.get_lines_mut();
+	//
+	// 		for line in &mut lines {
+	// 			let nodes: Option<&mut Vec<Node>> = line.get_nodes_mut();
+	// 			match nodes {
+	// 				Some(nodes) => {
+	// 					*nodes = add_link_to_nodes(nodes.clone(), &fragment, &outgoing_path);
+	// 				}
+	// 				None => {}
+	// 			}
+	// 		}
+	// 	}
+	//
+	// }
 
-			for line in &mut lines {
-				let mut nodes: Option<&mut Vec<Node>> = line.get_nodes_mut();
-				match nodes {
-					Some(nodes) => {
-						*nodes = add_link_to_nodes(nodes.clone(), &fragment, &outgoing_path);
-					}
-					None => {}
-				}
-			}
-		}
-
-	}
-
-	#[cfg(feature = "parallel")]
-	pub(crate) fn link_file_from_path(&mut self, path: &Path) {
-		let outgoing_links: Vec<(PathBuf, String)> = self.get_outgoing_links(self.get_md_file(path).unwrap());
-		let mut md_file  = self.get_md_file_mut(path).unwrap();
-		for (outgoing_path, fragment) in outgoing_links {
-			// let outgoing_md_file = self.get_md_file(&outgoing_path).unwrap();
-			// md_file.add_outgoing_link(outgoing_md_file.get_path(), fragment);
-			let mut lines: Vec<&mut Line> = md_file.get_lines_mut();
-
-			for line in &mut lines {
-				let mut nodes: Option<&mut Vec<Node>> = line.get_nodes_mut();
-				match nodes {
-					Some(nodes) => {
-						*nodes = add_link_to_nodes(nodes.clone(), &fragment, &outgoing_path);
-					}
-					None => {}
-				}
-			}
-		}
-
-	}
-
-	pub(crate) fn link_file_with_links(md_file: &mut MDFile, outgoing_links: Vec<(PathBuf, String)>) {
-		for (outgoing_path, fragment) in outgoing_links {
-			// let outgoing_md_file = self.get_md_file(&outgoing_path).unwrap();
-			// md_file.add_outgoing_link(outgoing_md_file.get_path(), fragment);
-			let mut lines: Vec<&mut Line> = md_file.get_lines_mut();
-
-			for line in &mut lines {
-				let mut nodes: Option<&mut Vec<Node>> = line.get_nodes_mut();
-				match nodes {
-					Some(nodes) => {
-						*nodes = add_link_to_nodes(nodes.clone(), &fragment, &outgoing_path);
-					}
-					None => {}
-				}
-			}
-		}
-
-	}
+	// pub(crate) fn link_file_with_links(md_file: &mut MDFile, outgoing_links: Vec<(PathBuf, String)>) {
+	// 	for (outgoing_path, fragment) in outgoing_links {
+	// 		// let outgoing_md_file = self.get_md_file(&outgoing_path).unwrap();
+	// 		// md_file.add_outgoing_link(outgoing_md_file.get_path(), fragment);
+	// 		let mut lines: Vec<&mut Line> = md_file.get_lines_mut();
+	//
+	// 		for line in &mut lines {
+	// 			let nodes: Option<&mut Vec<Node>> = line.get_nodes_mut();
+	// 			match nodes {
+	// 				Some(nodes) => {
+	// 					*nodes = add_link_to_nodes(nodes.clone(), &fragment, &outgoing_path);
+	// 				}
+	// 				None => {}
+	// 			}
+	// 		}
+	// 	}
+	//
+	// }
 
 	pub(crate) fn link_file(&mut self, md_file: &mut MDFile) {
-		let outgoing_links: Vec<(PathBuf, String)> = self.get_outgoing_links(md_file);
-		for (outgoing_path, fragment) in outgoing_links {
-			// let outgoing_md_file = self.get_md_file(&outgoing_path).unwrap();
-			// md_file.add_outgoing_link(outgoing_md_file.get_path(), fragment);
+		let outgoing_links: Vec<Link> = self.get_outgoing_links(md_file);
+		// for (outgoing_path, fragment) in outgoing_links {
+		for link in outgoing_links {
+
 			let mut lines: Vec<&mut Line> = md_file.get_lines_mut();
 
 			for line in &mut lines {
-				let mut nodes: Option<&mut Vec<Node>> = line.get_nodes_mut();
+				let nodes: Option<&mut Vec<Node>> = line.get_nodes_mut();
 				match nodes {
 					Some(nodes) => {
-						*nodes = add_link_to_nodes(nodes.clone(), &fragment, &outgoing_path);
+						*nodes = add_link_to_nodes(nodes.clone(), link.clone());
 					}
 					None => {}
 				}
@@ -353,56 +463,89 @@ impl Vault {
 
 	#[cfg(not(feature = "parallel"))]
 	pub fn link_all_files(&mut self) {
-		let outgoing_links: HashMap<PathBuf, Vec<(PathBuf, String)>> = self.data.iter().map(|(path, md_file)| {
+		let outgoing_links: HashMap<PathBuf, Vec<Link>> = self.data.iter().map(|(path, md_file)| {
 			let outgoing_links = self.get_outgoing_links(md_file);
 			(path.clone(), outgoing_links)
 		}).collect();
 
 		let _ = self.data.iter_mut().map(|(path, md_file)| {
-			println!("Linking file: {:?}", path);
 			let outgoing_links = outgoing_links.get(path).unwrap();
-			for (outgoing_path, fragment) in outgoing_links {
-				let mut lines: Vec<&mut Line> = md_file.get_lines_mut();
-				for line in &mut lines {
-					let mut nodes: Option<&mut Vec<Node>> = line.get_nodes_mut();
-					match nodes {
-						Some(nodes) => {
-							*nodes = add_link_to_nodes(nodes.clone(), &fragment, &outgoing_path);
-						}
-						None => {}
-					}
-				}
+
+			for link in outgoing_links {
+				md_file.link_noself(link.clone());
 			}
 		}).collect::<Vec<()>>();
 	}
 
 	#[cfg(feature = "parallel")]
 	pub fn link_all_files(&mut self) {
-		let outgoing_links: HashMap<PathBuf, Vec<(PathBuf, String)>> = self.data.par_iter().map(|(path, md_file)| {
+		let outgoing_links: HashMap<PathBuf, Vec<Link>> = self.data.par_iter().map(|(path, md_file)| {
 			let outgoing_links = self.get_outgoing_links(md_file);
 			(path.clone(), outgoing_links)
 		}).collect();
 
 		let _ = self.data.par_iter_mut().map(|(path, md_file)| {
-			println!("Linking file: {:?}", path);
 			let outgoing_links = outgoing_links.get(path).unwrap();
-			for (outgoing_path, fragment) in outgoing_links {
-				let mut lines: Vec<&mut Line> = md_file.get_lines_mut();
-				for line in &mut lines {
-					let mut nodes: Option<&mut Vec<Node>> = line.get_nodes_mut();
-					match nodes {
-						Some(nodes) => {
-							*nodes = add_link_to_nodes(nodes.clone(), &fragment, &outgoing_path);
-						}
-						None => {}
-					}
-				}
+
+			for link in outgoing_links {
+				md_file.link_noself(link.clone());
 			}
 		}).collect::<Vec<()>>();
 	}
 
-	pub fn get_md_file(&self, path: &Path) -> Option<&MDFile> {
-		self.data.get(path)
+	#[cfg(not(feature = "parallel"))]
+	pub fn link_all_files_no_self(&mut self) {
+		let outgoing_links: HashMap<PathBuf, Vec<Link>> = self.data.iter().map(|(path, md_file)| {
+			let outgoing_links = self.get_outgoing_links(md_file);
+			(path.clone(), outgoing_links)
+		}).collect();
+
+		let _ = self.data.iter_mut().map(|(path, md_file)| {
+			let outgoing_links = outgoing_links.get(path).unwrap();
+			for link in outgoing_links {
+				md_file.link_noself(link.clone());
+			}
+		}).collect::<Vec<()>>();
+	}
+
+	#[cfg(feature = "parallel")]
+	pub fn link_all_files_no_self(&mut self) {
+		let outgoing_links: HashMap<PathBuf, Vec<Link>> = self.data.par_iter().map(|(path, md_file)| {
+			let outgoing_links = self.get_outgoing_links(md_file);
+			(path.clone(), outgoing_links)
+		}).collect();
+
+		let _ = self.data.par_iter_mut().map(|(path, md_file)| {
+			let outgoing_links = outgoing_links.get(path).unwrap();
+			for link in outgoing_links {
+				md_file.link_noself(link.clone());
+			}
+		}).collect::<Vec<()>>();
+	}
+
+	pub fn get_md_file(&self, path: &Path) -> Result<&MDFile, String> {
+		let vault_path = self.path.clone();
+
+		// if path is absolute, strip prefix
+		let path = match path.is_absolute() {
+			true => {
+				match path.strip_prefix(&vault_path) {
+					Ok(path) => path,
+					Err(_) => return Err(format!("Path: {:?} does not start with Vault Path: {:?}", path, vault_path))
+				}
+			},
+			false => path
+		};
+
+		let data = self.data.get(path);
+		match data {
+			Some(md_file) => {
+				return Ok(md_file)
+			}
+			None => {
+				return Err(format!("No MDFile found for path: {}", path.display()))
+			}
+		}
 	}
 
 	pub fn get_md_file_mut(&mut self, path: &Path) -> Option<&mut MDFile> {
@@ -416,12 +559,35 @@ impl Vault {
 		md_file
 	}
 
+	pub fn unlink_md_file(&mut self, path: &Path) -> Result<(), String> {
+		let md_file = self.get_md_file_mut(path);
+		match md_file {
+			Some(md_file) => {
+				md_file.unlink();
+				return Ok(())
+			}
+			None => {
+				return Err(format!("No MDFile found for path: {}", path.display()))
+			}
+		}
+	}
+
+	pub fn export(&self, vault_path: &Path) {
+		let mut vault_path = vault_path.to_path_buf();
+		std::fs::create_dir_all(vault_path.clone()).unwrap();
+		for (path, md_file) in self.data.iter() {
+			let output_path = vault_path.join(path);
+			let string = md_file.to_string();
+			std::fs::create_dir_all(output_path.parent().unwrap()).unwrap();
+			std::fs::write(output_path, string).unwrap();
+		}
+	}
+
 }
 
 pub(crate) struct StringTree<T> {
 	end: Option<Vec<T>>,
 	children: HashMap<String, StringTree<T>>,
-	// parent: Option<Arc<StringTree<T>>>
 }
 
 impl<T: std::fmt::Debug> StringTree<T> {
@@ -429,7 +595,6 @@ impl<T: std::fmt::Debug> StringTree<T> {
 		Self {
 			end: None,
 			children: HashMap::new(),
-			// parent: None
 		}
 	}
 	pub(crate) fn insert(&mut self, keys: Vec<String>, value: T) {
@@ -458,6 +623,7 @@ impl<T: std::fmt::Debug> StringTree<T> {
 		return;
 	}
 
+	#[allow(dead_code)]
 	pub(crate) fn get(&self, keys: Vec<&String>) -> Option<&Vec<T>> {
 		// if len of keys is 0, return end
 		if keys.len() == 0 {
@@ -477,11 +643,6 @@ impl<T: std::fmt::Debug> StringTree<T> {
 	}
 
 	pub(crate) fn get_best<'a>(&'a self, keys: Vec<&'a String>) -> Option<(&Vec<T>, Vec<&String>)> {
-		// println!("Here");
-		// if len of keys is 0, or no children, return end
-		// println!("Keys: {:?}", keys);
-		// println!("Children: {:?}", self.children.len());
-		// println!("End: {:?}", self.end.as_ref());
 		if keys.len() == 0 || self.children.len() == 0 {
 			if self.end.is_none() {
 				return None;
@@ -510,73 +671,4 @@ impl<T: std::fmt::Debug> StringTree<T> {
 			return None;
 		}
 	}
-}
-
-
-fn add_link_to_nodes(nodes: Vec<Node>, text: &str, dest: &PathBuf) -> Vec<Node> {
-	let mut nodes = nodes;
-	let mut index = 0;
-	let mut links: Vec<(usize, Vec<Node>)> = Vec::new();
-	for node in nodes.iter_mut() {
-		match node {
-			Node::BoldItalic(inner_nodes) => {
-				*inner_nodes = crate::vault::add_link_to_nodes(inner_nodes.clone(), text, dest);
-			}
-			Node::Bold(inner_nodes) => {
-				*inner_nodes = crate::vault::add_link_to_nodes(inner_nodes.clone(), text, dest);
-			}
-			Node::Italic(inner_nodes) => {
-				*inner_nodes = crate::vault::add_link_to_nodes(inner_nodes.clone(), text, dest);
-			}
-			Node::String(string) => {
-				if string.contains(text) {
-					let mut string_clone: String = string.to_string();
-					let dest_str: String = dest.to_str().unwrap().to_string();
-					let mut split = string_clone.split(text);
-					let mut nodes_after: Vec<Node> = Vec::new();
-
-					for split_text in split {
-						if split_text.is_empty() {
-							nodes_after.push(Node::FormattedMarkdownLink(dest_str.clone(), text.to_string()));
-						} else {
-							nodes_after.push(Node::String(split_text.to_string()));
-							nodes_after.push(Node::FormattedMarkdownLink(dest_str.clone(), text.to_string()));
-						}
-					}
-					nodes_after.pop();
-					links.push((index, nodes_after));
-				} else {
-					// do nothing
-				}
-			}
-			_ => {}
-		}
-		index += 1;
-	}
-
-	let mut insertions: usize = 0;
-	for (index, nodes_vec) in links {
-		let len = nodes_vec.len();
-		nodes.remove(index + insertions);
-		nodes.splice(index + insertions..index + insertions, nodes_vec);
-		insertions += len - 1;
-	}
-
-	let mut index: usize = 0;
-	while index < nodes.len() {
-		match &nodes[index] {
-			Node::String(string) => {
-				if string.is_empty() {
-					nodes.remove(index);
-				}
-				else {
-					index += 1;
-				}
-			}
-			_ => {
-				index += 1;
-			}
-		}
-	}
-	nodes
 }

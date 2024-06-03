@@ -3,6 +3,7 @@ aliases:
 - virtual address
 - virtual addresses
 - virtual memory
+- Virtual Address Space
 tags:
 - computerarchitecture
 - operatingsystems
@@ -16,7 +17,7 @@ Virtual Address Spaces help to manage memory more efficiently and allows multipl
 Virtual address space includes several key components:
 - **Virtual Addresses:** These are addresses used by the software running on the system. Each process running on the system sees its own set of addresses that map to physical addresses in the main memory.
 - **Page Tables:** These are data structures used by the operating system to store the mapping between virtual addresses and physical addresses. Each instantiated process contains its own page table, which the CPU's memory management unit (MMU) uses to translate virtual addresses to physical addresses during program execution.
-- **Memory Management Unit (MMU):** This is a hardware component within the CPU responsible for handling all memory and [[Caching.md|caching]] operations associated with address translation from virtual to physical addresses.
+- **Memory Management Unit (MMU):** This is a hardware component within the CPU responsible for handling all memory and caching operations associated with address translation from virtual to physical addresses.
 
 ## Benefits of Virtual Address Space
 Virtual address spaces offer several advantages:
