@@ -1,4 +1,3 @@
-use std::path::PathBuf;
 use regex::Regex;
 use crate::md_file::Link;
 use crate::parse::Node;
@@ -84,4 +83,28 @@ pub(crate) fn add_link_to_nodes(nodes: Vec<Node>, link: Link) -> Vec<Node> {
 		}
 	}
 	nodes
+}
+
+#[derive(Clone, Debug)]
+pub struct LinkerOptions {
+	pub link_share_tag: bool,
+	pub link_self: bool
+}
+
+impl LinkerOptions {
+	pub fn new(link_share_tag: bool, link_self: bool) -> Self {
+		LinkerOptions {
+			link_share_tag,
+			link_self
+		}
+	}
+}
+
+impl Default for LinkerOptions {
+	fn default() -> Self {
+		LinkerOptions {
+			link_share_tag: false,
+			link_self: false
+		}
+	}
 }

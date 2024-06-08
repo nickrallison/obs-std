@@ -4,55 +4,43 @@ Meant to be a library to interact with obsidian and markdown files in an efficie
 
 ## TODO
 
-Lint code on Save
+### Phase 1 - Functionality
 
-Reorganization
- - Move all Struct
+- [ ] Get Args working
+   - With documentation
+- [ ] Verify linker works
+   - Go through each file
+      - If links are fine, accept them
+      - If not, make changes to linker
+- [ ] Linker with accepts lambda for whether to link
+- [ ] Write tests for each of my files
+   - Test Gen Script
+- [ ] Finalize Public interface
+- [ ] Derive / impl common traits on all types
+- [ ] Fix Local vs. Absolute Path
+- [ ] More Tests
+   - No two strings are adjacent in a line, should be linked
 
-Serialize & Deserialize vs. Parsing 
- - Profile difference
- - Serialization based on metadata
- - Public Types & Functions Specification
+### Phase 2 - Optimization
 
-Env Vars
- - Logging
- - Link to self
- - Link to other via lambda of the two files
+- [ ] Rayon Feature Flag
+- [ ] Serde save & load
+   - sqlite?
 
-Features
- - Unlinking
- - Linking Individual Files
- - Link Must contain same tag
- - Link with condition
- - Derive common traits on public types
+### Phase 3 - Organization
 
-Color Eyre
+- [ ] Restructure Structs & Enums
+- [ ] Add Code Comments to all methods
+- [ ] Get Lint on save working & clippy style guide?
+   - Bacon too?
 
-Add Link Type
- - String
- - Target Path
+### Phase 4 - Deployment
 
-Make sure local vs absolute done correctly
-
-Add assert to absolute path that it is inside vault path
-
-Add Default Traits to types
-
-Tests
- - No two Node::Strings are adjacent (Without a newline)
-
-## Notes
-
-Public Structs
- - Vault
- - MDFile
- - Link
-
-Public Functions
- - Vault
- - File
-   - new
-   - from_path
-   - from_str
- 
-   
+- [ ] Github automations
+- [ ] Usages
+   - Exe
+      - x86
+      - Arm
+      - WASM
+   - DLL
+   - Crate

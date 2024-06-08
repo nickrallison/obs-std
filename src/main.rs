@@ -1,10 +1,5 @@
-use std::env::Args;
-use std::fs;
-use std::path::PathBuf;
-use crate::md_file::MDFile;
-use crate::options::LinkerOptions;
 
-use crate::vault::Vault;
+use crate::cli::{Cli, CLIError, run_cli};
 
 use clap::Parser;
 
@@ -12,8 +7,10 @@ mod parse;
 mod md_file;
 mod vault;
 mod linking;
-mod options;
-mod args;
+mod cli;
+mod stringtree;
+mod test_suite;
+
 
 fn main() {
 	// let start_time = std::time::Instant::now();
@@ -63,12 +60,23 @@ fn main() {
 	// let output = PathBuf::from("out");
 	// vault.export(&output);
 
-	let args = crate::args::Cli::parse();
-	let action = args.action;
-	let options = args.options;
-	let target = args.target;
-
-	println!("{:?}", action);
-	println!("{:?}", options);
-	println!("{:?}", target);
+	let cli = Cli::parse();
+	let run_result: Result<(), CLIError> = run_cli(cli);
+	match run_result {
+		Ok(_) => {}
+		Err(e) => {
+			match e {
+				CLIError::InvalidAction => {
+					println!("Invalid Action");
+				}
+				CLIError::InvalidOptions => {
+					println!("Invalid Options");
+				}
+				CLIError::InvalidTarget => {
+					println!("Invalid Target");
+				}
+			}
+		}
+	}
 }
+
