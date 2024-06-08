@@ -183,12 +183,48 @@ pub fn run_cli(cli: Cli) -> Result<(), CLIError> {
                 if expected != actual {
                     // Print diff
                     print_diff(&expected, &actual);
+
                     // prompt user whether or not to accept changes
+                    println!("\n##### EOF #####\nDo you want to accept these changes to file: {}? yes, no, or cancel [y/n/c]: ", mdfile.path.as_ref().expect("MDFile does not have path set").display());
+                    let mut input = String::new();
+                    while input.trim() != "y" && input.trim() != "n" && input.trim() != "c" {
+                        std::io::stdin().read_line(&mut input).unwrap();
+                        if input.trim() == "y" {
+                            fs::write(&path, actual).unwrap();
+                            break;
+                        }
+                        else if input.trim() == "c" {
+                            return Ok(());
+                        }
+                        else if input.trim() == "n" {
+                            break;
+                        } else {
+                            println!("Invalid input: [{}]. Please enter y, n, or c: ", input.trim());
+                            input.clear();
+                        }
+                    }
                 }
             }
         }
         Options::Force => {
-            todo!()
+            println!("\nYou are about to modify these files under this path: {}. Are you sure you want to do this? yes, or no [y/n]: ", vault.get_path().display());
+            let mut input = String::new();
+            while input.trim() != "y" && input.trim() != "n" {
+                std::io::stdin().read_line(&mut input).unwrap();
+                if input.trim() == "y" {
+                    for (_, mdfile) in vault.data.iter() {
+                        let path = mdfile.path.clone().unwrap();
+                        let actual = mdfile.to_string();
+                        fs::write(&path, actual).unwrap();
+                    }
+                }
+                else if input.trim() == "n" {
+                    return Ok(());
+                } else {
+                    println!("Invalid input: [{}]. Please enter y, or n: ", input.trim());
+                    input.clear();
+                }
+            }
         }
     }
 

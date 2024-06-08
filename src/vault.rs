@@ -751,6 +751,10 @@ impl Vault {
 		}
 	}
 
+	pub fn get_path(&self) -> &PathBuf {
+		&self.path
+	}
+
 	pub fn unlink_all_files(self) -> Self {
 		let mut self_owned = self;
 		self_owned.unlink_all_files_mut_ref();
