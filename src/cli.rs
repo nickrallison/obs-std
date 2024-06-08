@@ -1,8 +1,9 @@
 use std::fmt::Display;
 use std::path::PathBuf;
-use std::result;
+use std::{fs, result};
 use clap::Parser;
 use clap_derive::ValueEnum;
+use difference::{Changeset, Difference};
 use crate::linking::LinkerOptions;
 use crate::vault::Vault;
 
@@ -155,21 +156,54 @@ pub fn run_cli(cli: Cli) -> Result<(), CLIError> {
     let mut vault = Vault::new(vault_path, ignore, linker_options);
 
     match action {
-        Action::None => {
-            todo!()
-        }
+        Action::None => {}
         Action::Link => {
-            todo!()
+            vault.link_all_files_mut_ref();
         }
         Action::Unlink => {
-            todo!()
+            vault.unlink_all_files_mut_ref();
         }
         Action::AliasTree => {
             println!("{}", vault.alias_tree_string());
+            return Ok(());
+        }
+    }
+
+    match options {
+        Options::Preview => {
+            for (_, mdfile) in vault.data.iter() {
+                println!("{}\n##########################", mdfile);
+            }
+        }
+        Options::Safe => {
+            for (_, mdfile) in vault.data.iter() {
+                let path = mdfile.path.clone().unwrap();
+                let expected = fs::read_to_string(&path).unwrap();
+                let actual = mdfile.to_string();
+                if expected != actual {
+                    // Print diff
+                    print_diff(&expected, &actual);
+                    // prompt user whether or not to accept changes
+                }
+            }
+        }
+        Options::Force => {
+            todo!()
         }
     }
 
     Ok(())
+}
+
+fn print_diff(str1: &String, str2: &String) {
+    let changeset = Changeset::new(str1, str2, "");
+    for diff in changeset.diffs {
+        match diff {
+            Difference::Same(part) => print!("{}", part),
+            Difference::Add(part) => print!("\x1b[92m{}\x1b[0m", part),
+            Difference::Rem(part) => print!("\x1b[91m{}\x1b[0m", part),
+        }
+    }
 }
 
 #[cfg(test)]

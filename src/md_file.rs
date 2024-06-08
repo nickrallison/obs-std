@@ -160,6 +160,20 @@ impl MDFile {
 		}
 
 	}
+
+	pub fn export_to_file(&self, path: &PathBuf) -> Result<(), String> {
+		match std::fs::write(&path, self.to_string()) {
+			Ok(_) => Ok(()),
+			Err(_) => Err(format!("Error writing to file: {}", path.display())),
+		}
+	}
+
+	pub fn export(&self) -> Result<(), String>  {
+		match self.path {
+			Some(ref path) => self.export_to_file(path),
+			None => Err("No path to export to".to_string())
+		}
+	}
 }
 
 impl Display for MDFile {
