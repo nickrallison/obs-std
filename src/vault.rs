@@ -1,6 +1,7 @@
 #![allow(dead_code)]
 use crate::parse::Node;
 use std::collections::HashMap;
+use std::fmt::Display;
 use std::path::{Path, PathBuf};
 use rand::Rng;
 use walkdir::WalkDir;
@@ -14,13 +15,13 @@ use crate::options::LinkerOptions;
 
 
 pub struct Vault {
-	// Absolute path to the vault
+	// Absolute path to the full_vault
 	path: PathBuf,
 
-	// Paths are relative to the vault
-	data: HashMap<PathBuf, MDFile>,
+	// Paths are relative to the full_vault
+	pub(crate) data: HashMap<PathBuf, MDFile>,
 
-	// Paths are relative to the vault
+	// Paths are relative to the full_vault
 	alias_tree: StringTree<PathBuf>,
 
 	// ignore directories
@@ -39,7 +40,7 @@ impl Vault {
 			false => std::env::current_dir().unwrap().join(vault_path)
 		};
 
-		// entries should be relative to the vault
+		// entries should be relative to the full_vault
 		let ignore: Vec<PathBuf> = ignore.into_iter().map(|path| {
 			let path = match path.is_absolute() {
 				true => path,
@@ -48,7 +49,7 @@ impl Vault {
 			path
 		}).collect();
 
-		// entries should be relative to the vault
+		// entries should be relative to the full_vault
 		let entries: Vec<PathBuf> = WalkDir::new(&vault_path).into_iter().filter_map(|entry| {
 			let entry = entry.unwrap();
 			let path = entry.path().to_path_buf();
@@ -110,7 +111,7 @@ impl Vault {
 			false => std::env::current_dir().unwrap().join(vault_path)
 		};
 
-		// entries should be relative to the vault
+		// entries should be relative to the full_vault
 		let ignore: Vec<PathBuf> = ignore.into_iter().map(|path| {
 			let path = match path.is_absolute() {
 				true => path,
@@ -119,7 +120,7 @@ impl Vault {
 			path
 		}).collect();
 
-		// entries should be relative to the vault
+		// entries should be relative to the full_vault
 		let entries: Vec<PathBuf> = WalkDir::new(&vault_path).into_iter().filter_map(|entry| {
 			let entry = entry.unwrap();
 			let path = entry.path().to_path_buf();
@@ -231,87 +232,65 @@ impl Vault {
 						Some(s) => s,
 						None => whitespace_string
 					};
-					original_whitespace_strings.push(stripped);
-				}
-				// original_whitespace_strings.extend(whitespace_strings);
-			}
-
-			let lowercase_strings: Vec<String> = original_whitespace_strings.iter().map(|s| s.to_lowercase()).collect();
-
-
-			let len = original_whitespace_strings.len();
-			let mut index = 0;
-			while index < len {
-				let keys: &[String] = &lowercase_strings[index..];
-				let keys: Vec<&String> = keys.iter().collect();
-
-				let result = self.alias_tree.get_best(keys);
-				if result.is_none() {
-					index += 1;
-				}
-				else {
-					let (paths, fragment) = result.unwrap();
-					if paths.len() > 1 {
-						for path in paths {
-							println!("Fragment Path: {:?}", path);
-						}
-						panic!("Fragment with multiple paths: {:?}, ", fragment);
-					}
-					for path in paths {
-						let fragment_len = fragment.len();
-						let original_fragment: Vec<String> = original_whitespace_strings[index..index+fragment_len].to_vec().iter().map(|s| s.to_string()).collect();
-						let original_fragment: String = original_fragment.join(" ");
-						let stripped_path = path.strip_prefix(&self.path).unwrap();
-						let link: Link = Link::new(original_fragment, PathBuf::from(stripped_path));
-						outgoing_links.push(link);
-					}
-					index += fragment.len();
-				}
-			}
-		}
-
-		// options filter link to self
-		let outgoing_links: Vec<Link> = match self.options.link_self {
-			true => outgoing_links,
-			false => {
-				outgoing_links.into_iter().filter(|link| {
-					link.get_path() != mdfile.get_path().unwrap()
-				}).collect()
-			}
-		};
-
-		// options filter tag share
-		let outgoing_links: Vec<Link> = match self.options.link_share_tag {
-			false => outgoing_links,
-			true => {
-				outgoing_links.into_iter().filter(|link| {
-					let path = link.get_path();
-					let link_md_file = self.get_md_file(path).unwrap();
-					let link_tags = link_md_file.get_tags();
-					let self_tags = mdfile.get_tags();
-					let intersection: Vec<&String> = link_tags.iter().filter(|tag| self_tags.contains(tag)).collect();
-					intersection.len() != 0
-				}).collect()
-			}
-		};
-
-
-		return outgoing_links;
-	}
-
-	#[cfg(feature = "parallel")]
-	pub(crate) fn get_outgoing_links(&self, mdfile: &MDFile) -> Vec<Link> {
-		let mut outgoing_links: Vec<Link> = Vec::new();
-		let lines: Vec<&Line> = mdfile.get_lines();
-		for line in lines {
-			let original_strings: Vec<&String> = line.iterate_strings();
-			let mut original_whitespace_strings: Vec<&str> = Vec::new();
-			for string in &original_strings {
-				let whitespace_strings: Vec<&str> = string.split_whitespace().collect();
-				for whitespace_string in &whitespace_strings {
-					let stripped = match whitespace_string.strip_suffix(",") {
+					let stripped = match stripped.strip_suffix(".") {
 						Some(s) => s,
-						None => whitespace_string
+						None => stripped
+					};
+					let stripped = match stripped.strip_suffix(":") {
+						Some(s) => s,
+						None => stripped
+					};
+					let stripped = match stripped.strip_suffix(";") {
+						Some(s) => s,
+						None => stripped
+					};
+					let stripped = match stripped.strip_suffix("!") {
+						Some(s) => s,
+						None => stripped
+					};
+					let stripped = match stripped.strip_suffix("?") {
+						Some(s) => s,
+						None => stripped
+					};
+					let stripped = match stripped.strip_suffix(")") {
+						Some(s) => s,
+						None => stripped
+					};
+					let stripped = match stripped.strip_prefix("(") {
+						Some(s) => s,
+						None => stripped
+					};
+					let stripped = match stripped.strip_prefix("[") {
+						Some(s) => s,
+						None => stripped
+					};
+					let stripped = match stripped.strip_suffix("]") {
+						Some(s) => s,
+						None => stripped
+					};
+					let stripped = match stripped.strip_prefix("{") {
+						Some(s) => s,
+						None => stripped
+					};
+					let stripped = match stripped.strip_suffix("}") {
+						Some(s) => s,
+						None => stripped
+					};
+					let stripped = match stripped.strip_suffix("\"") {
+						Some(s) => s,
+						None => stripped
+					};
+					let stripped = match stripped.strip_prefix("\"") {
+						Some(s) => s,
+						None => stripped
+					};
+					let stripped = match stripped.strip_suffix("'") {
+						Some(s) => s,
+						None => stripped
+					};
+					let stripped = match stripped.strip_prefix("'") {
+						Some(s) => s,
+						None => stripped
 					};
 					original_whitespace_strings.push(stripped);
 				}
@@ -340,30 +319,52 @@ impl Vault {
 						panic!("Fragment with multiple paths: {:?}, ", fragment);
 					}
 					for path in paths {
-						let fragment_len = fragment.len();
-						let original_fragment: Vec<String> = original_whitespace_strings[index..index+fragment_len].to_vec().par_iter().map(|s| s.to_string()).collect();
-						let original_fragment: String = original_fragment.join(" ");
 						let stripped_path = path.strip_prefix(&self.path).unwrap();
-						let link: Link = Link::new(original_fragment, PathBuf::from(stripped_path));
-						outgoing_links.push(link);
+						if stripped_path == mdfile.get_path().unwrap().strip_prefix(&self.path).unwrap() {
+							match self.options.link_self {
+								true => {
+									let fragment_len = fragment.len();
+									let original_fragment: Vec<String> = original_whitespace_strings[index..index+fragment_len].to_vec().iter().map(|s| s.to_string()).collect();
+									let original_fragment: String = original_fragment.join(" ");
+									let link: Link = Link::new(original_fragment, PathBuf::from(stripped_path));
+									outgoing_links.push(link);
+									index += fragment.len();
+								}
+								false => {
+									index += 1;
+								}
+							}
+						} else {
+							let fragment_len = fragment.len();
+							let original_fragment: Vec<String> = original_whitespace_strings[index..index+fragment_len].to_vec().iter().map(|s| s.to_string()).collect();
+							let original_fragment: String = original_fragment.join(" ");
+							let stripped_path = path.strip_prefix(&self.path).unwrap();
+							let link: Link = Link::new(original_fragment, PathBuf::from(stripped_path));
+							outgoing_links.push(link);
+							index += fragment.len();
+						}
 					}
-					index += fragment.len();
 				}
 			}
 		}
+
+		// let basename = mdfile.get_path().unwrap().file_name().unwrap().to_str().unwrap();
+		// if basename == "AVL Tree.md" {
+		// 	println!("Outgoing Links: {:?}", outgoing_links);
+		// }
 
 		// options filter link to self
 		let outgoing_links: Vec<Link> = match self.options.link_self {
 			true => outgoing_links,
 			false => {
-				outgoing_links.into_par_iter().filter(|link| {
+				outgoing_links.into_iter().filter(|link| {
 					link.get_path() != mdfile.get_path().unwrap()
 				}).collect()
 			}
 		};
 
 		// options filter tag share
-		let outgoing_links: Vec<Link> = match self.options.link_share_tag {
+		let mut outgoing_links: Vec<Link> = match self.options.link_share_tag {
 			false => outgoing_links,
 			true => {
 				outgoing_links.into_iter().filter(|link| {
@@ -376,6 +377,174 @@ impl Vault {
 				}).collect()
 			}
 		};
+
+		outgoing_links.dedup();
+
+		return outgoing_links;
+	}
+
+	#[cfg(feature = "parallel")]
+	pub(crate) fn get_outgoing_links(&self, mdfile: &MDFile) -> Vec<Link> {
+		let mut outgoing_links: Vec<Link> = Vec::new();
+		let lines: Vec<&Line> = mdfile.get_lines();
+		for line in lines {
+			let original_strings: Vec<&String> = line.iterate_strings();
+			let mut original_whitespace_strings: Vec<&str> = Vec::new();
+			for string in &original_strings {
+				let whitespace_strings: Vec<&str> = string.split_whitespace().collect();
+				for whitespace_string in &whitespace_strings {
+					let stripped = match whitespace_string.strip_suffix(",") {
+						Some(s) => s,
+						None => whitespace_string
+					};
+					let stripped = match stripped.strip_suffix(".") {
+						Some(s) => s,
+						None => stripped
+					};
+					let stripped = match stripped.strip_suffix(":") {
+						Some(s) => s,
+						None => stripped
+					};
+					let stripped = match stripped.strip_suffix(";") {
+						Some(s) => s,
+						None => stripped
+					};
+					let stripped = match stripped.strip_suffix("!") {
+						Some(s) => s,
+						None => stripped
+					};
+					let stripped = match stripped.strip_suffix("?") {
+						Some(s) => s,
+						None => stripped
+					};
+					let stripped = match stripped.strip_suffix(")") {
+						Some(s) => s,
+						None => stripped
+					};
+					let stripped = match stripped.strip_prefix("(") {
+						Some(s) => s,
+						None => stripped
+					};
+					let stripped = match stripped.strip_prefix("[") {
+						Some(s) => s,
+						None => stripped
+					};
+					let stripped = match stripped.strip_suffix("]") {
+						Some(s) => s,
+						None => stripped
+					};
+					let stripped = match stripped.strip_prefix("{") {
+						Some(s) => s,
+						None => stripped
+					};
+					let stripped = match stripped.strip_suffix("}") {
+						Some(s) => s,
+						None => stripped
+					};
+					let stripped = match stripped.strip_suffix("\"") {
+						Some(s) => s,
+						None => stripped
+					};
+					let stripped = match stripped.strip_prefix("\"") {
+						Some(s) => s,
+						None => stripped
+					};
+					let stripped = match stripped.strip_suffix("'") {
+						Some(s) => s,
+						None => stripped
+					};
+					let stripped = match stripped.strip_prefix("'") {
+						Some(s) => s,
+						None => stripped
+					};
+					original_whitespace_strings.push(stripped);
+				}
+				// original_whitespace_strings.extend(whitespace_strings);
+			}
+
+			let lowercase_strings: Vec<String> = original_whitespace_strings.iter().map(|s| s.to_lowercase()).collect();
+
+
+			let len = original_whitespace_strings.len();
+			let mut index = 0;
+			while index < len {
+				let keys: &[String] = &lowercase_strings[index..];
+				let keys: Vec<&String> = keys.iter().collect();
+
+				let result = self.alias_tree.get_best(keys);
+				if result.is_none() {
+					index += 1;
+				}
+				else {
+					let (paths, fragment) = result.unwrap();
+					if paths.len() > 1 {
+						for path in paths {
+							println!("Fragment Path: {:?}", path);
+						}
+						panic!("Fragment with multiple paths: {:?}, ", fragment);
+					}
+					for path in paths {
+						let stripped_path = path.strip_prefix(&self.path).unwrap();
+						if stripped_path == mdfile.get_path().unwrap().strip_prefix(&self.path).unwrap() {
+							match self.options.link_self {
+								true => {
+									let fragment_len = fragment.len();
+									let original_fragment: Vec<String> = original_whitespace_strings[index..index+fragment_len].to_vec().iter().map(|s| s.to_string()).collect();
+									let original_fragment: String = original_fragment.join(" ");
+									let link: Link = Link::new(original_fragment, PathBuf::from(stripped_path));
+									outgoing_links.push(link);
+									index += fragment.len();
+								}
+								false => {
+									index += 1;
+								}
+							}
+						} else {
+							let fragment_len = fragment.len();
+							let original_fragment: Vec<String> = original_whitespace_strings[index..index+fragment_len].to_vec().iter().map(|s| s.to_string()).collect();
+							let original_fragment: String = original_fragment.join(" ");
+							let stripped_path = path.strip_prefix(&self.path).unwrap();
+							let link: Link = Link::new(original_fragment, PathBuf::from(stripped_path));
+							outgoing_links.push(link);
+							index += fragment.len();
+						}
+					}
+				}
+			}
+		}
+
+		// let basename = mdfile.get_path().unwrap().file_name().unwrap().to_str().unwrap();
+		// if basename == "ARC Smart Pointer.md" {
+		// 	println!("Outgoing Links: {:?}", outgoing_links);
+		// }
+
+		// options filter link to self
+		let outgoing_links: Vec<Link> = match self.options.link_self {
+			true => outgoing_links,
+			false => {
+				outgoing_links.into_iter().filter(|link| {
+					link.get_path() != mdfile.get_path().unwrap()
+				}).collect()
+			}
+		};
+
+		// options filter tag share
+		let mut outgoing_links: Vec<Link> = match self.options.link_share_tag {
+			false => outgoing_links,
+			true => {
+				outgoing_links.into_iter().filter(|link| {
+					let path = link.get_path();
+					let link_md_file = self.get_md_file(path).unwrap();
+					let link_tags = link_md_file.get_tags();
+					let self_tags = mdfile.get_tags();
+					let intersection: Vec<&String> = link_tags.iter().filter(|tag| self_tags.contains(tag)).collect();
+					intersection.len() != 0
+				}).collect()
+			}
+		};
+
+		outgoing_links.dedup();
+
 
 		return outgoing_links;
 	}
@@ -468,11 +637,13 @@ impl Vault {
 			(path.clone(), outgoing_links)
 		}).collect();
 
-		let _ = self.data.iter_mut().map(|(path, md_file)| {
-			let outgoing_links = outgoing_links.get(path).unwrap();
 
-			for link in outgoing_links {
-				md_file.link_noself(link.clone());
+
+		let _ = self.data.iter_mut().map(|(path, md_file)| {
+			let outgoing_links_local = outgoing_links.get(path).unwrap();
+
+			for link in outgoing_links_local {
+				md_file.link(link.clone());
 			}
 		}).collect::<Vec<()>>();
 	}
@@ -484,13 +655,16 @@ impl Vault {
 			(path.clone(), outgoing_links)
 		}).collect();
 
-		let _ = self.data.par_iter_mut().map(|(path, md_file)| {
-			let outgoing_links = outgoing_links.get(path).unwrap();
 
-			for link in outgoing_links {
-				md_file.link_noself(link.clone());
+
+		let _ = self.data.par_iter_mut().map(|(path, md_file)| {
+			let outgoing_links_local = outgoing_links.get(path).unwrap();
+
+			for link in outgoing_links_local {
+				md_file.link(link.clone());
 			}
 		}).collect::<Vec<()>>();
+
 	}
 
 	#[cfg(not(feature = "parallel"))]
@@ -591,6 +765,10 @@ impl Vault {
 		}
 	}
 
+	pub fn alias_tree_string(&self) -> String {
+		format!("{}", self.alias_tree)
+	}
+
 }
 
 pub(crate) struct StringTree<T> {
@@ -651,6 +829,7 @@ impl<T: std::fmt::Debug> StringTree<T> {
 	}
 
 	pub(crate) fn get_best<'a>(&'a self, keys: Vec<&'a String>) -> Option<(&Vec<T>, Vec<&String>)> {
+
 		if keys.len() == 0 || self.children.len() == 0 {
 			if self.end.is_none() {
 				return None;
@@ -668,15 +847,81 @@ impl<T: std::fmt::Debug> StringTree<T> {
 		}
 
 		// Recurse on the next key
-		let best_child_option = self.children.get(current_key).unwrap().get_best(keys);
+		let child = self.children.get(current_key).unwrap();
+		let best_child_option = child.get_best(keys);
+		let child_end = child.end.as_ref();
 		if best_child_option.is_some() {
 			let (best_child, mut best_child_keys) = best_child_option.unwrap();
 			best_child_keys.insert(0, current_key);
 			return Some((best_child, best_child_keys));
-		} else if best_child_option.is_none() && self.end.is_some() {
-			return Some((self.end.as_ref().expect("End should not be none"), vec![current_key]));
+		} else if best_child_option.is_none() && child_end.is_some() {
+			return Some((child_end.as_ref().expect("End should not be none"), vec![current_key]));
 		} else {
 			return None;
 		}
 	}
 }
+
+// #### Correct way to format StringTree
+//
+// ├─ a
+// │  ├─ b
+// │  │  └─ ["keys1"]
+// │  ├─ c
+// │  │  ├─ e
+// │  │  │  └─ ["keys4"]
+// │  │  └─ ["keys2"]
+// │  └─ d
+// │     └─ ["keys3"]
+// └─ e
+//    └─ ["keys5"]
+impl Display for StringTree<PathBuf> {
+	fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+		fn fmt_helper(tree: &StringTree<PathBuf>, tag: Option<&String>) -> String {
+			let mut result = String::new();
+			match tag {
+				Some(tag) => {
+					result.push_str(&format!("{}\n", tag));
+				}
+				None => {}
+			}
+			let mut keys: Vec<&String> = tree.children.keys().map(|s| s).collect::<Vec<&String>>();
+			keys.sort();
+			let end: Option<Vec<PathBuf>> = tree.end.clone();
+			let mut child_strings: Vec<String> = keys.iter().map(|key| {
+				let child = tree.children.get(*key).unwrap();
+				fmt_helper(child, Some(key))
+			}).collect();
+			match end {
+				Some(end) => {
+					let mut match_result_string: String = String::from("[");
+					for value in end {
+						match_result_string.push_str(&format!("{:?}, ", value));
+					}
+					match_result_string.pop();
+					match_result_string.pop();
+					match_result_string.push_str("]");
+					child_strings.push(match_result_string);
+				}
+				None => {}
+			}
+			for (index_outer, child_string) in child_strings.iter().enumerate() {
+				for (index_inner, line) in child_string.lines().enumerate() {
+					if index_inner == 0 && index_outer == child_strings.iter().count() - 1 {
+						result.push_str(&format!("└─ {}\n", line));
+					} else if index_inner == 0 && index_outer != child_strings.iter().count() - 1 {
+						result.push_str(&format!("├─ {}\n", line));
+					} else if index_inner != 0 && index_outer == child_strings.iter().count() - 1  {
+						result.push_str(&format!("   {}\n", line));
+					} else {
+						result.push_str(&format!("│  {}\n", line));
+					}
+				}
+			}
+			result
+		}
+		let result = fmt_helper(self, None);
+		write!(f, "{}", result)
+	}
+}
+

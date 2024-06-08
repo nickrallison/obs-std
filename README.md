@@ -14,13 +14,10 @@ Serialize & Deserialize vs. Parsing
  - Serialization based on metadata
  - Public Types & Functions Specification
 
-Feature Flags
- - Serde
- - Rayon
-
 Env Vars
  - Logging
  - Link to self
+ - Link to other via lambda of the two files
 
 Features
  - Unlinking
@@ -30,8 +27,6 @@ Features
  - Derive common traits on public types
 
 Color Eyre
-
-RSTest
 
 Add Link Type
  - String

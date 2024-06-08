@@ -5,7 +5,7 @@ use crate::parse::{AST, Line, Node};
 #[allow(dead_code)]
 #[derive(Debug, Clone, PartialEq)]
 pub struct MDFile {
-	path: Option<PathBuf>,
+	pub(crate) path: Option<PathBuf>,
 	title: Option<String>,
 	aliases: Vec<String>,
 	ast: AST,
@@ -107,11 +107,13 @@ impl MDFile {
 	}
 	//
 	pub fn link_noself(&mut self, link: Link) {
+
 		let self_path_basename = self.path.as_ref().unwrap().file_stem().unwrap().to_str().unwrap();
 		let link_path_basename = link.get_path().file_stem().unwrap().to_str().unwrap();
 		if self_path_basename == link_path_basename {
 			return;
 		}
+
 		let mut lines: Vec<&mut Line> = self.get_lines_mut();
 		for line in &mut lines {
 			let nodes: Option<&mut Vec<Node>> = line.get_nodes_mut();
