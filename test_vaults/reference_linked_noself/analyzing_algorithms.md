@@ -1,0 +1,12 @@
+---
+bad_links: 
+aliases: []
+tags: [algorithms]
+---
+# Analyzing Algorithms
+
+The study of algorithms involves several factors, such as predicting the resources it needs, like memory, computational time, and communication [[Signal Bandwidth|bandwidth]]. This analysis uses a Random Access Memory (RAM) model of computation, a mechanism where instructions are executed consecutively and data access operates at a constant time. However, the RAM model is not a perfect representative of memory hierarchy, although it stands as an excellent estimator when judging performance on actual machines. Analyzing an algorithm with the RAM model can be demanding and often involves the utilization of mathematical tools.
+
+A detailed examination of the [[Insertion Sort|insertion sort]] algorithm's running time reveals that it can fluctuate based on several factors, including the input, the computing machine, and the programming language. Essentially, the running time can be defined as a function of the algorithm's input size, measured by either the volume of items or the bit count mandatory to represent the input. This running time is assessed by determining the frequency of execution of each code line and the duration of each run. By computing the sum of the products of the cost and times columns, one can arrive at the total running time. However, the running time can vary fittingly in different scenarios, with the best-case scenario being when the array is already sorted, and the worst-case scenario coming into play when the array is in a reverse sorted order. The running time is usually described as a linear function of the input size in this case.
+
+Worst-case running times are essential in real-time computing scenarios, as these operations have to be completed within a precise deadline. In certain algorithms, the worst case might appear quite often, for instance while searching a database. The average-case running time can often compare poorly to the worst-case scenario in some algorithms. However, defining an "average" input may not be straightforward, limiting the scope of average-case analysis. To simplify the process, one might choose to overlook each statement's actual cost and give preference to the leading term, as the lower-ordered terms and constant coefficients are usually trivial for larger inputs. When it comes to the [[Insertion Sort|insertion sort]], the most influential factor in the worst-case running time is the n^2 term.
