@@ -7,7 +7,6 @@ Meant to be a library to interact with obsidian and markdown files in an efficie
 ### Phase 1 - Functionality
 
 - [ ] Linker with accepts lambda for whether to link
-- [ ] Finalize Test Suite
 - [ ] Derive / impl common traits on all types
 - [ ] More Tests
    - No two strings are adjacent in a line, should be linked

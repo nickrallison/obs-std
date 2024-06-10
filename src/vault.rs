@@ -14,6 +14,7 @@ use crate::stringtree::StringTree;
 use rayon::prelude::*;
 
 
+#[derive(Debug, Clone, PartialEq, Eq, Default)]
 pub struct Vault {
 	// Absolute path to the full_vault
 	pub path: PathBuf,

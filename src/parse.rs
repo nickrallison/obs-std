@@ -24,7 +24,7 @@ lazy_static! {
 
 }
 
-#[derive(Debug, Clone, PartialEq)]
+#[derive(Debug, Clone, PartialEq, Eq, Default)]
 pub struct AST {
 	pub blocks: Vec<Block>,
 	pub line_sep: NewlineType
@@ -115,13 +115,14 @@ impl Display for AST {
 
 }
 
-#[derive(Debug, Clone, PartialEq)]
+#[derive(Debug, Clone, PartialEq, Eq, Default)]
 pub enum NewlineType {
+	#[default]
 	Unix,
 	Windows,
 }
 
-#[derive(Debug, Clone, PartialEq)]
+#[derive(Debug, Clone, PartialEq, Eq)]
 pub enum Block {
 	YAML(serde_yaml::Value, Vec<String>),
 	CodeBlock(Vec<String>),
@@ -210,7 +211,7 @@ impl Display for Block {
 	}
 }
 
-#[derive(Debug, Clone, PartialEq)]
+#[derive(Debug, Clone, PartialEq, Eq)]
 pub enum Line {
 	Heading(Vec<Node>, u8),
 	BulletPoint(Vec<Node>, String), // string is indentation
@@ -354,7 +355,7 @@ impl Display for Line {
 	}
 }
 
-#[derive(Debug, Clone, PartialEq)]
+#[derive(Debug, Clone, PartialEq, Eq)]
 pub enum Node {
 
 	InlineCode(String),
@@ -372,6 +373,8 @@ pub enum Node {
 	Italic(Vec<Node>),
 
 	String(String),
+
+
 
 }
 
@@ -454,8 +457,9 @@ impl Display for Node {
 	}
 }
 
-#[derive(Debug, PartialEq, Copy, Clone)]
+#[derive(Debug, Clone, PartialEq, Eq, Default)]
 pub enum  BlockParseState {
+	#[default]
 	Start,
 	YAML,
 	CodeBlock,
@@ -731,9 +735,10 @@ pub fn parse_into_lines(lines: Vec<String>) -> Vec<Line> {
 	return line_vec;
 }
 
-#[derive(Debug, PartialEq, Copy, Clone)]
+#[derive(Debug, Clone, PartialEq, Eq, Default)]
 pub enum NodeParseState {
 	// Start,
+
 	InlineCode,
 	InlineBlockLatex,
 	InlineLatex,
@@ -744,6 +749,7 @@ pub enum NodeParseState {
 	BoldItalic,
 	Bold,
 	Italic,
+	#[default]
 	String,
 }
 

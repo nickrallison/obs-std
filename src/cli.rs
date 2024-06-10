@@ -7,8 +7,9 @@ use difference::{Changeset, Difference};
 use crate::linking::LinkerOptions;
 use crate::vault::Vault;
 
-#[derive(Debug, Copy, Clone, PartialEq, Eq, PartialOrd, Ord, ValueEnum)]
+#[derive(Debug, Copy, Clone, PartialEq, Eq, Default, ValueEnum)]
 pub enum Action {
+    #[default]
     None,
     Link,
     Unlink,
@@ -38,10 +39,12 @@ impl Display for Action {
     }
 }
 
+
 // String is the export path
 /// Safety level when linking / unlinking files
-#[derive(Debug, Copy, Clone, PartialEq, Eq, PartialOrd, Ord, ValueEnum)]
+#[derive(Debug, Copy, Clone, PartialEq, Eq, Default, ValueEnum)]
 pub enum Options {
+    #[default]
     Preview,
     Safe,
     Force
@@ -68,7 +71,7 @@ impl Display for Options {
     }
 }
 
-#[derive(Parser, Debug, Clone, PartialEq, Eq, PartialOrd, Ord)]
+#[derive(Parser, Debug, Clone, PartialEq, Eq, Default)]
 #[command(version, about, long_about = None)]
 pub struct CLI {
 
@@ -108,10 +111,9 @@ impl CLI {
 
 }
 
-#[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord)]
+#[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Default)]
 pub enum CLIError {
-    InvalidAction,
-    InvalidOptions,
+    #[default]
     InvalidTarget
 }
 
@@ -236,12 +238,6 @@ mod cli_tests {
             Ok(_) => {}
             Err(e) => {
                 match e {
-                    CLIError::InvalidAction => {
-                        panic!("Test got invalid action error when it should not have.");
-                    }
-                    CLIError::InvalidOptions => {
-                        panic!("Test got invalid options error when it should not have.");
-                    }
                     CLIError::InvalidTarget => {
                         panic!("Test got invalid target error when it should not have.");
                     }
@@ -265,12 +261,6 @@ mod cli_tests {
             }
             Err(e) => {
                 match e {
-                    CLIError::InvalidAction => {
-                        panic!("Test got invalid action error when it should not have.");
-                    }
-                    CLIError::InvalidOptions => {
-                        panic!("Test got invalid options error when it should not have.");
-                    }
                     CLIError::InvalidTarget => {}
                 }
             }

@@ -4,7 +4,7 @@ use crate::linking::Link;
 use crate::parse::{AST, Line, Node};
 
 #[allow(dead_code)]
-#[derive(Debug, Clone, PartialEq)]
+#[derive(Debug, Clone, PartialEq, Eq, Default)]
 pub struct MDFile {
 	pub path: PathBuf,
 	pub title: String,

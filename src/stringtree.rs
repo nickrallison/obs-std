@@ -2,6 +2,7 @@ use std::collections::HashMap;
 use std::fmt::Display;
 use std::path::PathBuf;
 
+#[derive(Debug, Clone, PartialEq, Eq, Default)]
 pub struct StringTree<T> {
 	pub end: Option<Vec<T>>,
 	pub children: HashMap<String, StringTree<T>>,

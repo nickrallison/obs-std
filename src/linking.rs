@@ -1,8 +1,9 @@
 use std::path::PathBuf;
+use clap_derive::ValueEnum;
 use regex::Regex;
 use crate::parse::Node;
 
-#[derive(Debug, Clone, PartialEq)]
+#[derive(Debug, Clone, PartialEq, Eq, Default)]
 pub struct Link {
 	pub alias: String,
 	pub path: PathBuf,
@@ -94,7 +95,7 @@ pub fn add_link_to_nodes(nodes: Vec<Node>, link: Link) -> Vec<Node> {
 	nodes
 }
 
-#[derive(Clone, Debug)]
+#[derive(Debug, Clone, PartialEq, Eq)]
 pub struct LinkerOptions {
 	pub link_share_tag: bool,
 	pub link_self: bool
