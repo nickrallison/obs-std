@@ -17,7 +17,7 @@ impl<T: std::fmt::Debug> StringTree<T> {
 	}
 	pub fn insert(&mut self, keys: Vec<String>, value: T) {
 		// if len of keys is 0, set end to value
-		if keys.len() == 0 {
+		if keys.is_empty() {
 			// if end is None, set end to value
 			if self.end.is_none() {
 				self.end = Some(vec![value]);
@@ -33,18 +33,17 @@ impl<T: std::fmt::Debug> StringTree<T> {
 
 		// If the next key is not in the tree, create it
 		if !self.children.contains_key(&current_key) {
-			self.children.insert(current_key.clone(), StringTree::new());
+			self.children.insert(current_key.clone(), Self::new());
 		}
 
 		// Recurse on the next key
 		self.children.get_mut(&current_key).unwrap().insert(keys, value);
-		return;
 	}
 
 	#[allow(dead_code)]
 	pub fn get(&self, keys: Vec<&String>) -> Option<&Vec<T>> {
 		// if len of keys is 0, return end
-		if keys.len() == 0 {
+		if keys.is_empty() {
 			return self.end.as_ref();
 		}
 
@@ -62,7 +61,7 @@ impl<T: std::fmt::Debug> StringTree<T> {
 
 	pub fn get_best<'a>(&'a self, keys: Vec<&'a String>) -> Option<(&Vec<T>, Vec<&String>)> {
 
-		if keys.len() == 0 || self.children.len() == 0 {
+		if keys.is_empty() || self.children.is_empty() {
 			if self.end.is_none() {
 				return None;
 			} else {
@@ -85,7 +84,7 @@ impl<T: std::fmt::Debug> StringTree<T> {
 		if best_child_option.is_some() {
 			let (best_child, mut best_child_keys) = best_child_option.unwrap();
 			best_child_keys.insert(0, current_key);
-			return Some((best_child, best_child_keys));
+			Some((best_child, best_child_keys))
 		} else if best_child_option.is_none() && child_end.is_some() {
 			return Some((child_end.as_ref().expect("End should not be none"), vec![current_key]));
 		} else {
@@ -111,55 +110,49 @@ impl Display for StringTree<PathBuf> {
 	fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
 		fn fmt_helper(tree: &StringTree<PathBuf>, tag: Option<&String>) -> String {
 			let mut result = String::new();
-			match tag {
-				Some(tag) => {
-					result.push_str(&format!("{}\n", tag));
-				}
-				None => {}
-			}
-			let mut keys: Vec<&String> = tree.children.keys().map(|s| s).collect::<Vec<&String>>();
+			if let Some(tag) = tag {
+   					result.push_str(&format!("{tag}\n"));
+   				}
+			let mut keys: Vec<&String> = tree.children.keys().collect::<Vec<&String>>();
 			keys.sort();
 			let end: Option<Vec<PathBuf>> = tree.end.clone();
 			let mut child_strings: Vec<String> = keys.iter().map(|key| {
 				let child = tree.children.get(*key).unwrap();
 				fmt_helper(child, Some(key))
 			}).collect();
-			match end {
-				Some(end) => {
-					let cwd = std::env::current_dir().unwrap();
+			if let Some(end) = end {
+   					let cwd = std::env::current_dir().unwrap();
 
-					let mut match_result_string: String = String::from("[");
-					for value in end {
-						let value = match value.strip_prefix(&cwd) {
-							Ok(value) => value,
-							Err(_) => value.as_path()
-						};
-						match_result_string.push_str(&format!("{:?}, ", value));
-					}
-					match_result_string.pop();
-					match_result_string.pop();
-					match_result_string.push_str("]");
-					child_strings.push(match_result_string);
-				}
-				None => {}
-			}
+   					let mut match_result_string: String = String::from("[");
+   					for value in end {
+   						let value = match value.strip_prefix(&cwd) {
+   							Ok(value) => value,
+   							Err(_) => value.as_path()
+   						};
+   						match_result_string.push_str(&format!("{value:?}, "));
+   					}
+   					match_result_string.pop();
+   					match_result_string.pop();
+   					match_result_string.push(']');
+   					child_strings.push(match_result_string);
+   				}
 			for (index_outer, child_string) in child_strings.iter().enumerate() {
 				for (index_inner, line) in child_string.lines().enumerate() {
-					if index_inner == 0 && index_outer == child_strings.iter().count() - 1 {
-						result.push_str(&format!("└─ {}\n", line));
-					} else if index_inner == 0 && index_outer != child_strings.iter().count() - 1 {
-						result.push_str(&format!("├─ {}\n", line));
-					} else if index_inner != 0 && index_outer == child_strings.iter().count() - 1  {
-						result.push_str(&format!("   {}\n", line));
+					if index_inner == 0 && index_outer == child_strings.len() - 1 {
+						result.push_str(&format!("└─ {line}\n"));
+					} else if index_inner == 0 && index_outer != child_strings.len() - 1 {
+						result.push_str(&format!("├─ {line}\n"));
+					} else if index_inner != 0 && index_outer == child_strings.len() - 1  {
+						result.push_str(&format!("   {line}\n"));
 					} else {
-						result.push_str(&format!("│  {}\n", line));
+						result.push_str(&format!("│  {line}\n"));
 					}
 				}
 			}
 			result
 		}
 		let result = fmt_helper(self, None);
-		write!(f, "{}", result)
+		write!(f, "{result}")
 	}
 }
 

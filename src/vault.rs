@@ -1,7 +1,6 @@
 #![allow(dead_code)]
 use crate::parse::Node;
 use std::collections::HashMap;
-use std::fmt::Display;
 use std::path::{Path, PathBuf};
 use rand::Rng;
 use walkdir::WalkDir;
@@ -10,8 +9,8 @@ use crate::parse::Line;
 use crate::linking::{add_link_to_nodes, Link, LinkerOptions};
 use crate::stringtree::StringTree;
 
-#[cfg(feature = "parallel")]
-use rayon::prelude::*;
+// #[cfg(feature = "parallel")]
+// use rayon::prelude::*;
 
 
 #[derive(Debug, Clone, PartialEq, Eq, Default)]
@@ -42,11 +41,11 @@ impl Vault {
 
 		// entries should be relative to the full_vault
 		let ignore: Vec<PathBuf> = ignore.into_iter().map(|path| {
-			let path = match path.is_absolute() {
+			
+			match path.is_absolute() {
 				true => path,
 				false => std::env::current_dir().unwrap().join(path)
-			};
-			path
+			}
 		}).collect();
 
 		// entries should be relative to the full_vault
@@ -67,7 +66,7 @@ impl Vault {
 
 		let data: HashMap<PathBuf, MDFile> = entries.into_iter().map(|path| {
 			let md_file_path = vault_path.join(&path);
-			let md_file = MDFile::from(md_file_path.to_path_buf()).expect(format!("Should be able to create MDFile: {}", path.display()).as_str());
+			let md_file = MDFile::from(md_file_path).unwrap_or_else(|_| panic!("Should be able to create MDFile: {}", path.display()));
 			(path, md_file)
 		}).collect();
 
@@ -79,7 +78,7 @@ impl Vault {
 			for alias in aliases {
 				let alias = alias.to_lowercase();
 				let path = md_file.get_path().clone();
-				let keys: Vec<String> = alias.split_whitespace().map(|s| s.to_string()).collect();
+				let keys: Vec<String> = alias.split_whitespace().map(std::string::ToString::to_string).collect();
 				alias_tree.insert(keys, path.clone());
 			}
 		}
@@ -93,7 +92,7 @@ impl Vault {
 	}
 
 	pub fn get_links(&self) -> Vec<Link> {
-		let links: Vec<Link> = self.data.iter().map(|(path, md_file)| {
+		let links: Vec<Link> = self.data.iter().flat_map(|(path, md_file)| {
 			let title = md_file.get_title();
 			let mut links = vec![Link::new(title.to_string(), path.to_owned())];
 			for alias in md_file.get_aliases() {
@@ -101,7 +100,7 @@ impl Vault {
 				links.push(link);
 			}
 			links
-		}).flatten().collect();
+		}).collect();
 		links
 	}
 	pub fn get_outgoing_links(&self, mdfile: &MDFile) -> Vec<Link> {
@@ -198,9 +197,9 @@ impl Vault {
 					let (paths, fragment) = result.unwrap();
 					if paths.len() > 1 {
 						for path in paths {
-							println!("Fragment Path: {:?}", path);
+							println!("Fragment Path: {path:?}");
 						}
-						panic!("Fragment with multiple paths: {:?}, ", fragment);
+						panic!("Fragment with multiple paths: {fragment:?}, ");
 					}
 					for path in paths {
 						let stripped_path = path.strip_prefix(&self.path).unwrap();
@@ -208,7 +207,7 @@ impl Vault {
 							match self.options.link_self {
 								true => {
 									let fragment_len = fragment.len();
-									let original_fragment: Vec<String> = original_whitespace_strings[index..index + fragment_len].to_vec().iter().map(|s| s.to_string()).collect();
+									let original_fragment: Vec<String> = original_whitespace_strings[index..index + fragment_len].to_vec().iter().map(|s| (*s).to_string()).collect();
 									let original_fragment: String = original_fragment.join(" ");
 									let link: Link = Link::new(original_fragment, PathBuf::from(stripped_path));
 									outgoing_links.push(link);
@@ -220,7 +219,7 @@ impl Vault {
 							}
 						} else {
 							let fragment_len = fragment.len();
-							let original_fragment: Vec<String> = original_whitespace_strings[index..index + fragment_len].to_vec().iter().map(|s| s.to_string()).collect();
+							let original_fragment: Vec<String> = original_whitespace_strings[index..index + fragment_len].to_vec().iter().map(|s| (*s).to_string()).collect();
 							let original_fragment: String = original_fragment.join(" ");
 							let stripped_path = path.strip_prefix(&self.path).unwrap();
 							let link: Link = Link::new(original_fragment, PathBuf::from(stripped_path));
@@ -257,14 +256,14 @@ impl Vault {
 					let link_tags = link_md_file.get_tags();
 					let self_tags = mdfile.get_tags();
 					let intersection: Vec<&String> = link_tags.iter().filter(|tag| self_tags.contains(tag)).collect();
-					intersection.len() != 0
+					!intersection.is_empty()
 				}).collect()
 			}
 		};
 
 		outgoing_links.dedup();
 
-		return outgoing_links;
+		outgoing_links
 	}
 
 	pub fn link_file(&mut self, md_file: &mut MDFile) {
@@ -276,12 +275,9 @@ impl Vault {
 
 			for line in &mut lines {
 				let nodes: Option<&mut Vec<Node>> = line.get_nodes_mut();
-				match nodes {
-					Some(nodes) => {
-						*nodes = add_link_to_nodes(nodes.clone(), link.clone());
-					}
-					None => {}
-				}
+				if let Some(nodes) = nodes {
+    						*nodes = add_link_to_nodes(nodes.clone(), link.clone());
+    					}
 			}
 		}
 
@@ -294,7 +290,6 @@ impl Vault {
 		self_owned
 	}
 
-	#[cfg(not(feature = "parallel"))]
 	pub fn link_all_files_mut_ref(&mut self) {
 		let outgoing_links: HashMap<PathBuf, Vec<Link>> = self.data.iter().map(|(path, md_file)| {
 			let outgoing_links = self.get_outgoing_links(md_file);
@@ -310,25 +305,6 @@ impl Vault {
 		}).collect::<Vec<()>>();
 	}
 
-	#[cfg(feature = "parallel")]
-	pub fn link_all_files_ref_mut(&mut self) {
-		let outgoing_links: HashMap<PathBuf, Vec<Link>> = self.data.par_iter().map(|(path, md_file)| {
-			let outgoing_links = self.get_outgoing_links(md_file);
-			(path.clone(), outgoing_links)
-		}).collect();
-
-
-
-		let _ = self.data.par_iter_mut().map(|(path, md_file)| {
-			let outgoing_links_local = outgoing_links.get(path).unwrap();
-
-			for link in outgoing_links_local {
-				md_file.link(link.clone());
-			}
-		}).collect::<Vec<()>>();
-
-	}
-
 	pub fn get_md_file(&self, path: &Path) -> Result<&MDFile, String> {
 		let vault_path = self.path.clone();
 
@@ -337,7 +313,7 @@ impl Vault {
 			true => {
 				match path.strip_prefix(&vault_path) {
 					Ok(path) => path,
-					Err(_) => return Err(format!("Path: {:?} does not start with Vault Path: {:?}", path, vault_path))
+					Err(_) => return Err(format!("Path: {path:?} does not start with Vault Path: {vault_path:?}"))
 				}
 			},
 			false => path
@@ -346,10 +322,10 @@ impl Vault {
 		let data = self.data.get(path);
 		match data {
 			Some(md_file) => {
-				return Ok(md_file)
+				Ok(md_file)
 			}
 			None => {
-				return Err(format!("No MDFile found for path: {}", path.display()))
+				Err(format!("No MDFile found for path: {}", path.display()))
 			}
 		}
 	}
@@ -370,10 +346,10 @@ impl Vault {
 		match md_file {
 			Some(md_file) => {
 				md_file.unlink();
-				return Ok(())
+				Ok(())
 			}
 			None => {
-				return Err(format!("No MDFile found for path: {}", path.display()))
+				Err(format!("No MDFile found for path: {}", path.display()))
 			}
 		}
 	}
@@ -399,9 +375,9 @@ impl Vault {
 
 
 	pub fn export(&self, vault_path: &Path) {
-		let mut vault_path = vault_path.to_path_buf();
+		let vault_path = vault_path.to_path_buf();
 		std::fs::create_dir_all(vault_path.clone()).unwrap();
-		for (path, md_file) in self.data.iter() {
+		for (path, md_file) in &self.data {
 			let output_path = vault_path.join(path);
 			let string = md_file.to_string();
 			std::fs::create_dir_all(output_path.parent().unwrap()).unwrap();

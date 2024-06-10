@@ -1,5 +1,4 @@
 use std::path::PathBuf;
-use clap_derive::ValueEnum;
 use regex::Regex;
 use crate::parse::Node;
 
@@ -10,8 +9,8 @@ pub struct Link {
 }
 
 impl Link {
-	pub fn new(alias: String, path: PathBuf) -> Link {
-		Link {
+	pub fn new(alias: String, path: PathBuf) -> Self {
+		Self {
 			alias,
 			path,
 		}
@@ -31,7 +30,7 @@ pub fn add_link_to_nodes(nodes: Vec<Node>, link: Link) -> Vec<Node> {
 	let dest = link.get_path();
 	let text = link.get_alias();
 	let mut links: Vec<(usize, Vec<Node>)> = Vec::new();
-	for node in nodes.iter_mut() {
+	for node in &mut nodes {
 		match node {
 			Node::BoldItalic(inner_nodes) => {
 				*inner_nodes = crate::linking::add_link_to_nodes(inner_nodes.clone(), link.clone());
@@ -44,10 +43,10 @@ pub fn add_link_to_nodes(nodes: Vec<Node>, link: Link) -> Vec<Node> {
 			}
 			Node::String(string) => {
 				if string.contains(text) {
-					let string_clone: String = string.to_string();
+					let string_clone: String = (*string).to_string();
 					let dest_str: String = dest.to_str().unwrap().to_string();
 
-					let split_reg = Regex::new(&format!(r"\b{}\b", text)).unwrap();
+					let split_reg = Regex::new(&format!(r"\b{text}\b")).unwrap();
 					let split = split_reg.split(&string_clone);
 					let mut nodes_after: Vec<Node> = Vec::new();
 
@@ -96,25 +95,19 @@ pub fn add_link_to_nodes(nodes: Vec<Node>, link: Link) -> Vec<Node> {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Default)]
 pub struct LinkerOptions {
 	pub link_share_tag: bool,
 	pub link_self: bool
 }
 
 impl LinkerOptions {
+	#[allow(dead_code)]
 	pub fn new(link_share_tag: bool, link_self: bool) -> Self {
-		LinkerOptions {
+		Self {
 			link_share_tag,
 			link_self
 		}
 	}
 }
 
-impl Default for LinkerOptions {
-	fn default() -> Self {
-		LinkerOptions {
-			link_share_tag: false,
-			link_self: false
-		}
-	}
-}

@@ -1,6 +1,6 @@
 use std::fmt::Display;
 use std::path::PathBuf;
-use std::{fs, result};
+use std::fs;
 use clap::Parser;
 use clap_derive::ValueEnum;
 use difference::{Changeset, Difference};
@@ -17,13 +17,14 @@ pub enum Action {
 }
 
 impl Action {
+    #[allow(dead_code)]
     pub fn new(action: &str) -> Result<Self, String> {
         match action {
             "none" => Ok(Self::None),
             "link" => Ok(Self::Link),
             "unlink" => Ok(Self::Unlink),
             "alias_tree" => Ok(Self::AliasTree),
-            _ => Err(format!("Invalid Action: {}", action))
+            _ => Err(format!("Invalid Action: {action}"))
         }
     }
 }
@@ -51,12 +52,13 @@ pub enum Options {
 }
 
 impl Options {
+    #[allow(dead_code)]
     pub fn new(options: &str) -> Result<Self, String> {
         match options {
             "preview" => Ok(Self::Preview),
             "safe" => Ok(Self::Safe),
             "force" => Ok(Self::Force),
-            _ => Err(format!("Invalid Options: {}", options))
+            _ => Err(format!("Invalid Options: {options}"))
         }
     }
 }
@@ -79,7 +81,7 @@ pub struct CLI {
     #[arg(short, long)]
     pub action: Action,
 
-    /// Safety level (Ignored for AliasTree)
+    /// Safety level (Ignored for `AliasTree`)
     #[arg(short, long)]
     pub options: Options,
 
@@ -89,6 +91,7 @@ pub struct CLI {
 }
 
 impl CLI {
+    #[allow(dead_code)]
     pub fn new(action: Action, options: Options, target_path: String) -> Self {
         Self {
             action,
@@ -97,13 +100,13 @@ impl CLI {
         }
     }
 
-
+    #[allow(dead_code)]
     pub fn from_str(action: &str, options: &str, target_path: &str) -> Result<Self, String> {
         let action = Action::new(action);
         let options = Options::new(options);
         match (action, options) {
             (Ok(action), Ok(options)) => Ok(Self::new(action, options, target_path.to_string())),
-            (Err(e1), Err(e2)) => Err(format!("{}\n{}", e1, e2)),
+            (Err(e1), Err(e2)) => Err(format!("{e1}\n{e2}")),
             (Err(e), _) => Err(e),
             (_, Err(e)) => Err(e)
         }
@@ -117,6 +120,7 @@ pub enum CLIError {
     InvalidTarget
 }
 
+#[allow(dead_code)]
 pub fn run_cli(cli: CLI) -> Result<(), CLIError> {
     let action = cli.action;
     let options = cli.options;
@@ -151,12 +155,12 @@ pub fn run_cli(cli: CLI) -> Result<(), CLIError> {
 
     match options {
         Options::Preview => {
-            for (_, mdfile) in vault.data.iter() {
-                println!("{}\n##########################", mdfile);
+            for (_, mdfile) in &vault.data {
+                println!("{mdfile}\n##########################");
             }
         }
         Options::Safe => {
-            for (_, mdfile) in vault.data.iter() {
+            for (_, mdfile) in &vault.data {
                 let path = mdfile.path.clone();
                 let expected = fs::read_to_string(&path).unwrap();
                 let actual = mdfile.to_string();
@@ -192,7 +196,7 @@ pub fn run_cli(cli: CLI) -> Result<(), CLIError> {
             while input.trim() != "y" && input.trim() != "n" {
                 std::io::stdin().read_line(&mut input).unwrap();
                 if input.trim() == "y" {
-                    for (_, mdfile) in vault.data.iter() {
+                    for (_, mdfile) in &vault.data {
                         fs::write(&mdfile.path, mdfile.to_string()).unwrap();
                     }
                 }
@@ -213,9 +217,9 @@ fn print_diff(str1: &String, str2: &String) {
     let changeset = Changeset::new(str1, str2, "");
     for diff in changeset.diffs {
         match diff {
-            Difference::Same(part) => print!("{}", part),
-            Difference::Add(part) => print!("\x1b[92m{}\x1b[0m", part),
-            Difference::Rem(part) => print!("\x1b[91m{}\x1b[0m", part),
+            Difference::Same(part) => print!("{part}"),
+            Difference::Add(part) => print!("\x1b[92m{part}\x1b[0m"),
+            Difference::Rem(part) => print!("\x1b[91m{part}\x1b[0m"),
         }
     }
 }
@@ -230,12 +234,12 @@ mod cli_tests {
         let cli = match cli_res {
             Ok(cli) => cli,
             Err(e) => {
-                panic!("Test failed to create cli: {}", e);
+                panic!("Test failed to create cli: {e}");
             }
         };
         let run_result: Result<(), CLIError> = run_cli(cli);
         match run_result {
-            Ok(_) => {}
+            Ok(()) => {}
             Err(e) => {
                 match e {
                     CLIError::InvalidTarget => {
@@ -251,12 +255,12 @@ mod cli_tests {
         let cli = match cli_res {
             Ok(cli) => cli,
             Err(e) => {
-                panic!("Test failed to create cli: {}", e);
+                panic!("Test failed to create cli: {e}");
             }
         };
         let run_result: Result<(), CLIError> = run_cli(cli);
         match run_result {
-            Ok(_) => {
+            Ok(()) => {
                 panic!("CLI run should not have succeeded.")
             }
             Err(e) => {

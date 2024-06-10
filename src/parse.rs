@@ -33,16 +33,16 @@ pub struct AST {
 #[allow(dead_code)]
 impl AST {
 
-	pub fn new(contents: String) -> AST {
+	pub fn new(contents: String) -> Self {
 		let contents = contents;
-		let line_sep: NewlineType = if (&contents).contains("\r\n") {
+		let line_sep: NewlineType = if contents.contains("\r\n") {
 			NewlineType::Windows
 		} else {
 			NewlineType::Unix
 		};
-		let lines: Vec<String> = contents.split('\n').map(|x| x.to_string()).collect();
+		let lines: Vec<String> = contents.split('\n').map(std::string::ToString::to_string).collect();
 		let blocks = parse_into_blocks(lines);
-		AST {
+		Self {
 			blocks,
 			line_sep,
 		}
@@ -60,7 +60,7 @@ impl AST {
 				_ => continue,
 			}
 		}
-		return None;
+		None
 	}
 
 	pub fn get_aliases(&self) -> Vec<String> {
@@ -102,13 +102,13 @@ impl Display for AST {
 	fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
 		let mut blocks_str_vec: Vec<String> = Vec::new();
 		for block in &self.blocks {
-			blocks_str_vec.push(format!("{}", block));
+			blocks_str_vec.push(format!("{block}"));
 		}
 		let mut file_contents: String = blocks_str_vec.join("\n");
 		file_contents = file_contents.replace("\r\n", "\n");
 		match self.line_sep {
-			NewlineType::Unix => write!(f, "{}", file_contents),
-			NewlineType::Windows => write!(f, "{}", file_contents.replace("\n", "\r\n")),
+			NewlineType::Unix => write!(f, "{file_contents}"),
+			NewlineType::Windows => write!(f, "{}", file_contents.replace('\n', "\r\n")),
 		}
 
 	}
@@ -135,7 +135,7 @@ pub enum Block {
 impl Block {
 	pub fn get_lines(&self) -> Vec<&Line> {
 		match self {
-			Block::BlockQuote(blocks) => {
+			Self::BlockQuote(blocks) => {
 				let mut lines: Vec<&Line> = Vec::new();
 				for block in blocks {
 					for line in block.get_lines() {
@@ -144,7 +144,7 @@ impl Block {
 				}
 				lines
 			},
-			Block::TextBlock(text_lines) => {
+			Self::TextBlock(text_lines) => {
 				let mut lines: Vec<&Line> = Vec::new();
 				for line in text_lines {
 					lines.push(line);
@@ -159,14 +159,14 @@ impl Block {
 	pub fn get_lines_mut(&mut self) -> Vec<&mut Line> {
 
 		match self {
-			Block::BlockQuote(blocks) => {
+			Self::BlockQuote(blocks) => {
 				let mut lines_mut: Vec<&mut Line> = Vec::new();
 				for block in blocks {
 					lines_mut.append(&mut block.get_lines_mut());
 				}
 				lines_mut
 			},
-			Block::TextBlock(lines) => {
+			Self::TextBlock(lines) => {
 				let mut lines_mut: Vec<&mut Line> = Vec::new();
 				for line in lines {
 					lines_mut.push(line);
@@ -183,29 +183,29 @@ impl Block {
 impl Display for Block {
 	fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
 		match self {
-			Block::YAML(_, lines_vec) => {
+			Self::YAML(_, lines_vec) => {
 				let lines_string: String = lines_vec.join("\n");
-				write!(f, "{}", lines_string)
+				write!(f, "{lines_string}")
 			},
-			Block::CodeBlock(lines_vec) => {
+			Self::CodeBlock(lines_vec) => {
 				let lines_string: String = lines_vec.join("\n");
-				write!(f, "{}", lines_string)
+				write!(f, "{lines_string}")
 			},
-			Block::LatexBlock(lines_vec) => {
+			Self::LatexBlock(lines_vec) => {
 				let lines_string: String = lines_vec.join("\n");
-				write!(f, "{}", lines_string)
+				write!(f, "{lines_string}")
 			},
-			Block::BlockQuote(blocks_vec) => {
-				let blocks_str_vec: Vec<String> = blocks_vec.iter().map(|x| format!("{}", x)).collect();
+			Self::BlockQuote(blocks_vec) => {
+				let blocks_str_vec: Vec<String> = blocks_vec.iter().map(|x| format!("{x}")).collect();
 				let blocks_string: String = blocks_str_vec.join("\n");
-				let prepended_blocks_string_vec: Vec<String> = blocks_string.lines().map(|x| format!(">{}", x)).collect();
+				let prepended_blocks_string_vec: Vec<String> = blocks_string.lines().map(|x| format!(">{x}")).collect();
 				let prepended_blocks_string: String = prepended_blocks_string_vec.join("\n");
-				write!(f, "{}", prepended_blocks_string)
+				write!(f, "{prepended_blocks_string}")
 			},
-			Block::TextBlock(lines_vec) => {
-				let lines_str_vec: Vec<String> = lines_vec.iter().map(|x| format!("{}", x)).collect();
+			Self::TextBlock(lines_vec) => {
+				let lines_str_vec: Vec<String> = lines_vec.iter().map(|x| format!("{x}")).collect();
 				let lines_string: String = lines_str_vec.join("\n");
-				write!(f, "{}", lines_string)
+				write!(f, "{lines_string}")
 			},
 		}
 	}
@@ -223,88 +223,88 @@ pub enum Line {
 impl Line {
 	pub fn iterate_strings(&self) -> Vec<&String> {
 		match self {
-			Line::Heading(nodes, _) => {
+			Self::Heading(nodes, _) => {
 				let mut strings: Vec<&String> = Vec::new();
 				for node in nodes {
 					strings.append(&mut node.iterate_strings());
 				}
 				strings
 			},
-			Line::BulletPoint(nodes, _) => {
+			Self::BulletPoint(nodes, _) => {
 				let mut strings: Vec<&String> = Vec::new();
 				for node in nodes {
 					strings.append(&mut node.iterate_strings());
 				}
 				strings
 			},
-			Line::ListItem(nodes, _, _) => {
+			Self::ListItem(nodes, _, _) => {
 				let mut strings: Vec<&String> = Vec::new();
 				for node in nodes {
 					strings.append(&mut node.iterate_strings());
 				}
 				strings
 			},
-			Line::String(nodes) => {
+			Self::String(nodes) => {
 				let mut strings: Vec<&String> = Vec::new();
 				for node in nodes {
 					strings.append(&mut node.iterate_strings());
 				}
 				strings
 			},
-			Line::Linebar => Vec::new(),
+			Self::Linebar => Vec::new(),
 		}
 	}
 
 	#[allow(dead_code)]
 	pub fn iterate_nodes(&self) -> Vec<&Node> {
 		match self {
-			Line::Heading(nodes, _) => {
+			Self::Heading(nodes, _) => {
 				let mut nodes_vec: Vec<&Node> = Vec::new();
 				for node in nodes {
 					nodes_vec.push(node);
 				}
 				nodes_vec
 			},
-			Line::BulletPoint(nodes, _) => {
+			Self::BulletPoint(nodes, _) => {
 				let mut nodes_vec: Vec<&Node> = Vec::new();
 				for node in nodes {
 					nodes_vec.push(node);
 				}
 				nodes_vec
 			},
-			Line::ListItem(nodes, _, _) => {
+			Self::ListItem(nodes, _, _) => {
 				let mut nodes_vec: Vec<&Node> = Vec::new();
 				for node in nodes {
 					nodes_vec.push(node);
 				}
 				nodes_vec
 			},
-			Line::String(nodes) => {
+			Self::String(nodes) => {
 				let mut nodes_vec: Vec<&Node> = Vec::new();
 				for node in nodes {
 					nodes_vec.push(node);
 				}
 				nodes_vec
 			},
-			Line::Linebar => Vec::new(),
+			Self::Linebar => Vec::new(),
 		}
 	}
 
 	pub fn get_nodes_mut(&mut self) -> Option<&mut Vec<Node>> {
 		match self {
-			Line::Heading(nodes, _) => {
+			Self::Heading(nodes, _) => {
 				Some(nodes)
 			},
-			Line::BulletPoint(nodes, _) => {
+			Self::BulletPoint(nodes, _) => {
 				Some(nodes)
 			},
-			Line::ListItem(nodes, _, _) => {
+			Self::ListItem(nodes, _, _) => {
 				Some(nodes)
 			},
-			Line::String(nodes) => {
+			Self::String(nodes) => {
 				Some(nodes)
 			},
-			Line::Linebar => None,
+			Self::Linebar => None,
 		}
 	}
 
@@ -313,7 +313,7 @@ impl Line {
 impl Display for Line {
 	fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
 		match self {
-			Line::Heading(nodes, level) => {
+			Self::Heading(nodes, level) => {
 				// write!(f, "\n")?;
 				// write the heading level
 				for _ in 0..*level {
@@ -322,35 +322,35 @@ impl Display for Line {
 
 				write!(f, " ")?;
 				for node in nodes {
-					write!(f, "{}", node)?;
+					write!(f, "{node}")?;
 				}
 				write!(f, "")
 			},
-			Line::BulletPoint(nodes, indentation) => {
+			Self::BulletPoint(nodes, indentation) => {
 				// write!(f, "\n")?;
-				write!(f, "{}- ", indentation)?;
+				write!(f, "{indentation}- ")?;
 				for node in nodes {
-					write!(f, "{}", node)?;
+					write!(f, "{node}")?;
 				}
 				write!(f, "")
 			},
-			Line::ListItem(nodes, number, indentation) => {
+			Self::ListItem(nodes, number, indentation) => {
 				// write!(f, "\n")?;
-				write!(f, "{}{}. ", indentation, number)?;
+				write!(f, "{indentation}{number}. ")?;
 				for node in nodes {
-					write!(f, "{}", node)?;
+					write!(f, "{node}")?;
 				}
 				write!(f, "")
 			},
-			Line::String(nodes) => {
+			Self::String(nodes) => {
 
 				// write!(f, "\n")?;
 				for node in nodes {
-					write!(f, "{}", node)?;
+					write!(f, "{node}")?;
 				}
 				write!(f, "")
 			},
-			Line::Linebar => write!(f, "---"),
+			Self::Linebar => write!(f, "---"),
 		}
 	}
 }
@@ -381,14 +381,14 @@ pub enum Node {
 impl Node {
 	pub fn iterate_strings(&self) -> Vec<&String> {
 		match self {
-			Node::InlineCode(_) => Vec::new(),
-			Node::InlineBlockLatex(_) => Vec::new(),
-			Node::InlineLatex(_) => Vec::new(),
-			Node::FormattedMarkdownLink(_, _) => Vec::new(),
-			Node::MarkdownLink(_) => Vec::new(),
-			Node::FormattedWebLink(_, _) => Vec::new(),
-			Node::WebLink(_) => Vec::new(),
-			Node::BoldItalic(nodes) => {
+			Self::InlineCode(_) => Vec::new(),
+			Self::InlineBlockLatex(_) => Vec::new(),
+			Self::InlineLatex(_) => Vec::new(),
+			Self::FormattedMarkdownLink(_, _) => Vec::new(),
+			Self::MarkdownLink(_) => Vec::new(),
+			Self::FormattedWebLink(_, _) => Vec::new(),
+			Self::WebLink(_) => Vec::new(),
+			Self::BoldItalic(nodes) => {
 				let mut strings: Vec<&String> = Vec::new();
 				for node in nodes {
 					let mut other_strings = node.iterate_strings();
@@ -396,7 +396,7 @@ impl Node {
 				}
 				strings
 			},
-			Node::Bold(nodes) => {
+			Self::Bold(nodes) => {
 				let mut strings: Vec<&String> = Vec::new();
 				for node in nodes {
 					let mut other_strings = node.iterate_strings();
@@ -404,7 +404,7 @@ impl Node {
 				}
 				strings
 			},
-			Node::Italic(nodes) => {
+			Self::Italic(nodes) => {
 				let mut strings: Vec<&String> = Vec::new();
 				for node in nodes {
 					let mut other_strings = node.iterate_strings();
@@ -413,7 +413,7 @@ impl Node {
 				strings
 			},
 
-			Node::String(string) => {
+			Self::String(string) => {
 				vec![string]
 			},
 		}
@@ -423,36 +423,36 @@ impl Node {
 impl Display for Node {
 	fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
 		match self {
-			Node::InlineCode(content) => write!(f, "`{}`", content),
-			Node::InlineBlockLatex(content) => write!(f, "$${}$$", content),
-			Node::InlineLatex(content) => write!(f, "${}$", content),
-			Node::MarkdownLink(content) => write!(f, "[[{}]]", content),
-			Node::FormattedMarkdownLink(link, text) => write!(f, "[[{}|{}]]", link, text),
-			Node::WebLink(content) => write!(f, "[{}]", content),
-			Node::FormattedWebLink(link, text) => write!(f, "[{}]({})", text, link),
-			Node::BoldItalic(content) => {
+			Self::InlineCode(content) => write!(f, "`{content}`"),
+			Self::InlineBlockLatex(content) => write!(f, "$${content}$$"),
+			Self::InlineLatex(content) => write!(f, "${content}$"),
+			Self::MarkdownLink(content) => write!(f, "[[{content}]]"),
+			Self::FormattedMarkdownLink(link, text) => write!(f, "[[{link}|{text}]]"),
+			Self::WebLink(content) => write!(f, "[{content}]"),
+			Self::FormattedWebLink(link, text) => write!(f, "[{text}]({link})"),
+			Self::BoldItalic(content) => {
 				write!(f, "***")?;
 				for node in content {
-					write!(f, "{}", node)?;
+					write!(f, "{node}")?;
 				}
 				write!(f, "***")
 			},
 
-			Node::Bold(content) => {
+			Self::Bold(content) => {
 				write!(f, "**")?;
 				for node in content {
-					write!(f, "{}", node)?;
+					write!(f, "{node}")?;
 				}
 				write!(f, "**")
 			},
-			Node::Italic(content) => {
+			Self::Italic(content) => {
 				write!(f, "*")?;
 				for node in content {
-					write!(f, "{}", node)?;
+					write!(f, "{node}")?;
 				}
 				write!(f, "*")
 			}
-			Node::String(content) => write!(f, "{}", content),
+			Self::String(content) => write!(f, "{content}"),
 		}
 	}
 }
@@ -471,7 +471,7 @@ pub enum  BlockParseState {
 
 pub fn parse_into_blocks(lines: Vec<String>) -> Vec<Block> {
 	let mut lines = lines;
-	if lines.len() == 0 {
+	if lines.is_empty() {
 		return vec![];
 	}
 	let mut state = BlockParseState::Start;
@@ -495,7 +495,7 @@ pub fn parse_into_blocks(lines: Vec<String>) -> Vec<Block> {
 					current_lines.push(line);
 					state = BlockParseState::LatexBlock;
 				}
-				else if line.starts_with(">") {
+				else if line.starts_with('>') {
 					current_lines.push(line.strip_prefix(">").unwrap());
 					state = BlockParseState::BlockQuote;
 				}
@@ -547,7 +547,7 @@ pub fn parse_into_blocks(lines: Vec<String>) -> Vec<Block> {
 			BlockParseState::BlockQuote => {
 				// the current line may or may not be a block quote,
 				// but the previous line was a block quote
-				if line.starts_with(">") {
+				if line.starts_with('>') {
 					current_lines.push(line.strip_prefix(">").unwrap());
 				}
 				else {
@@ -576,7 +576,7 @@ pub fn parse_into_blocks(lines: Vec<String>) -> Vec<Block> {
 					current_lines.push(line);
 					state = BlockParseState::CodeBlock;
 				}
-				else if line.starts_with(">") {
+				else if line.starts_with('>') {
 
 					// blocks.push(Block::TextBlock(parse_into_lines(current_lines)));
 					block_markers.push((BlockParseState::TextBlock, start_index, index - 1));
@@ -604,7 +604,7 @@ pub fn parse_into_blocks(lines: Vec<String>) -> Vec<Block> {
 					current_lines.push(line);
 					state = BlockParseState::LatexBlock;
 				}
-				else if line.starts_with(">") {
+				else if line.starts_with('>') {
 					current_lines.push(line.strip_prefix(">").unwrap());
 					state = BlockParseState::BlockQuote;
 				}
@@ -649,7 +649,7 @@ pub fn parse_into_blocks(lines: Vec<String>) -> Vec<Block> {
 	let mut block_lines: Vec<(BlockParseState, Vec<String>)> = Vec::new();
 	for (state, start, end) in block_markers {
 		let mut block_lines_inner: Vec<String> = Vec::new();
-		for _index in start..end + 1 {
+		for _index in start..=end {
 			block_lines_inner.push(lines.remove(0));
 		}
 		block_lines.push((state, block_lines_inner));
@@ -664,7 +664,7 @@ pub fn parse_block_lines_into_blocks(block_lines: Vec<(BlockParseState, Vec<Stri
 	let mut blocks: Vec<Block> = Vec::new();
 
 	loop {
-		if block_lines.len() == 0 {
+		if block_lines.is_empty() {
 			break;
 		}
 		let (state, lines) = block_lines.remove(0);
@@ -704,7 +704,7 @@ pub fn parse_into_lines(lines: Vec<String>) -> Vec<Line> {
 	for line in lines {
 
 		// if heading_pattern.is_match(&line) {
-		if line.starts_with("#") {
+		if line.starts_with('#') {
 			let chars: Vec<char> = line.chars().collect();
 			let level: u8 = chars.iter().take_while(|x| x == &&'#').count() as u8;
 			let text: String = chars.iter().skip_while(|x| x == &&'#' || x == &&' ').collect();
@@ -720,7 +720,7 @@ pub fn parse_into_lines(lines: Vec<String>) -> Vec<Line> {
 		else if LIST_ITEM_PATTERN.is_match(&line) {
 			let caps = LIST_ITEM_PATTERN.captures(&line).unwrap();
 			let indentation = &caps["indent"];
-			let number = (&caps["number"]).parse::<u32>().unwrap();
+			let number = caps["number"].parse::<u32>().unwrap();
 			let text = &caps["text"];
 			line_vec.push(Line::ListItem(parse_into_nodes(text.to_string()), number, indentation.to_string()));
 		}
@@ -732,7 +732,7 @@ pub fn parse_into_lines(lines: Vec<String>) -> Vec<Line> {
 		}
 	}
 
-	return line_vec;
+	line_vec
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Default)]
@@ -776,18 +776,18 @@ pub fn parse_into_nodes(content: String) -> Vec<Node> {
 				node_parse_vector.push((NodeParseState::String, start_index, index));
 				// start_index = index;
 			}
-			let caps = INLINE_CODE_PATTERN.captures(&loop_string).unwrap();
+			let caps = INLINE_CODE_PATTERN.captures(loop_string).unwrap();
 			let length = caps.get(0).unwrap().as_str().chars().count();
 			node_parse_vector.push((NodeParseState::InlineCode, index, index + length));
 			index += length;
 			start_index = index;
-		} else if INLINE_BLOCK_LATEX_PATTERN.is_match(&loop_string) {
+		} else if INLINE_BLOCK_LATEX_PATTERN.is_match(loop_string) {
 			if index != start_index {
 				// nodes.push(Node::String(characters[start_index..index].into_iter().collect()));
 				node_parse_vector.push((NodeParseState::String, start_index, index));
 				// start_index = index;
 			}
-			let caps = INLINE_BLOCK_LATEX_PATTERN.captures(&loop_string).unwrap();
+			let caps = INLINE_BLOCK_LATEX_PATTERN.captures(loop_string).unwrap();
 			let cap_0 = caps.get(0).unwrap().as_str();
 			// println!("Cap: {}", cap_0);
 			let length =
@@ -800,93 +800,93 @@ pub fn parse_into_nodes(content: String) -> Vec<Node> {
 			start_index = index;
 
 		}
-		else if INLINE_LATEX_PATTERN.is_match(&loop_string) {
+		else if INLINE_LATEX_PATTERN.is_match(loop_string) {
 			if index != start_index {
 				// nodes.push(Node::String(characters[start_index..index].into_iter().collect()));
 				node_parse_vector.push((NodeParseState::String, start_index, index));
 			}
-			let caps = INLINE_LATEX_PATTERN.captures(&loop_string).unwrap();
+			let caps = INLINE_LATEX_PATTERN.captures(loop_string).unwrap();
 			// nodes.push(Node::InlineLatex(caps.get(1).unwrap().as_str().to_string()));
 			let length = caps.get(0).unwrap().as_str().chars().count();
 			node_parse_vector.push((NodeParseState::InlineLatex, index, index + length));
 			index += length;
 			start_index = index;
-		} else if FORMATTED_MARKDOWN_LINK_PATTERN.is_match(&loop_string) {
+		} else if FORMATTED_MARKDOWN_LINK_PATTERN.is_match(loop_string) {
 			if index != start_index {
 				// nodes.push(Node::String(characters[start_index..index].into_iter().collect()));
 				node_parse_vector.push((NodeParseState::String, start_index, index));
 			}
-			let caps = FORMATTED_MARKDOWN_LINK_PATTERN.captures(&loop_string).unwrap();
+			let caps = FORMATTED_MARKDOWN_LINK_PATTERN.captures(loop_string).unwrap();
 			// nodes.push(Node::FormattedMarkdownLink(caps.get(1).unwrap().as_str().to_string(), caps.get(2).unwrap().as_str().to_string()));
 			let length = caps.get(0).unwrap().as_str().chars().count();
 			node_parse_vector.push((NodeParseState::FormattedMarkdownLink, index, index + length));
 			index += length;
 			start_index = index;
-		} else if MARKDOWN_LINK_PATTERN.is_match(&loop_string) {
+		} else if MARKDOWN_LINK_PATTERN.is_match(loop_string) {
 			if index != start_index {
 				// nodes.push(Node::String(characters[start_index..index].into_iter().collect()));
 				node_parse_vector.push((NodeParseState::String, start_index, index));
 			}
-			let caps = MARKDOWN_LINK_PATTERN.captures(&loop_string).unwrap();
+			let caps = MARKDOWN_LINK_PATTERN.captures(loop_string).unwrap();
 			// nodes.push(Node::MarkdownLink(caps.get(1).unwrap().as_str().to_string()));
 			let length = caps.get(0).unwrap().as_str().chars().count();
 			node_parse_vector.push((NodeParseState::MarkdownLink, index, index + length));
 			index += length;
 			start_index = index;
-		} else if FORMATTED_WEB_LINK_PATTERN.is_match(&loop_string) {
+		} else if FORMATTED_WEB_LINK_PATTERN.is_match(loop_string) {
 			if index != start_index {
 				// nodes.push(Node::String(characters[start_index..index].into_iter().collect()));
 				node_parse_vector.push((NodeParseState::String, start_index, index));
 			}
-			let caps = FORMATTED_WEB_LINK_PATTERN.captures(&loop_string).unwrap();
+			let caps = FORMATTED_WEB_LINK_PATTERN.captures(loop_string).unwrap();
 			// nodes.push(Node::FormattedWebLink(caps.get(2).unwrap().as_str().to_string(), caps.get(1).unwrap().as_str().to_string()));
 			let length = caps.get(0).unwrap().as_str().chars().count();
 			node_parse_vector.push((NodeParseState::FormattedWebLink, index, index + length));
 			index += length;
 			start_index = index;
 
-		} else if WEB_LINK_PATTERN.is_match(&loop_string) {
+		} else if WEB_LINK_PATTERN.is_match(loop_string) {
 			if index != start_index {
 				// nodes.push(Node::String(characters[start_index..index].into_iter().collect()));
 				node_parse_vector.push((NodeParseState::String, start_index, index));
 			}
-			let caps = WEB_LINK_PATTERN.captures(&loop_string).unwrap();
+			let caps = WEB_LINK_PATTERN.captures(loop_string).unwrap();
 			// nodes.push(Node::WebLink(caps.get(1).unwrap().as_str().to_string()));
 			let length = caps.get(0).unwrap().as_str().chars().count();
 			node_parse_vector.push((NodeParseState::WebLink, index, index + length));
 			index += length;
 			start_index = index;
 			// text = String::new();
-		} else if BOLD_ITALIC_PATTERN.is_match(&loop_string) {
+		} else if BOLD_ITALIC_PATTERN.is_match(loop_string) {
 			if index != start_index {
 				// nodes.push(Node::String(characters[start_index..index].into_iter().collect()));
 				node_parse_vector.push((NodeParseState::String, start_index, index));
 			}
-			let caps = BOLD_ITALIC_PATTERN.captures(&loop_string).unwrap();
+			let caps = BOLD_ITALIC_PATTERN.captures(loop_string).unwrap();
 			// nodes.push(Node::BoldItalic(parse_into_nodes(caps.get(1).unwrap().as_str().to_string())));
 			let length = caps.get(0).unwrap().as_str().chars().count();
 			node_parse_vector.push((NodeParseState::BoldItalic, index, index + length));
 			index += length;
 			start_index = index;
 			// text = String::new();
-		} else if BOLD_PATTERN.is_match(&loop_string) {
+		} else if BOLD_PATTERN.is_match(loop_string) {
 			if index != start_index {
 				// nodes.push(Node::String(characters[start_index..index].into_iter().collect()));
 				node_parse_vector.push((NodeParseState::String, start_index, index));
 			}
-			let caps = BOLD_PATTERN.captures(&loop_string).unwrap();
+			let caps = BOLD_PATTERN.captures(loop_string).unwrap();
 			// nodes.push(Node::Bold(parse_into_nodes(caps.get(1).unwrap().as_str().to_string())));
 			let length = caps.get(0).unwrap().as_str().chars().count();
 			node_parse_vector.push((NodeParseState::Bold, index, index + length));
 			index += length;
 			start_index = index;
 			// text = String::new();
-		} else if ITALIC_PATTERN.is_match(&loop_string) {
+		} else if ITALIC_PATTERN.is_match(loop_string) {
 			if index != start_index {
 				// nodes.push(Node::String(characters[start_index..index].into_iter().collect()));
 				node_parse_vector.push((NodeParseState::String, start_index, index));
 			}
-			let caps = ITALIC_PATTERN.captures(&loop_string).unwrap();
+			let caps = ITALIC_PATTERN.captures(loop_string).unwrap();
 			// nodes.push(Node::Italic(parse_into_nodes(caps.get(1).unwrap().as_str().to_string())));
 			let length = caps.get(0).unwrap().as_str().chars().count();
 			node_parse_vector.push((NodeParseState::Italic, index, index + length));
@@ -916,7 +916,7 @@ pub fn parse_node_lines_into_nodes(node_parts: Vec<(NodeParseState, Vec<char>)>)
 	let mut node_parts: Vec<(NodeParseState, Vec<char>)> = node_parts;
 	let mut nodes: Vec<Node> = Vec::new();
 	loop {
-		if node_parts.len() == 0 {
+		if node_parts.is_empty() {
 			break;
 		}
 		let (state, parts) = node_parts.remove(0);
@@ -936,7 +936,7 @@ pub fn parse_node_lines_into_nodes(node_parts: Vec<(NodeParseState, Vec<char>)>)
 			NodeParseState::FormattedMarkdownLink => {
 				let parts: String = parts[2..parts.len() - 2].iter().collect();
 				let parts: String = parts.chars().collect();
-				let mut parts: Vec<String> = parts.split("|").map(|x| x.to_string()).collect();
+				let mut parts: Vec<String> = parts.split('|').map(std::string::ToString::to_string).collect();
 				let part_0: String = parts.remove(0);
 				let part_1: String = parts.remove(0);
 				nodes.push(Node::FormattedMarkdownLink(part_0, part_1));

@@ -17,32 +17,32 @@ pub struct MDFile {
 impl MDFile {
 
 	// Constructor Methods
-	pub fn from(file_path: PathBuf) -> Result<MDFile, String> {
+	pub fn from(file_path: PathBuf) -> Result<Self, String> {
 		assert!(file_path.is_file(), "Path is not a file: {}", file_path.display());
 		let file_contents = match std::fs::read_to_string(&file_path) {
 			Ok(contents) => contents,
 			Err(_) => return Err(format!("Error reading file: {}", file_path.display())),
 		};
 
-		let title: String = file_path.file_stem().unwrap().to_str().expect(&format!("Can't convert path to &str: {}", file_path.display())).to_string();
+		let title: String = file_path.file_stem().unwrap().to_str().unwrap_or_else(|| panic!("Can't convert path to &str: {}", file_path.display())).to_string();
 		let last_modified = match std::fs::metadata(&file_path) {
 			Ok(metadata) => metadata.modified().unwrap(),
 			Err(_) => return Err(format!("Error getting last modified time from file: {}", file_path.display())),
 		};
 
-		let mut md_file = MDFile::new(file_path, title, file_contents);
+		let mut md_file = Self::new(file_path, title, file_contents);
 
 		md_file.set_last_modified(Some(last_modified));
 
 		Ok(md_file)
 	}
 
-	pub fn new(path: PathBuf, title: String, string: String) -> MDFile {
+	pub fn new(path: PathBuf, title: String, string: String) -> Self {
 
 		let ast: AST = AST::new(string);
 		let aliases: Vec<String> = ast.get_aliases();
 
-		MDFile {
+		Self {
 			path,
 			title,
 			aliases,
@@ -97,12 +97,9 @@ impl MDFile {
 		let mut lines: Vec<&mut Line> = self.get_lines_mut();
 		for line in &mut lines {
 			let nodes: Option<&mut Vec<Node>> = line.get_nodes_mut();
-			match nodes {
-				Some(nodes) => {
-					*nodes = crate::linking::add_link_to_nodes(nodes.clone(), link.clone());
-				}
-				None => {}
-			}
+			if let Some(nodes) = nodes {
+   					*nodes = crate::linking::add_link_to_nodes(nodes.clone(), link.clone());
+   				}
 		}
 	}
 	pub fn link_noself(&mut self, link: Link) {
@@ -116,12 +113,9 @@ impl MDFile {
 		let mut lines: Vec<&mut Line> = self.get_lines_mut();
 		for line in &mut lines {
 			let nodes: Option<&mut Vec<Node>> = line.get_nodes_mut();
-			match nodes {
-				Some(nodes) => {
-					*nodes = crate::linking::add_link_to_nodes(nodes.clone(), link.clone());
-				}
-				None => {}
-			}
+			if let Some(nodes) = nodes {
+   					*nodes = crate::linking::add_link_to_nodes(nodes.clone(), link.clone());
+   				}
 		}
 	}
 	pub fn unlink(&mut self) {
@@ -142,7 +136,7 @@ impl MDFile {
 						Node::String(text) => {
 							if let Some(Node::String(last_text)) = acc.clone().last() {
 								acc.pop();
-								acc.push(Node::String(format!("{}{}", last_text, text)));
+								acc.push(Node::String(format!("{last_text}{text}")));
 							} else {
 								acc.push(Node::String(text.clone()));
 							}
@@ -160,8 +154,8 @@ impl MDFile {
 	}
 
 	pub fn export_to_file(&self, path: &PathBuf) -> Result<(), String> {
-		match std::fs::write(&path, self.to_string()) {
-			Ok(_) => Ok(()),
+		match std::fs::write(path, self.to_string()) {
+			Ok(()) => Ok(()),
 			Err(_) => Err(format!("Error writing to file: {}", path.display())),
 		}
 	}
@@ -173,6 +167,6 @@ impl MDFile {
 
 impl Display for MDFile {
 	fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
-		write!(f, "{}", self.ast.to_string())
+		write!(f, "{}", self.ast)
 	}
 }

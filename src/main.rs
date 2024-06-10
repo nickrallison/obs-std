@@ -17,7 +17,7 @@ fn main() {
 	let cli = CLI::parse();
 	let run_result: Result<(), CLIError> = run_cli(cli);
 	match run_result {
-		Ok(_) => {}
+		Ok(()) => {}
 		Err(e) => {
 			match e {
 				CLIError::InvalidTarget => {
