@@ -1,5 +1,5 @@
 
-use crate::cli::{Cli, CLIError, run_cli};
+use crate::cli::{CLI, CLIError, run_cli};
 
 use clap::Parser;
 
@@ -60,7 +60,7 @@ fn main() {
 	// let output = PathBuf::from("out");
 	// vault.export(&output);
 
-	let cli = Cli::parse();
+	let cli = CLI::parse();
 	let run_result: Result<(), CLIError> = run_cli(cli);
 	match run_result {
 		Ok(_) => {}

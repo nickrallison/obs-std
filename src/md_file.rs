@@ -1,15 +1,16 @@
 use std::fmt::Display;
 use std::path::PathBuf;
+use crate::linking::Link;
 use crate::parse::{AST, Line, Node};
 
 #[allow(dead_code)]
 #[derive(Debug, Clone, PartialEq)]
 pub struct MDFile {
-	pub(crate) path: Option<PathBuf>,
-	title: Option<String>,
-	aliases: Vec<String>,
-	ast: AST,
-	last_modified: Option<std::time::SystemTime>,
+	pub path: PathBuf,
+	pub title: String,
+	pub aliases: Vec<String>,
+	pub ast: AST,
+	pub last_modified: Option<std::time::SystemTime>,
 }
 
 #[allow(dead_code)]
@@ -22,7 +23,6 @@ impl MDFile {
 			Ok(contents) => contents,
 			Err(_) => return Err(format!("Error reading file: {}", file_path.display())),
 		};
-		let mut md_file = MDFile::from_string(file_contents);
 
 		let title: String = file_path.file_stem().unwrap().to_str().expect(&format!("Can't convert path to &str: {}", file_path.display())).to_string();
 		let last_modified = match std::fs::metadata(&file_path) {
@@ -30,21 +30,21 @@ impl MDFile {
 			Err(_) => return Err(format!("Error getting last modified time from file: {}", file_path.display())),
 		};
 
-		md_file.set_title(Some(title));
-		md_file.set_path(Some(file_path));
+		let mut md_file = MDFile::new(file_path, title, file_contents);
+
 		md_file.set_last_modified(Some(last_modified));
 
 		Ok(md_file)
 	}
 
-	pub fn from_string(string: String) -> MDFile {
+	pub fn new(path: PathBuf, title: String, string: String) -> MDFile {
 
 		let ast: AST = AST::new(string);
 		let aliases: Vec<String> = ast.get_aliases();
 
 		MDFile {
-			path: None,
-			title: None,
+			path,
+			title,
 			aliases,
 			ast,
 			last_modified: None,
@@ -54,23 +54,23 @@ impl MDFile {
 
 	// Getter Methods
 
-	pub fn get_title(&self) -> Option<&String> {
-		self.title.as_ref()
+	pub fn get_title(&self) -> &String {
+		&self.title
 	}
 
 	pub fn get_aliases(&self) -> Vec<&String> {
 		self.aliases.iter().collect()
 	}
 
-	pub fn get_path(&self) -> Option<&PathBuf> {
-		self.path.as_ref()
+	pub fn get_path(&self) -> &PathBuf {
+		&self.path
 	}
 
-	pub fn get_lines(&self) -> Vec<&crate::parse::Line> {
+	pub fn get_lines(&self) -> Vec<&Line> {
 		self.ast.get_lines()
 	}
 
-	pub fn get_lines_mut(&mut self) -> Vec<&mut crate::parse::Line> {
+	pub fn get_lines_mut(&mut self) -> Vec<&mut Line> {
 		self.ast.get_lines_mut()
 	}
 
@@ -79,13 +79,13 @@ impl MDFile {
 	}
 
 	// Setter Methods
-	pub fn set_title(&mut self, title: Option<String>) {
+	pub fn set_title(&mut self, title: String) {
 		self.title = title;
 	}
 	pub fn set_aliases(&mut self, aliases: Vec<String>) {
 		self.aliases = aliases;
 	}
-	pub fn set_path(&mut self, path: Option<PathBuf>) {
+	pub fn set_path(&mut self, path: PathBuf) {
 		self.path = path;
 	}
 	pub fn set_last_modified(&mut self, last_modified: Option<std::time::SystemTime>) {
@@ -105,10 +105,9 @@ impl MDFile {
 			}
 		}
 	}
-	//
 	pub fn link_noself(&mut self, link: Link) {
 
-		let self_path_basename = self.path.as_ref().unwrap().file_stem().unwrap().to_str().unwrap();
+		let self_path_basename = self.path.file_stem().unwrap().to_str().unwrap();
 		let link_path_basename = link.get_path().file_stem().unwrap().to_str().unwrap();
 		if self_path_basename == link_path_basename {
 			return;
@@ -138,7 +137,6 @@ impl MDFile {
 					}
 				}).collect();
 
-				// Join adjacent strings into a single string node
 				*nodes = nodes.clone().iter().fold(vec![], |mut acc, node| {
 					match node {
 						Node::String(text) => {
@@ -169,10 +167,7 @@ impl MDFile {
 	}
 
 	pub fn export(&self) -> Result<(), String>  {
-		match self.path {
-			Some(ref path) => self.export_to_file(path),
-			None => Err("No path to export to".to_string())
-		}
+		self.export_to_file(self.get_path())
 	}
 }
 
@@ -181,26 +176,3 @@ impl Display for MDFile {
 		write!(f, "{}", self.ast.to_string())
 	}
 }
-
-#[derive(Debug, Clone, PartialEq)]
-pub struct Link {
-	alias: String,
-	path: PathBuf,
-}
-
-impl Link {
-	pub fn new(alias: String, path: PathBuf) -> Link {
-		Link {
-			alias,
-			path,
-		}
-	}
-	pub fn get_alias(&self) -> &String {
-		&self.alias
-	}
-	pub fn get_path(&self) -> &PathBuf {
-		&self.path
-	}
-}
-
-

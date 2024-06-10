@@ -26,8 +26,8 @@ lazy_static! {
 
 #[derive(Debug, Clone, PartialEq)]
 pub struct AST {
-	blocks: Vec<Block>,
-	line_sep: LineSep
+	pub blocks: Vec<Block>,
+	pub line_sep: NewlineType
 }
 
 #[allow(dead_code)]
@@ -35,10 +35,10 @@ impl AST {
 
 	pub fn new(contents: String) -> AST {
 		let contents = contents;
-		let line_sep: LineSep = if (&contents).contains("\r\n") {
-			LineSep::Windows
+		let line_sep: NewlineType = if (&contents).contains("\r\n") {
+			NewlineType::Windows
 		} else {
-			LineSep::Unix
+			NewlineType::Unix
 		};
 		let lines: Vec<String> = contents.split('\n').map(|x| x.to_string()).collect();
 		let blocks = parse_into_blocks(lines);
@@ -107,8 +107,8 @@ impl Display for AST {
 		let mut file_contents: String = blocks_str_vec.join("\n");
 		file_contents = file_contents.replace("\r\n", "\n");
 		match self.line_sep {
-			LineSep::Unix => write!(f, "{}", file_contents),
-			LineSep::Windows => write!(f, "{}", file_contents.replace("\n", "\r\n")),
+			NewlineType::Unix => write!(f, "{}", file_contents),
+			NewlineType::Windows => write!(f, "{}", file_contents.replace("\n", "\r\n")),
 		}
 
 	}
@@ -116,7 +116,7 @@ impl Display for AST {
 }
 
 #[derive(Debug, Clone, PartialEq)]
-pub enum LineSep {
+pub enum NewlineType {
 	Unix,
 	Windows,
 }
@@ -907,9 +907,6 @@ pub fn parse_into_nodes(content: String) -> Vec<Node> {
 }
 
 pub fn parse_node_lines_into_nodes(node_parts: Vec<(NodeParseState, Vec<char>)>) -> Vec<Node> {
-	// for (state, parts) in &node_parts {
-	// 	println!("{:?} -> {}", state, parts.iter().collect::<String>());
-	// }
 	let mut node_parts: Vec<(NodeParseState, Vec<char>)> = node_parts;
 	let mut nodes: Vec<Node> = Vec::new();
 	loop {
@@ -919,28 +916,18 @@ pub fn parse_node_lines_into_nodes(node_parts: Vec<(NodeParseState, Vec<char>)>)
 		let (state, parts) = node_parts.remove(0);
 		match state {
 			NodeParseState::InlineCode => {
-				// prune the backticks
-				// let parts = parts.strip_prefix("`").unwrap().strip_suffix("`").unwrap().to_string();
 				let parts: String = parts[1..parts.len() - 1].iter().collect();
 				nodes.push(Node::InlineCode(parts));
 			},
 			NodeParseState::InlineBlockLatex => {
-				// prune the dollar signs
-				// let parts = parts.strip_prefix("$$").unwrap().strip_suffix("$$").unwrap().to_string();
-				// println!("Parts Before: {:?}", parts.iter().collect::<String>());
 				let parts: String = parts[2..parts.len() - 2].iter().collect();
-				// println!("Parts After: {:?}", parts);
 				nodes.push(Node::InlineBlockLatex(parts));
 			},
 			NodeParseState::InlineLatex => {
-				// prune the dollar signs
-				// let parts = parts.strip_prefix("$").unwrap().strip_suffix("$").unwrap().to_string();
 				let parts: String = parts[1..parts.len() - 1].iter().collect();
 				nodes.push(Node::InlineLatex(parts));
 			},
 			NodeParseState::FormattedMarkdownLink => {
-				// prune the brackets
-				// let parts = parts.strip_prefix("[[").unwrap().strip_suffix("]]").unwrap().to_string();
 				let parts: String = parts[2..parts.len() - 2].iter().collect();
 				let parts: String = parts.chars().collect();
 				let mut parts: Vec<String> = parts.split("|").map(|x| x.to_string()).collect();
@@ -949,39 +936,27 @@ pub fn parse_node_lines_into_nodes(node_parts: Vec<(NodeParseState, Vec<char>)>)
 				nodes.push(Node::FormattedMarkdownLink(part_0, part_1));
 			},
 			NodeParseState::MarkdownLink => {
-				// prune the brackets
-				// let parts = parts.strip_prefix("[[").unwrap().strip_suffix("]]").unwrap().to_string();
 				let parts: String = parts[2..parts.len() - 2].iter().collect();
 				nodes.push(Node::MarkdownLink(parts));
 			},
 			NodeParseState::FormattedWebLink => {
-				// prune the brackets
-				// let parts = parts.strip_prefix("[").unwrap().strip_suffix(")").unwrap().to_string();
 				let parts: String = parts[1..parts.len() - 1].iter().collect();
 				let parts: Vec<&str> = parts.split("](").collect();
 				nodes.push(Node::FormattedWebLink(parts[1].to_string(), parts[0].to_string()));
 			},
 			NodeParseState::WebLink => {
-				// prune the brackets
-				// let parts = parts.strip_prefix("[").unwrap().strip_suffix("]").unwrap().to_string();
 				let parts: String = parts[1..parts.len() - 1].iter().collect();
 				nodes.push(Node::WebLink(parts));
 			},
 			NodeParseState::BoldItalic => {
-				// prune the asterisks
-				// let parts = parts.strip_prefix("***").unwrap().strip_suffix("***").unwrap().to_string();
 				let parts: String = parts[3..parts.len() - 3].iter().collect();
 				nodes.push(Node::BoldItalic(parse_into_nodes(parts)));
 			},
 			NodeParseState::Bold => {
-				// prune the asterisks
-				// let parts = parts.strip_prefix("**").unwrap().strip_suffix("**").unwrap().to_string();
 				let parts: String = parts[2..parts.len() - 2].iter().collect();
 				nodes.push(Node::Bold(parse_into_nodes(parts)));
 			},
 			NodeParseState::Italic => {
-				// prune the asterisks
-				// let parts = parts.strip_prefix("*").unwrap().strip_suffix("*").unwrap().to_string();
 				let parts: String = parts[1..parts.len() - 1].iter().collect();
 				nodes.push(Node::Italic(parse_into_nodes(parts)));
 			},
@@ -989,7 +964,6 @@ pub fn parse_node_lines_into_nodes(node_parts: Vec<(NodeParseState, Vec<char>)>)
 				let parts: String = parts.iter().collect();
 				nodes.push(Node::String(parts));
 			},
-			// NodeParseState::Start => {},
 		}
 	}
 	nodes

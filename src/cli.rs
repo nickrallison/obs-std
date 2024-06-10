@@ -70,7 +70,7 @@ impl Display for Options {
 
 #[derive(Parser, Debug, Clone, PartialEq, Eq, PartialOrd, Ord)]
 #[command(version, about, long_about = None)]
-pub struct Cli {
+pub struct CLI {
 
     /// Action to perform
     #[arg(short, long)]
@@ -85,7 +85,7 @@ pub struct Cli {
     pub target_path: String
 }
 
-impl Cli {
+impl CLI {
     pub fn new(action: Action, options: Options, target_path: String) -> Self {
         Self {
             action,
@@ -115,7 +115,7 @@ pub enum CLIError {
     InvalidTarget
 }
 
-pub fn run_cli(cli: Cli) -> Result<(), CLIError> {
+pub fn run_cli(cli: CLI) -> Result<(), CLIError> {
     let action = cli.action;
     let options = cli.options;
     let target = cli.target_path;
@@ -155,7 +155,7 @@ pub fn run_cli(cli: Cli) -> Result<(), CLIError> {
         }
         Options::Safe => {
             for (_, mdfile) in vault.data.iter() {
-                let path = mdfile.path.clone().unwrap();
+                let path = mdfile.path.clone();
                 let expected = fs::read_to_string(&path).unwrap();
                 let actual = mdfile.to_string();
                 if expected != actual {
@@ -163,7 +163,7 @@ pub fn run_cli(cli: Cli) -> Result<(), CLIError> {
                     print_diff(&expected, &actual);
 
                     // prompt user whether or not to accept changes
-                    println!("\n##### EOF #####\nDo you want to accept these changes to file: {}? yes, no, or cancel [y/n/c]: ", mdfile.path.as_ref().expect("MDFile does not have path set").display());
+                    println!("\n##### EOF #####\nDo you want to accept these changes to file: {}? yes, no, or cancel [y/n/c]: ", mdfile.path.display());
                     let mut input = String::new();
                     while input.trim() != "y" && input.trim() != "n" && input.trim() != "c" {
                         std::io::stdin().read_line(&mut input).unwrap();
@@ -191,9 +191,7 @@ pub fn run_cli(cli: Cli) -> Result<(), CLIError> {
                 std::io::stdin().read_line(&mut input).unwrap();
                 if input.trim() == "y" {
                     for (_, mdfile) in vault.data.iter() {
-                        let path = mdfile.path.clone().unwrap();
-                        let actual = mdfile.to_string();
-                        fs::write(&path, actual).unwrap();
+                        fs::write(&mdfile.path, mdfile.to_string()).unwrap();
                     }
                 }
                 else if input.trim() == "n" {
@@ -222,11 +220,11 @@ fn print_diff(str1: &String, str2: &String) {
 
 #[cfg(test)]
 mod cli_tests {
-    use crate::cli::{Cli, CLIError, run_cli};
+    use crate::cli::{CLI, CLIError, run_cli};
 
     #[test]
     fn test_cli_folder_does_exist() {
-        let cli_res = Cli::from_str("alias_tree", "preview", "test_vaults/full_vault");
+        let cli_res = CLI::from_str("alias_tree", "preview", "test_vaults/full_vault");
         let cli = match cli_res {
             Ok(cli) => cli,
             Err(e) => {
@@ -253,7 +251,7 @@ mod cli_tests {
     }
     #[test]
     fn test_cli_folder_does_not_exist() {
-        let cli_res = Cli::from_str("alias_tree", "preview", "test_vaults/bad_vault");
+        let cli_res = CLI::from_str("alias_tree", "preview", "test_vaults/bad_vault");
         let cli = match cli_res {
             Ok(cli) => cli,
             Err(e) => {

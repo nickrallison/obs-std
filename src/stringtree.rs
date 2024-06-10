@@ -3,8 +3,8 @@ use std::fmt::Display;
 use std::path::PathBuf;
 
 pub struct StringTree<T> {
-	end: Option<Vec<T>>,
-	children: HashMap<String, StringTree<T>>,
+	pub end: Option<Vec<T>>,
+	pub children: HashMap<String, StringTree<T>>,
 }
 
 impl<T: std::fmt::Debug> StringTree<T> {

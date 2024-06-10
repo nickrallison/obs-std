@@ -1,6 +1,28 @@
+use std::path::PathBuf;
 use regex::Regex;
-use crate::md_file::Link;
 use crate::parse::Node;
+
+#[derive(Debug, Clone, PartialEq)]
+pub struct Link {
+	pub alias: String,
+	pub path: PathBuf,
+}
+
+impl Link {
+	pub fn new(alias: String, path: PathBuf) -> Link {
+		Link {
+			alias,
+			path,
+		}
+	}
+	pub fn get_alias(&self) -> &String {
+		&self.alias
+	}
+	pub fn get_path(&self) -> &PathBuf {
+		&self.path
+	}
+}
+
 
 pub fn add_link_to_nodes(nodes: Vec<Node>, link: Link) -> Vec<Node> {
 	let mut nodes = nodes;
@@ -23,20 +45,9 @@ pub fn add_link_to_nodes(nodes: Vec<Node>, link: Link) -> Vec<Node> {
 				if string.contains(text) {
 					let string_clone: String = string.to_string();
 					let dest_str: String = dest.to_str().unwrap().to_string();
-					// if text == "binary search tree" {
-					// 	println!("{}: {}", text, string_clone);
-					// }
 
-					// Case Insensitive
-					// let split_reg = Regex::new(&format!(r"(?i)\b{}\b", text)).unwrap();
 					let split_reg = Regex::new(&format!(r"\b{}\b", text)).unwrap();
 					let split = split_reg.split(&string_clone);
-					// let string_clone_2: String = string.to_string();
-					// let split_2 = split_reg.split(&string_clone_2);
-					// let parts_temp: Vec<&str> = split_2.collect();
-					// if text == "binary search tree" {
-					// 	println!("Split: {:?}", parts_temp);
-					// }
 					let mut nodes_after: Vec<Node> = Vec::new();
 
 					for split_text in split {
@@ -49,8 +60,6 @@ pub fn add_link_to_nodes(nodes: Vec<Node>, link: Link) -> Vec<Node> {
 					}
 					nodes_after.pop();
 					links.push((index, nodes_after));
-				} else {
-					// do nothing
 				}
 			}
 			_ => {}
