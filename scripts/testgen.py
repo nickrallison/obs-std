@@ -112,16 +112,9 @@ if __name__ == '__main__':
         print('Usage: {} <vault_path_linked> <vault_path_unlinked> <output_test_file>'.format(sys.argv[0]))
         sys.exit(1)
 
-    vault_path_linked = (sys.argv[1]
-                         .replace("\\", "\\\\")
-                         .replace('/', '\\\\'))
-    vault_path_unlinked = (sys.argv[2]
-                           .replace("\\", "\\\\")
-                           .replace('/', '\\\\'))
-
-    output_test_file = (sys.argv[3]
-                        .replace("\\", "\\\\")
-                        .replace('/', '\\\\'))
+    vault_path_linked = sys.argv[1]
+    vault_path_unlinked = sys.argv[2]
+    output_test_file = sys.argv[3]
 
     tests = []
     for root, _, files in os.walk(vault_path_linked):
@@ -133,10 +126,8 @@ if __name__ == '__main__':
                 file_title_lower = re.sub(r'_+', '_', file_title_lower)
                 file_title_lower = file_title_lower.strip('_')
 
-                file_path = os.path.join(root, file).replace("\\\\", "\\")
-                file_path_lower = (os.path.join(root, file_title_lower + '.md').replace("\\\\", "\\")
-                                   .replace("\\", "\\\\")
-                                   .replace('/', '\\\\'))
+                file_path = os.path.join(root, file)
+                file_path_lower = os.path.join(root, file_title_lower + '.md')
                 if os.path.normpath(file_path_lower) != os.path.normpath(file_path):
                     print(f'renaming {file_path.strip()} to {file_path_lower}')
                     os.rename(file_path, file_path_lower)
@@ -150,10 +141,8 @@ if __name__ == '__main__':
                     file_title_lower = re.sub(r'_+', '_', file_title_lower)
                     file_title_lower = file_title_lower.strip('_')
 
-                    file_path = os.path.join(root, file).replace("\\\\", "\\")
-                    file_path_lower = (os.path.join(root, file_title_lower + '.md').replace("\\\\", "\\")
-                                       .replace("\\", "\\\\")
-                                       .replace('/', '\\\\'))
+                    file_path = os.path.join(root, file)
+                    file_path_lower = os.path.join(root, file_title_lower + '.md')
                     if os.path.normpath(file_path_lower) != os.path.normpath(file_path):
                         print(f'renaming {file_path} to {file_path_lower}')
                         os.rename(file_path, file_path_lower)
