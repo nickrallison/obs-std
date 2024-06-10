@@ -15,6 +15,7 @@ Meant to be a library to interact with obsidian and markdown files in an efficie
 - [x] Write tests for each of my files
    - Test Gen Script
 - [ ] Finalize Public interface
+   - Make everything public?
 - [ ] Derive / impl common traits on all types
 - [x] Fix Local vs. Absolute Path
 - [ ] More Tests
@@ -25,6 +26,8 @@ Meant to be a library to interact with obsidian and markdown files in an efficie
 - [ ] Rayon Feature Flag
 - [ ] Serde save & load
    - sqlite?
+- [ ] Better Profiling
+- [ ] Optimize mdparser
 
 ### Phase 3 - Organization
 
