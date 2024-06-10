@@ -6,16 +6,10 @@ Meant to be a library to interact with obsidian and markdown files in an efficie
 
 ### Phase 1 - Functionality
 
-- [x] Get Args working
-- [ ] Verify linker works
-   - Go through each file
-      - If links are fine, accept them
-      - If not, make changes to linker
 - [ ] Linker with accepts lambda for whether to link
-- [x] Write tests for each of my files
-   - Test Gen Script
+- [ ] Finalize Test Suite
 - [ ] Finalize Public interface
-   - Make everything public?
+   - Finalize getters and setters
 - [ ] Derive / impl common traits on all types
 - [x] Fix Local vs. Absolute Path
 - [ ] More Tests

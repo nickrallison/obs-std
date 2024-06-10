@@ -25,7 +25,7 @@ lazy_static! {
 }
 
 #[derive(Debug, Clone, PartialEq)]
-pub(crate) struct AST {
+pub struct AST {
 	blocks: Vec<Block>,
 	line_sep: LineSep
 }
@@ -33,7 +33,7 @@ pub(crate) struct AST {
 #[allow(dead_code)]
 impl AST {
 
-	pub(crate) fn new(contents: String) -> AST {
+	pub fn new(contents: String) -> AST {
 		let contents = contents;
 		let line_sep: LineSep = if (&contents).contains("\r\n") {
 			LineSep::Windows
@@ -48,7 +48,7 @@ impl AST {
 		}
 	}
 
-	fn get_yaml(&self, tag: &str) -> Option<serde_yaml::Value> {
+	pub fn get_yaml(&self, tag: &str) -> Option<serde_yaml::Value> {
 		for block in &self.blocks {
 			match block {
 				Block::YAML(content, _) => {
@@ -63,21 +63,21 @@ impl AST {
 		return None;
 	}
 
-	pub(crate) fn get_aliases(&self) -> Vec<String> {
+	pub fn get_aliases(&self) -> Vec<String> {
 		if self.get_yaml("aliases").is_none() {
 			return vec![];
 		}
 		self.get_yaml("aliases").unwrap().as_sequence().unwrap().iter().map(|x| x.as_str().unwrap().to_string()).collect()
 	}
 
-	pub(crate) fn get_tags(&self) -> Vec<String> {
+	pub fn get_tags(&self) -> Vec<String> {
 		if self.get_yaml("tags").is_none() {
 			return vec![];
 		}
 		self.get_yaml("tags").unwrap().as_sequence().unwrap().iter().map(|x| x.as_str().unwrap().to_string()).collect()
 	}
 
-	pub(crate) fn get_lines(&self) -> Vec<&Line> {
+	pub fn get_lines(&self) -> Vec<&Line> {
 		let mut lines: Vec<&Line> = Vec::new();
 		for block in &self.blocks {
 			for line in block.get_lines() {
@@ -87,7 +87,7 @@ impl AST {
 		lines
 	}
 
-	pub(crate) fn get_lines_mut(&mut self) -> Vec<&mut Line> {
+	pub fn get_lines_mut(&mut self) -> Vec<&mut Line> {
 		let mut lines: Vec<&mut Line> = Vec::new();
 		for block in &mut self.blocks {
 			for line in block.get_lines_mut() {
@@ -116,13 +116,13 @@ impl Display for AST {
 }
 
 #[derive(Debug, Clone, PartialEq)]
-enum LineSep {
+pub enum LineSep {
 	Unix,
 	Windows,
 }
 
 #[derive(Debug, Clone, PartialEq)]
-enum Block {
+pub enum Block {
 	YAML(serde_yaml::Value, Vec<String>),
 	CodeBlock(Vec<String>),
 	LatexBlock(Vec<String>),
@@ -132,7 +132,7 @@ enum Block {
 
 
 impl Block {
-	pub(crate) fn get_lines(&self) -> Vec<&Line> {
+	pub fn get_lines(&self) -> Vec<&Line> {
 		match self {
 			Block::BlockQuote(blocks) => {
 				let mut lines: Vec<&Line> = Vec::new();
@@ -155,7 +155,7 @@ impl Block {
 	}
 
 
-	pub(crate) fn get_lines_mut(&mut self) -> Vec<&mut Line> {
+	pub fn get_lines_mut(&mut self) -> Vec<&mut Line> {
 
 		match self {
 			Block::BlockQuote(blocks) => {
@@ -210,42 +210,8 @@ impl Display for Block {
 	}
 }
 
-// impl Verbose for Block {
-// 	fn verbose(&self) -> String {
-// 		match self {
-// 			Block::YAML(_, string) => {
-// 				format!("YAML:\n{}", add_indentation("\t", string))
-// 			}
-// 			Block::CodeBlock(code_block) => {
-// 				format!("Code Block:\n{}", add_indentation("\t", code_block))
-// 			}
-// 			Block::LatexBlock(latex_block) => {
-// 				format!("Latex Block:\n{}", add_indentation("\t", latex_block))
-// 			}
-// 			Block::BlockQuote(block_quote) => {
-// 				let mut verbose: String = String::new();
-// 				verbose = verbose + "Block Quote:\n";
-// 				for block in block_quote {
-// 					verbose = verbose + &add_indentation("\t", &(block.verbose()));
-// 				}
-// 				verbose
-// 			}
-// 			Block::TextBlock(text_block) => {
-// 				let mut verbose: String = String::new();
-// 				verbose = verbose + "Text Block:\n";
-// 				for line in text_block {
-// 					verbose = verbose + &add_indentation("\t", &line.verbose());
-// 				}
-// 				verbose
-// 			}
-//
-// 		}
-//
-// 	}
-// }
-
 #[derive(Debug, Clone, PartialEq)]
-pub(crate) enum Line {
+pub enum Line {
 	Heading(Vec<Node>, u8),
 	BulletPoint(Vec<Node>, String), // string is indentation
 	ListItem(Vec<Node>, u32, String), // string is indentation
@@ -254,7 +220,7 @@ pub(crate) enum Line {
 }
 
 impl Line {
-	pub(crate) fn iterate_strings(&self) -> Vec<&String> {
+	pub fn iterate_strings(&self) -> Vec<&String> {
 		match self {
 			Line::Heading(nodes, _) => {
 				let mut strings: Vec<&String> = Vec::new();
@@ -289,7 +255,7 @@ impl Line {
 	}
 
 	#[allow(dead_code)]
-	pub(crate) fn iterate_nodes(&self) -> Vec<&Node> {
+	pub fn iterate_nodes(&self) -> Vec<&Node> {
 		match self {
 			Line::Heading(nodes, _) => {
 				let mut nodes_vec: Vec<&Node> = Vec::new();
@@ -323,7 +289,7 @@ impl Line {
 		}
 	}
 
-	pub(crate) fn get_nodes_mut(&mut self) -> Option<&mut Vec<Node>> {
+	pub fn get_nodes_mut(&mut self) -> Option<&mut Vec<Node>> {
 		match self {
 			Line::Heading(nodes, _) => {
 				Some(nodes)
@@ -389,7 +355,7 @@ impl Display for Line {
 }
 
 #[derive(Debug, Clone, PartialEq)]
-pub(crate) enum Node {
+pub enum Node {
 
 	InlineCode(String),
 	InlineBlockLatex(String),
@@ -410,7 +376,7 @@ pub(crate) enum Node {
 }
 
 impl Node {
-	pub(crate) fn iterate_strings(&self) -> Vec<&String> {
+	pub fn iterate_strings(&self) -> Vec<&String> {
 		match self {
 			Node::InlineCode(_) => Vec::new(),
 			Node::InlineBlockLatex(_) => Vec::new(),
@@ -489,7 +455,7 @@ impl Display for Node {
 }
 
 #[derive(Debug, PartialEq, Copy, Clone)]
-enum  BlockParseState {
+pub enum  BlockParseState {
 	Start,
 	YAML,
 	CodeBlock,
@@ -499,7 +465,7 @@ enum  BlockParseState {
 	Unknown,
 }
 
-fn parse_into_blocks(lines: Vec<String>) -> Vec<Block> {
+pub fn parse_into_blocks(lines: Vec<String>) -> Vec<Block> {
 	let mut lines = lines;
 	if lines.len() == 0 {
 		return vec![];
@@ -689,7 +655,7 @@ fn parse_into_blocks(lines: Vec<String>) -> Vec<Block> {
 
 }
 
-fn parse_block_lines_into_blocks(block_lines: Vec<(BlockParseState, Vec<String>)>) -> Vec<Block> {
+pub fn parse_block_lines_into_blocks(block_lines: Vec<(BlockParseState, Vec<String>)>) -> Vec<Block> {
 	let mut block_lines: Vec<(BlockParseState, Vec<String>)> = block_lines;
 	let mut blocks: Vec<Block> = Vec::new();
 
@@ -728,7 +694,7 @@ fn parse_block_lines_into_blocks(block_lines: Vec<(BlockParseState, Vec<String>)
 }
 
 
-fn parse_into_lines(lines: Vec<String>) -> Vec<Line> {
+pub fn parse_into_lines(lines: Vec<String>) -> Vec<Line> {
 	let lines = lines;
 	let mut line_vec: Vec<Line> = Vec::new();
 	for line in lines {
@@ -766,7 +732,7 @@ fn parse_into_lines(lines: Vec<String>) -> Vec<Line> {
 }
 
 #[derive(Debug, PartialEq, Copy, Clone)]
-enum NodeParseState {
+pub enum NodeParseState {
 	// Start,
 	InlineCode,
 	InlineBlockLatex,
@@ -782,7 +748,7 @@ enum NodeParseState {
 }
 
 
-fn parse_into_nodes(content: String) -> Vec<Node> {
+pub fn parse_into_nodes(content: String) -> Vec<Node> {
 
 	let _nodes: Vec<Node> = Vec::new();
 	let content = content.strip_suffix("\n").unwrap_or(&content).to_string();
@@ -940,7 +906,7 @@ fn parse_into_nodes(content: String) -> Vec<Node> {
 
 }
 
-fn parse_node_lines_into_nodes(node_parts: Vec<(NodeParseState, Vec<char>)>) -> Vec<Node> {
+pub fn parse_node_lines_into_nodes(node_parts: Vec<(NodeParseState, Vec<char>)>) -> Vec<Node> {
 	// for (state, parts) in &node_parts {
 	// 	println!("{:?} -> {}", state, parts.iter().collect::<String>());
 	// }
@@ -1028,11 +994,3 @@ fn parse_node_lines_into_nodes(node_parts: Vec<(NodeParseState, Vec<char>)>) -> 
 	}
 	nodes
 }
-
-// pub(crate) fn add_indentation(indentation: &str, text: &str) -> String {
-// 	let mut indented_text: String = String::new();
-// 	for line in text.lines() {
-// 		indented_text = indented_text + indentation + line + "\n";
-// 	}
-// 	return indented_text;
-// }

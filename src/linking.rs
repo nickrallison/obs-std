@@ -2,7 +2,7 @@ use regex::Regex;
 use crate::md_file::Link;
 use crate::parse::Node;
 
-pub(crate) fn add_link_to_nodes(nodes: Vec<Node>, link: Link) -> Vec<Node> {
+pub fn add_link_to_nodes(nodes: Vec<Node>, link: Link) -> Vec<Node> {
 	let mut nodes = nodes;
 	let mut index = 0;
 	let dest = link.get_path();

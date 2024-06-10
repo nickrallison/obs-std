@@ -2,19 +2,19 @@ use std::collections::HashMap;
 use std::fmt::Display;
 use std::path::PathBuf;
 
-pub(crate) struct StringTree<T> {
+pub struct StringTree<T> {
 	end: Option<Vec<T>>,
 	children: HashMap<String, StringTree<T>>,
 }
 
 impl<T: std::fmt::Debug> StringTree<T> {
-	pub(crate) fn new() -> Self {
+	pub fn new() -> Self {
 		Self {
 			end: None,
 			children: HashMap::new(),
 		}
 	}
-	pub(crate) fn insert(&mut self, keys: Vec<String>, value: T) {
+	pub fn insert(&mut self, keys: Vec<String>, value: T) {
 		// if len of keys is 0, set end to value
 		if keys.len() == 0 {
 			// if end is None, set end to value
@@ -41,7 +41,7 @@ impl<T: std::fmt::Debug> StringTree<T> {
 	}
 
 	#[allow(dead_code)]
-	pub(crate) fn get(&self, keys: Vec<&String>) -> Option<&Vec<T>> {
+	pub fn get(&self, keys: Vec<&String>) -> Option<&Vec<T>> {
 		// if len of keys is 0, return end
 		if keys.len() == 0 {
 			return self.end.as_ref();
@@ -59,7 +59,7 @@ impl<T: std::fmt::Debug> StringTree<T> {
 		self.children.get(current_key).unwrap().get(keys)
 	}
 
-	pub(crate) fn get_best<'a>(&'a self, keys: Vec<&'a String>) -> Option<(&Vec<T>, Vec<&String>)> {
+	pub fn get_best<'a>(&'a self, keys: Vec<&'a String>) -> Option<(&Vec<T>, Vec<&String>)> {
 
 		if keys.len() == 0 || self.children.len() == 0 {
 			if self.end.is_none() {

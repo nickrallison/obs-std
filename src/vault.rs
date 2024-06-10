@@ -219,7 +219,7 @@ impl Vault {
 	}
 
 	#[cfg(not(feature = "parallel"))]
-	pub(crate) fn get_outgoing_links(&self, mdfile: &MDFile) -> Vec<Link> {
+	pub fn get_outgoing_links(&self, mdfile: &MDFile) -> Vec<Link> {
 		let mut outgoing_links: Vec<Link> = Vec::new();
 		let lines: Vec<&Line> = mdfile.get_lines();
 		for line in lines {
@@ -384,7 +384,7 @@ impl Vault {
 	}
 
 	#[cfg(feature = "parallel")]
-	pub(crate) fn get_outgoing_links(&self, mdfile: &MDFile) -> Vec<Link> {
+	pub fn get_outgoing_links(&self, mdfile: &MDFile) -> Vec<Link> {
 		let mut outgoing_links: Vec<Link> = Vec::new();
 		let lines: Vec<&Line> = mdfile.get_lines();
 		for line in lines {
@@ -549,68 +549,7 @@ impl Vault {
 		return outgoing_links;
 	}
 
-	// #[cfg(not(feature = "parallel"))]
-	// pub(crate) fn link_file_from_path(&mut self, path: &Path) {
-	// 	let outgoing_links: Vec<(PathBuf, String)> = self.get_outgoing_links(self.get_md_file(path).unwrap());
-	// 	let mut md_file  = self.get_md_file_mut(path).unwrap();
-	// 	for (outgoing_path, fragment) in outgoing_links {
-	// 		// let outgoing_md_file = self.get_md_file(&outgoing_path).unwrap();
-	// 		// md_file.add_outgoing_link(outgoing_md_file.get_path(), fragment);
-	// 		let mut lines: Vec<&mut Line> = md_file.get_lines_mut();
-	//
-	// 		for line in &mut lines {
-	// 			let mut nodes: Option<&mut Vec<Node>> = line.get_nodes_mut();
-	// 			match nodes {
-	// 				Some(nodes) => {
-	// 					*nodes = add_link_to_nodes(nodes.clone(), &fragment, &outgoing_path);
-	// 				}
-	// 				None => {}
-	// 			}
-	// 		}
-	// 	}
-	//
-	// }
-	//
-	// #[cfg(feature = "parallel")]
-	// pub(crate) fn link_file_from_path(&mut self, path: &Path) {
-	// 	let outgoing_links: Vec<(PathBuf, String)> = self.get_outgoing_links(self.get_md_file(path).unwrap());
-	// 	let md_file  = self.get_md_file_mut(path).unwrap();
-	// 	for (outgoing_path, fragment) in outgoing_links {
-	// 		let mut lines: Vec<&mut Line> = md_file.get_lines_mut();
-	//
-	// 		for line in &mut lines {
-	// 			let nodes: Option<&mut Vec<Node>> = line.get_nodes_mut();
-	// 			match nodes {
-	// 				Some(nodes) => {
-	// 					*nodes = add_link_to_nodes(nodes.clone(), &fragment, &outgoing_path);
-	// 				}
-	// 				None => {}
-	// 			}
-	// 		}
-	// 	}
-	//
-	// }
-
-	// pub(crate) fn link_file_with_links(md_file: &mut MDFile, outgoing_links: Vec<(PathBuf, String)>) {
-	// 	for (outgoing_path, fragment) in outgoing_links {
-	// 		// let outgoing_md_file = self.get_md_file(&outgoing_path).unwrap();
-	// 		// md_file.add_outgoing_link(outgoing_md_file.get_path(), fragment);
-	// 		let mut lines: Vec<&mut Line> = md_file.get_lines_mut();
-	//
-	// 		for line in &mut lines {
-	// 			let nodes: Option<&mut Vec<Node>> = line.get_nodes_mut();
-	// 			match nodes {
-	// 				Some(nodes) => {
-	// 					*nodes = add_link_to_nodes(nodes.clone(), &fragment, &outgoing_path);
-	// 				}
-	// 				None => {}
-	// 			}
-	// 		}
-	// 	}
-	//
-	// }
-
-	pub(crate) fn link_file(&mut self, md_file: &mut MDFile) {
+	pub fn link_file(&mut self, md_file: &mut MDFile) {
 		let outgoing_links: Vec<Link> = self.get_outgoing_links(md_file);
 		// for (outgoing_path, fragment) in outgoing_links {
 		for link in outgoing_links {
@@ -671,36 +610,6 @@ impl Vault {
 		}).collect::<Vec<()>>();
 
 	}
-
-	// #[cfg(not(feature = "parallel"))]
-	// pub fn link_all_files_no_self(&mut self) {
-	// 	let outgoing_links: HashMap<PathBuf, Vec<Link>> = self.data.iter().map(|(path, md_file)| {
-	// 		let outgoing_links = self.get_outgoing_links(md_file);
-	// 		(path.clone(), outgoing_links)
-	// 	}).collect();
-	//
-	// 	let _ = self.data.iter_mut().map(|(path, md_file)| {
-	// 		let outgoing_links = outgoing_links.get(path).unwrap();
-	// 		for link in outgoing_links {
-	// 			md_file.link_noself(link.clone());
-	// 		}
-	// 	}).collect::<Vec<()>>();
-	// }
-	//
-	// #[cfg(feature = "parallel")]
-	// pub fn link_all_files_no_self(&mut self) {
-	// 	let outgoing_links: HashMap<PathBuf, Vec<Link>> = self.data.par_iter().map(|(path, md_file)| {
-	// 		let outgoing_links = self.get_outgoing_links(md_file);
-	// 		(path.clone(), outgoing_links)
-	// 	}).collect();
-	//
-	// 	let _ = self.data.par_iter_mut().map(|(path, md_file)| {
-	// 		let outgoing_links = outgoing_links.get(path).unwrap();
-	// 		for link in outgoing_links {
-	// 			md_file.link_noself(link.clone());
-	// 		}
-	// 	}).collect::<Vec<()>>();
-	// }
 
 	pub fn get_md_file(&self, path: &Path) -> Result<&MDFile, String> {
 		let vault_path = self.path.clone();

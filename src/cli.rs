@@ -7,28 +7,6 @@ use difference::{Changeset, Difference};
 use crate::linking::LinkerOptions;
 use crate::vault::Vault;
 
-// Actions
-// #######
-// None
-// Linking
-// Unlinking
-// Alias Tree
-
-// Options
-// #######
-// Preview - Defaults to False
-//  - No file changes, just print what would happen
-// Safe - Defaults to True
-//  - Prompt before linking, change files
-// Force - Defaults to False
-//  - Dangerously link all files in place, no prompts (use with caution)
-
-// Targets
-// #######
-// File
-// All
-
-
 #[derive(Debug, Copy, Clone, PartialEq, Eq, PartialOrd, Ord, ValueEnum)]
 pub enum Action {
     None,
