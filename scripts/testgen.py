@@ -28,8 +28,6 @@ lazy_static! {
 mod test_suite {
 	use std::fs;
 	use std::path::PathBuf;
-	use crate::md_file::MDFile;
-	use crate::linking::LinkerOptions;
 	use crate::test_suite::{TEST_SUITE_REF_CLEAN_TO_LINKED_VAULT, TEST_SUITE_REF_CLEAN_VAULT, TEST_SUITE_REF_LINKED_TO_CLEAN_VAULT, TEST_SUITE_REF_LINKED_VAULT};
 
 	[TESTS]

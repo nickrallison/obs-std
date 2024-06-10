@@ -48,7 +48,9 @@ pub enum Options {
     #[default]
     Preview,
     Safe,
-    Force
+    Force,
+
+    Time
 }
 
 impl Options {
@@ -58,6 +60,7 @@ impl Options {
             "preview" => Ok(Self::Preview),
             "safe" => Ok(Self::Safe),
             "force" => Ok(Self::Force),
+            "time" => Ok(Self::Time),
             _ => Err(format!("Invalid Options: {options}"))
         }
     }
@@ -68,7 +71,8 @@ impl Display for Options {
         match self {
             Self::Preview => write!(f, "Preview"),
             Self::Safe => write!(f, "Safe"),
-            Self::Force => write!(f, "Force")
+            Self::Force => write!(f, "Force"),
+            Self::Time => write!(f, "Time")
         }
     }
 }
@@ -208,6 +212,7 @@ pub fn run_cli(cli: CLI) -> Result<(), CLIError> {
                 }
             }
         }
+        Options::Time => {}
     }
 
     Ok(())
