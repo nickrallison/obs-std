@@ -5,7 +5,7 @@ bad_links:
 ---
 # Rust Iterator Map
 
-The `map` method in Rust is a part of the `Iterator` [[Rust Traits|trait]]. It is a higher-order function that takes a closure and creates an iterator that applies the closure to every element of the underlying iterator.
+The `map` method in Rust is a part of the `Iterator` [[Rust Traits|trait]]. It is a higher-order function that takes a [[closure.md|closure]] and creates an iterator that applies the [[closure.md|closure]] to every element of the underlying iterator.
 
 Here is the signature of the `map` function:
 
@@ -15,7 +15,7 @@ where
     F: FnMut(Self::Item) -> B,
 ```
 
-In this signature, `B` is the type of items that the closure `f` returns, and `F` is the type of the closure. The `map` function takes `self` and a closure `f` as arguments, and returns a `Map` struct that contains the original iterator and the closure.
+In this signature, `B` is the type of items that the [[closure.md|closure]] `f` returns, and `F` is the type of the [[closure.md|closure]]. The `map` function takes `self` and a [[closure.md|closure]] `f` as arguments, and returns a `Map` struct that contains the original iterator and the [[closure.md|closure]].
 
 The `Map` struct is defined as follows:
 
@@ -26,7 +26,7 @@ pub struct Map<I, F> {
 }
 ```
 
-Here, `I` is the type of the underlying iterator and `F` is the type of the closure.
+Here, `I` is the type of the underlying iterator and `F` is the type of the [[closure.md|closure]].
 
 The `Map` struct also implements the `Iterator` [[Rust Traits|trait.]] The `next` method of the `Iterator` [[Rust Traits|trait]] is implemented for the `Map` struct as follows:
 
@@ -36,7 +36,7 @@ fn next(&mut self) -> Option<B> {
 }
 ```
 
-In this implementation, the `next` method calls the `next` method of the underlying iterator and applies the closure `f` to the result. The `map` method of the `Option` enum is used here, which applies the closure to the `Some` variant and does nothing to the `None` variant.
+In this implementation, the `next` method calls the `next` method of the underlying iterator and applies the [[closure.md|closure]] `f` to the result. The `map` method of the `Option` enum is used here, which applies the [[closure.md|closure]] to the `Some` variant and does nothing to the `None` variant.
 
 The `map` method is used to transform the elements of an iterator. Here is an example:
 

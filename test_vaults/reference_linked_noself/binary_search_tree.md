@@ -11,7 +11,7 @@ A Binary Search Tree (BST) is a node-based [[Binary Tree.md|binary tree]] data s
 - The right subtree of a node contains only nodes with keys greater than the node’s key.
 - Both the left and right subtrees must also be binary search trees.
 
-The above properties of BST provide an ordering among keys so that the operations like search, minimum and maximum can be done fast. If there is no ordering, then we may have to compare every key to search a given key.
+The above properties of BST provide an [[ordering.md|ordering]] among keys so that the operations like search, minimum and maximum can be done fast. If there is no [[ordering.md|ordering]], then we may have to compare every key to search a given key.
 
 ## Binary Search Tree Representation
 
@@ -31,7 +31,7 @@ Here is a simple representation of a BST:
 
 ## Operations on BST
 
-There are several fundamental operations that can be executed on a BST in $O(h)$ time complexity, where $h$ is the height of the tree:
+There are several fundamental operations that can be executed on a BST in $O(h)$ [[big_o_notation.md|time complexity]], where $h$ is the height of the tree:
 
 1. **Search**: Starting from the root, we traverse the tree. If the current node is null, the key is not present in the tree. Otherwise, if the current node's key equals the target key, we return the current node. If the current node's key is less than the target key, we move to the right child of the current node. Otherwise, we move to the left child.
 

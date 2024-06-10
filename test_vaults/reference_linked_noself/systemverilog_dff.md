@@ -12,7 +12,7 @@ The behavior of D flip-flops can be described precisely using SystemVerilog, a h
 
 ## Basic D Flip-FlopImplementation
 
-In SystemVerilog, a D flip flop can be modeled as sensitive to either the rising edge (posedge) or the falling edge (negedge) of the clock signal. Here's a basic implementation of a DFF:
+In SystemVerilog, a D flip flop can be modeled as sensitive to either the rising edge (posedge) or the falling edge (negedge) of the clock signal. Here's a basic implementation of a [[d_flip_flop.md|DFF]]:
 
 ```systemverilog
 module dff (
@@ -35,9 +35,9 @@ endmodule
 ## Important Implementation Note
 
 Make sure the async reset has priority over any other symbols, if some other condition is met first in the if statement chain, a reset may not occur when it should.
-## Enhancing the D Flip-Flop
+## Enhancing the [[d_flip_flop.md|D Flip-Flop]]
 
-The basic DFF can be extended or modified in numerous ways to fit specific requirements. For example, one might add functionality to:
+The basic [[d_flip_flop.md|DFF]] can be extended or modified in numerous ways to fit specific requirements. For example, one might add functionality to:
 
 - **Enable Input:** Helps control when the [[D Flip Flop|DFF]] captures data, offering an additional layer of control beyond just the clock and reset.
 - **Asynchronous/Synchronous Set or Reset:** Allows for setting or resetting the flip-flop independently of the clock signal, either immediately (asynchronously) or at the next clock edge (synchronously).

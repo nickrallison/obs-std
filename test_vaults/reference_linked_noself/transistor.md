@@ -11,7 +11,7 @@ The transistor was invented in 1947 at Bell Laboratories by John Bardeen, Walter
 
 Transistors are composed of semiconductor material, usually with at least three layers of two types of material. They have three leads (connections), each of which connects to one of the layers. The layer in the middle is called the base, and the layers on the sides are the emitter and collector for BJTs. They would be called Drain, Source, and Gate for MOSFETs.
 
-There are two types of BJT transistors: **NPN** and **PNP**, with different circuit symbols. The letters refer to the layers of semiconductor material used to make the transistor. Most transistors used today are [[BJT Transistor|NPN]] because this is the easiest type to make from silicon.
+There are two types of BJT transistors: **[[bjt_transistor.md|NPN]]** and **[[bjt_transistor.md|PNP]]**, with different circuit symbols. The letters refer to the layers of semiconductor material used to make the transistor. Most transistors used today are [[BJT Transistor|NPN]] because this is the easiest type to make from silicon.
 
 The basic function of a transistor is to control a large amount of current with a small amount of current. This is why they are used as amplifiers or switches.
 

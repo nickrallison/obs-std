@@ -12,7 +12,7 @@ In Rust, methods can [[Rust Ownership|borrow]] (`&self`), mutably [[Rust Ownersh
 
 2. **Methods and [[Rust Ownership|Ownership]]**: If struct methods took ownership by default, you would not be able to call any other methods on that instance after the first one, because the first method call would move the instance. This would be very limiting. By [[Rust Ownership|borrowing]] the instance instead, Rust allows you to call multiple methods on the same instance.
 
-3. **Mutable [[Rust Ownership|Borrowing]]**: If you need to modify the instance, you can use [[Mutability|mutable]] [[Rust Ownership|borrowing]] (`&mut self`). This still doesn't take ownership, but it does prevent any other references to the instance for as long as the [[Mutability|mutable]] [[Rust Ownership|borrow]] lasts, preventing data races.
+3. **[[mutability.md|Mutable]] [[Rust Ownership|Borrowing]]**: If you need to modify the instance, you can use [[Mutability|mutable]] [[Rust Ownership|borrowing]] (`&mut self`). This still doesn't take ownership, but it does prevent any other references to the instance for as long as the [[Mutability|mutable]] [[Rust Ownership|borrow]] lasts, preventing data races.
 
 4. **Taking Ownership**: There are cases where you might want a method to take ownership (`self`). This is usually when the method transforms the instance into something else and you want to prevent any further use of the original instance.
 

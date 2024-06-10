@@ -31,7 +31,7 @@ In the realm of image processing, codecs facilitate the storage, editing, and tr
 - **JPEG** (Joint Photographic Experts Group): Predominantly used for compressing photographs.
 - **PNG** (Portable Network Graphics): Offers lossless compression, often used for web graphics.
 - **GIF** (Graphics Interchange Format): Used for simple animations and images with limited color palettes.
-- **HEVC** (High Efficiency Video Coding) / H.265: A more recent codec offering efficient compression for high-resolution images and video.
+- **[[h264_vs_h265.md|HEVC]]** (High Efficiency Video Coding) / H.265: A more recent codec offering efficient compression for high-resolution images and video.
 
 ### Considerations
 

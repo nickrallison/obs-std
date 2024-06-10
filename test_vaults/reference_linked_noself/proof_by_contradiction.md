@@ -17,7 +17,7 @@ The general structure of a proof by [[Contradictions|contradiction]] is as follo
 3. Show that these deductions lead to a [[Contradictions|contradiction,]] i.e., a statement that is patently false or conflicts with a previously established fact or [[Mathematical Axioms|axiom]].
 4. Conclude that the original assumption (the negation of the proposition) must be false, and therefore, the proposition itself must be true.
 
-Here's a simple example of a proof by contradiction:
+Here's a simple example of a proof by [[contradictions.md|contradiction]]:
 
 **Proposition**: There is no smallest positive rational number.
 

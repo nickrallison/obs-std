@@ -16,7 +16,7 @@ $$
 where:
 - $P_{dynamic}$ is the dynamic power,
 - $C$ is the total load capacitance being switched,
-- $V$ is the [[Voltage|voltage]] swing (difference between the high and low voltage),
+- $V$ is the [[Voltage|voltage]] swing (difference between the high and low [[voltage.md|voltage]]),
 - $f$ is the switching frequency.
 
 This formula is derived from the basic definition of power as energy per unit time. The energy stored in a capacitor is given by $\frac{1}{2}CV^2$, and each switching event involves charging and discharging this energy. If the switching events occur at a frequency $f$, then the power (energy per unit time) is $\frac{1}{2}CV^2f$.

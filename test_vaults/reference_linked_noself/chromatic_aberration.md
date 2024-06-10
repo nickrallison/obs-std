@@ -12,7 +12,7 @@ Chromatic Aberration (CA), also known as "color fringing" or "purple fringing," 
 
 Chromatic aberration is primarily caused by the dispersion of the lens material � the fact that different colors (wavelengths) of light have different refractive indices when passing through the lens, causing them to be bent differently and focus at different points. There are two main types of chromatic aberration:
 
-1. **Longitudinal Chromatic Aberration (LCA)**: This occurs when different wavelengths of light are focused at different distances from the lens, resulting in a shift in color along the axis of the lens. It's most noticeable in high-contrast situations.
+1. **Longitudinal Chromatic Aberration ([[binary_search_tree_lowest_common_ancestor.md|LCA]])**: This occurs when different wavelengths of light are focused at different distances from the lens, resulting in a shift in color along the axis of the lens. It's most noticeable in high-contrast situations.
 2. **Transverse Chromatic Aberration (TCA)**: This happens when different wavelengths are focused at different positions on the focal plane. It manifests as color fringes around the edges of objects and is more pronounced towards the edges of the image.
 
 ## Correction in Image Processing

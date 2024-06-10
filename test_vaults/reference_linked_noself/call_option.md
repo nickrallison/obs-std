@@ -24,7 +24,7 @@ Every call option comes with an expiration date, after which the option becomes 
 
 ## Payoff Profile
 
-The payoff for a call option buyer depends on the underlying asset's price relative to the strike price at expiration. If the market price exceeds the strike price (the option is "in the money"), the buyer can exercise the option to achieve a profit, minus the cost of the option (premium). If the market price is below the strike price (the option is "out of the money"), the buyer will not exercise the option, and the loss is limited to the initially paid premium.
+The payoff for a call option buyer depends on the underlying asset's price relative to the strike price at expiration. If the market price exceeds the strike price (the option is "[[in_the_money_vs_out_of_the_money.md|in the money]]"), the buyer can exercise the option to achieve a profit, minus the cost of the option (premium). If the market price is below the strike price (the option is "[[in_the_money_vs_out_of_the_money.md|out of the money]]"), the buyer will not exercise the option, and the loss is limited to the initially paid premium.
 
 ## Uses of Call Options
 

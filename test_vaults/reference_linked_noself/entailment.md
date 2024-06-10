@@ -31,8 +31,8 @@ Here, statements A and B together entail statement C. This example demonstrates 
 
 Entailment has several important properties that characterize its logical behavior:
 
-- **Transitivity**: If \(A \models B\) and \(B \models C\), then \(A \models C\).
-- **Reflexivity**: Any set of statements \(S\) always entails itself.
+- **[[transitive_relation.md|Transitivity]]**: If \(A \models B\) and \(B \models C\), then \(A \models C\).
+- **[[reflexive_relation.md|Reflexivity]]**: Any set of statements \(S\) always entails itself.
 - **Monotonicity**: If \(S \models P\) and \(S \subseteq T\), then \(T \models P\). This means that adding more premises does not invalidate an entailment relationship.
 
 ## Types of Entailment

@@ -7,14 +7,14 @@ bad_links:
 
 The `env!` and `option_env!` macros in Rust are used to access [[Environment Variables.md|environment variables]] at compile time.
 
-1. **env! macro**: The `env!` [[Rust Macros|macro]] allows you to access the value of an environment variable during the compilation process. It takes a string literal representing the name of the environment variable as an argument and returns the value of the environment variable as a static string (`&'static str`). If the environment variable is not set, the `env!` [[Rust Macros|macro]] will cause a compile-time error. Here is an example of its usage:
+1. **env! [[rust_macros.md|macro]]**: The `env!` [[Rust Macros|macro]] allows you to access the value of an environment variable during the compilation process. It takes a string literal representing the name of the environment variable as an argument and returns the value of the environment variable as a static string (`&'static str`). If the environment variable is not set, the `env!` [[Rust Macros|macro]] will cause a compile-time error. Here is an example of its usage:
 
 ```rust
 let path = env!("PATH");
 println!("The PATH variable is: {}", path);
 ```
 
-1. **option_env! macro**: The `option_env!` [[Rust Macros|macro]] is similar to `env!`, but instead of causing a compile-time error when the environment variable is not set, it returns an `Option<&'static str>`. If the environment variable is set, it returns `Some(value)`, otherwise, it returns `None`. Here is an example of its usage:
+1. **option_env! [[rust_macros.md|macro]]**: The `option_env!` [[Rust Macros|macro]] is similar to `env!`, but instead of causing a compile-time error when the environment variable is not set, it returns an `Option<&'static str>`. If the environment variable is set, it returns `Some(value)`, otherwise, it returns `None`. Here is an example of its usage:
 
 ```rust
 match option_env!("SOME_VARIABLE") {

@@ -11,7 +11,7 @@ bad_links: [Continuity.md]
 
 Integer [[Linear Programming|Linear Programming]] (ILP) is a mathematical optimization or feasibility program in which some or all of the variables are restricted to be integers. In many settings, the term refers to integer [[Linear Programming|linear programming]] (ILP), in which the objective function and the constraints (other than the integer constraints) are linear.
 
-ILP is a special case of [[Linear Programming|linear programming]] where the solution space is discrete rather than continuous. While a [[Linear Programming|linear programming]] problem can be solved relatively easily, an integer [[Linear Programming|linear programming]] problem is much more complex. In fact, ILP is NP-hard, meaning that there is no known algorithm that can solve all instances of the problem quickly (in [[Polynomial Time|polynomial time]]).
+ILP is a special case of [[Linear Programming|linear programming]] where the solution space is discrete rather than [[continuity.md|continuous]]. While a [[Linear Programming|linear programming]] problem can be solved relatively easily, an integer [[Linear Programming|linear programming]] problem is much more complex. In fact, ILP is NP-hard, meaning that there is no known algorithm that can solve all instances of the problem quickly (in [[Polynomial Time|polynomial time]]).
 
 The general form of an ILP is as follows:
 

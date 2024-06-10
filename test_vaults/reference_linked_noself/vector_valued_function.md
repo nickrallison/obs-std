@@ -32,7 +32,7 @@ This integral can represent physical quantities like displacement, if the functi
 Vector valued functions are pivotal in several branches of calculus, including:
 
 - **Calculus of Curves**: Here, $\mathbf{r}(t)$ can describe the position of a particle moving along a curve in three-dimensional space. Analysis of such curves involves computing tangents, normals, and curvature using vector derivatives.
-- **Multivariable Calculus**: VVFs are essential in fields, flow lines, and surface mappings, where concepts like divergence, curl, and gradient become important in describing the behavior of three-dimensional and vector fields.
+- **Multivariable Calculus**: VVFs are essential in fields, flow lines, and surface mappings, where concepts like [[divergence.md|divergence]], [[curl.md|curl]], and [[gradient.md|gradient]] become important in describing the behavior of three-dimensional and vector fields.
 - **Physics and Engineering**: In electromagnetism, fluid dynamics, and mechanics, vector calculus is used to model and solve problems regarding fields and forces.
 
 ## Example

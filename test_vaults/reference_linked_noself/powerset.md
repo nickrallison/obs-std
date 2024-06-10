@@ -37,8 +37,8 @@ Powersets are not just a theoretical concept but have practical applications in 
 
 ## Properties
 
-- **Cardinality:** The [[Cardinality|cardinality]] of the powerset of $S$, where $|S| = n$, is $2^n$.
-- **Subset Relation:** Every element of the powerset is a subset of the original set by definition.
+- **[[cardinality.md|Cardinality]]:** The [[Cardinality|cardinality]] of the powerset of $S$, where $|S| = n$, is $2^n$.
+- **Subset [[binary_relation.md|Relation]]:** Every element of the powerset is a subset of the original set by definition.
 - **Empty and Full Subsets:** The powerset always includes the empty set and the set itself.
 
 ## Conclusion

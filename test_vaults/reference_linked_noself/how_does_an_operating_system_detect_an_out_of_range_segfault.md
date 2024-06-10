@@ -17,15 +17,15 @@ In modern operating systems (OS), memory management is primarily based on paging
 
 The OS allocates memory in units called pages in a paging system, each associated with access rights. Similarly, in segmentation, each segment of memory has access rights. When the CPU tries to access memory, it must first check whether the address is valid and whether the access type (read, write, or execute) is permitted by the access rights.
 
-The processor's Memory Management Unit (MMU) plays a crucial role in this. For each memory access:
+The processor's Memory Management Unit ([[memory_management_unit.md|MMU]]) plays a crucial role in this. For each memory access:
 
-1. The MMU maps the [[Virtual Address Space|virtual address]] used by the program to a physical address in RAM.
+1. The [[memory_management_unit.md|MMU]] maps the [[Virtual Address Space|virtual address]] used by the program to a physical address in RAM.
 2. It checks the access against a table of permissions (page table in paging, segment table in segmentation).
-3. If the access is invalid (e.g., the address does not exist or violates the access rights), the MMU generates a hardware exception.
+3. If the access is invalid (e.g., the address does not exist or violates the access rights), the [[memory_management_unit.md|MMU]] generates a hardware exception.
 
 ### Hardware-Level Intervention
 
-The hardware exception triggered by the MMU is typically a specific type of fault, such as a General Protection Fault (GPF) or a Page Fault in systems primarily using paging. This exception informs the processor that an error concerning memory access has been detected.
+The hardware exception triggered by the [[memory_management_unit.md|MMU]] is typically a specific type of fault, such as a General Protection Fault (GPF) or a Page Fault in systems primarily using paging. This exception informs the processor that an error concerning memory access has been detected.
 
 Upon receiving the exception, the CPU stops the normal execution of the current program and hands control over to the OS by invoking an exception handler. This handler is part of the OS's [[Kernel.md|kernel]] and designed to deal with such faults. The sequence is as follows:
 
@@ -40,4 +40,4 @@ Some operating systems and runtime environments provide additional mechanisms to
 
 ## Conclusion
 
-The detection of an out-of-range segfault involves a collaborative effort between the hardware (primarily the MMU) and the operating system. By leveraging the system's architecture and exception handling capabilities, the OS can protect the system from crashes and data corruption by stopping or handling faulty processes effectively. This layered security mechanism helps maintain system stability and integrity even when individual programs attempt to perform illegal memory operations.
+The detection of an out-of-range segfault involves a collaborative effort between the hardware (primarily the [[memory_management_unit.md|MMU]]) and the operating system. By leveraging the system's architecture and exception handling capabilities, the OS can protect the system from crashes and data corruption by stopping or handling faulty processes effectively. This layered security mechanism helps maintain [[lti_system_stability.md|system stability]] and integrity even when individual programs attempt to perform illegal memory operations.

@@ -7,7 +7,7 @@ tags: [rust]
 
 The `filter_map` function in Rust is a method available on iterators. It combines the functionalities of `filter` and `map`, two fundamental operations in functional programming, into a single operation. 
 
-The `filter_map` function takes a closure that returns an `Option<T>`. If the closure returns `Some(element)`, the `element` is returned. If the closure returns `None`, the element is skipped. This allows you to simultaneously transform and filter elements in a single pass.
+The `filter_map` function takes a [[closure.md|closure]] that returns an `Option<T>`. If the [[closure.md|closure]] returns `Some(element)`, the `element` is returned. If the [[closure.md|closure]] returns `None`, the element is skipped. This allows you to simultaneously transform and filter elements in a single pass.
 
 Here is the signature of `filter_map`:
 
@@ -18,7 +18,7 @@ where
     Self: Sized
 ```
 
-In this signature, `B` is the type of elements after transformation, `F` is the type of the closure, and `Self::Item` is the type of elements in the original iterator.
+In this signature, `B` is the type of elements after transformation, `F` is the type of the [[closure.md|closure]], and `Self::Item` is the type of elements in the original iterator.
 
 Here is an example of `filter_map` usage:
 
@@ -30,7 +30,7 @@ println!("{:?}", b); // prints: [4]
 
 In this example, `filter_map` is used to double the value of even numbers and discard odd numbers.
 
-Tangentially related items include the `filter` and `map` functions in Rust. `filter` takes a closure that returns a boolean and only keeps elements for which the closure returns `true`. `map` takes a closure that transforms an element into another. 
+Tangentially related items include the `filter` and `map` functions in Rust. `filter` takes a [[closure.md|closure]] that returns a boolean and only keeps elements for which the [[closure.md|closure]] returns `true`. `map` takes a [[closure.md|closure]] that transforms an element into another. 
 
 There are no specific mathematical formulas, derivations, or proofs directly related to `filter_map`, as it is more of a programming concept. However, it is worth noting that `filter_map`, `filter`, and `map` are all examples of higher-order functions, a fundamental concept in functional programming and [[Lambda Functions|lambda]] calculus.
 

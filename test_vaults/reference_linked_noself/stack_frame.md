@@ -19,7 +19,7 @@ A typical stack frame may consist of several key components:
 - **Function Parameters**: The arguments that are passed to the function.
 - **Return Address**: The point in the program to return to once the function call completes.
 - **Local Variables**: Variables that are declared within the function. These are only accessible within the scope of the function.
-- **Frame [[Pointer.md|Pointer]] (or Base Pointer)**: A [[Pointer.md|pointer]] that points to the start of the current stack frame. This helps in accessing function parameters and local variables consistently across different function calls.
+- **Frame [[Pointer.md|Pointer]] (or Base [[pointer.md|Pointer]])**: A [[Pointer.md|pointer]] that points to the start of the current stack frame. This helps in accessing function parameters and local variables consistently across different function calls.
 
 ## How Stack Frames Work
 
@@ -28,7 +28,7 @@ When a function is called, the process generally follows these steps:
 1. **Space Allocation**: Space for the function's local variables is allocated on the stack.
 2. **Parameter Passing**: The arguments to the function are pushed onto the stack.
 3. **Frame Setup**: The return address and possibly the old frame [[Pointer.md|pointer]] are pushed onto the stack. A new frame [[Pointer.md|pointer]] may be established pointing to the start of the new stack frame.
-4. **Function Execution**: The function executes its body. It may access its parameters and local variables relative to the frame pointer.
+4. **Function Execution**: The function executes its body. It may access its parameters and local variables relative to the frame [[pointer.md|pointer]].
 5. **Return**: Upon completion, the function may return a value. The stack frame is cleaned up, the old frame [[Pointer.md|pointer]] is restored, and control is transferred back to the return address.
 
 ## Importance of Stack Frames

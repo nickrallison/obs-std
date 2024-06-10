@@ -7,21 +7,21 @@ bad_links:
 ---
 # Address Resolution Protocol
 
-ARP, short for Address Resolution Protocol, is a fundamental protocol used within the OSI model's Network Layer. It plays a critical role in [[IP Address.md|Internet Protocol]] (IP) networking, serving as a bridge between the network layer and the data link layer. In essence, ARP is utilized for mapping or translating network addresses (IP addresses) into physical addresses, commonly known as Media Access Control (MAC) addresses. This mapping is crucial for the actual data packet transmissions over the network, as devices within a local network segment identify and communicate with each other through MAC addresses, not [[IP Address.md|IP]] addresses.
+ARP, short for Address Resolution Protocol, is a fundamental protocol used within the OSI model's Network Layer. It plays a critical role in [[IP Address.md|Internet Protocol]] ([[ip_address.md|IP]]) networking, serving as a bridge between the network layer and the data link layer. In essence, ARP is utilized for mapping or translating network addresses ([[ip_address.md|IP]] addresses) into physical addresses, commonly known as Media Access Control (MAC) addresses. This mapping is crucial for the actual data packet transmissions over the network, as devices within a local network segment identify and communicate with each other through MAC addresses, not [[IP Address.md|IP]] addresses.
 
 ## How ARP Works
 
 The ARP process begins whenever a device (say, Host A) wants to communicate with another device (Host B) within the same local network and knows Host B's [[IP Address.md|IP]] address but not its MAC address. Host A will then broadcast an ARP request packet across the local network, asking "Who has [[IP Address.md|IP]] address X, and what's your MAC address?"
 
-All devices within the local network segment receive the ARP request, but only the device with the matching [[IP Address.md|IP]] address (Host B) responds. Host B replies with an ARP reply packet, which includes its MAC address. Upon receiving this, Host A can update its ARP cache, a temporary database containing mappings of [[IP Address.md|IP]] addresses to MAC addresses, with this information. This cache helps in reducing the need to broadcast ARP requests for subsequent communications to the same device, thereby improving network efficiency.
+All devices within the local network segment receive the ARP request, but only the device with the matching [[IP Address.md|IP]] address (Host B) responds. Host B replies with an ARP reply packet, which includes its MAC address. Upon receiving this, Host A can update its ARP [[caching.md|cache]], a temporary database containing mappings of [[IP Address.md|IP]] addresses to MAC addresses, with this information. This [[caching.md|cache]] helps in reducing the need to broadcast ARP requests for subsequent communications to the same device, thereby improving network efficiency.
 
 ## ARP Message Format
 
 An ARP message, whether a request or a reply, typically includes several fields:
 - Hardware type: Identifies the type of networking hardware used (Ethernet, for example).
-- Protocol type: Specifies the type of protocol (typically [[IP Address.md|IP]] for Internet Protocol).
+- Protocol type: Specifies the type of protocol (typically [[IP Address.md|IP]] for [[ip_address.md|Internet Protocol]]).
 - Hardware address length: The length of the physical address (MAC address for Ethernet).
-- Protocol address length: The length of the logical address (IP address).
+- Protocol address length: The length of the logical address ([[ip_address.md|IP]] address).
 - Opcode: Specifies the operation, whether it's a request (1) or a reply (2).
 - Sender's MAC address: The MAC address of the sender.
 - Sender's [[IP Address.md|IP]] address: The [[IP Address.md|IP]] address of the sender.
@@ -30,7 +30,7 @@ An ARP message, whether a request or a reply, typically includes several fields:
 
 ## ARP in [[IP Address.md|IPv4]] vs. [[IP Address.md|IPv6]]
 
-In [[IP Address.md|IPv4]] networks, ARP is directly responsible for IP-to-MAC resolution. However, in [[IP Address.md|IPv6]] networks, this function is handled by a different protocol known as Neighbor Discovery Protocol (NDP). While ARP and NDP serve similar roles in their respective [[IP Address.md|IP]] versions, NDP provides enhanced features and security improvements over ARP.
+In [[IP Address.md|IPv4]] networks, ARP is directly responsible for [[ip_address.md|IP]]-to-MAC resolution. However, in [[IP Address.md|IPv6]] networks, this function is handled by a different protocol known as Neighbor Discovery Protocol (NDP). While ARP and NDP serve similar roles in their respective [[IP Address.md|IP]] versions, NDP provides enhanced features and security improvements over ARP.
 
 ## Security Considerations
 

@@ -15,7 +15,7 @@ fn display<T: Display>(t: T) {
 }
 ```
 
-In this function, `T: Display` is a [[Rust Traits|trait]] bound. It means "T must implement the Display trait". The `Display` [[Rust Traits|trait]] is part of Rust's standard library and provides a method for formatting the type into a string.
+In this function, `T: Display` is a [[Rust Traits|trait]] bound. It means "T must implement the Display [[rust_traits.md|trait]]". The `Display` [[Rust Traits|trait]] is part of Rust's standard library and provides a method for formatting the type into a string.
 
 [[Rust Traits|Trait]] bounds can also be specified with the `where` keyword, which can make complex [[Rust Traits|trait]] bounds more readable:
 

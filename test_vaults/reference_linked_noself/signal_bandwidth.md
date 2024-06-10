@@ -21,7 +21,7 @@ $$
 C = B \log_2(1 + SNR)
 $$
 
-where $C$ is the maximum achievable data rate (capacity), $B$ is the bandwidth, and $SNR$ is the signal-to-noise ratio. This formula, derived by Claude Shannon, shows that the data rate is directly proportional to the bandwidth: the larger the bandwidth, the higher the potential data rate.
+where $C$ is the maximum achievable data rate (capacity), $B$ is the bandwidth, and $SNR$ is the [[signal_to_noise_ratio.md|signal-to-noise ratio]]. This formula, derived by Claude Shannon, shows that the data rate is directly proportional to the bandwidth: the larger the bandwidth, the higher the potential data rate.
 
 Bandwidth is also related to the concept of the [[Fourier Transform|Fourier Transform]], which allows us to analyze the frequency components of a signal. The [[Fourier Transform|Fourier Transform]] of a time-domain signal gives us its frequency-domain representation, showing us the signal's behavior over a range of frequencies. This is crucial in understanding the bandwidth of a signal.
 

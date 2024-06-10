@@ -45,6 +45,13 @@ Meant to be a library to interact with obsidian and markdown files in an efficie
 Other Features
 - Tag Manipulation
 - Tag Splitting
+- Find Links that don't belong
+  - Embeddings Matching?
+- Individual Linking Rules Per File
+  - eg. incoming must match tag
+  - eg. outgoing must match tag or this other tag...
+  - eg. incoming must be at least this distance in embedding space
+  - User Customizable?
 
 ## Documentation
 

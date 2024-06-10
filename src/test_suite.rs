@@ -8360,9 +8360,9 @@ mod test_suite {
 
 
     #[test]
-	fn test_suite_stability_conservative_vector_field__clean() {
+	fn test_suite_stability_conservative_vector_field_clean() {
 		let vault_path: PathBuf = PathBuf::from("test_vaults\\reference_clean");
-		let file: PathBuf = PathBuf::from("conservative_vector_field_.md");
+		let file: PathBuf = PathBuf::from("conservative_vector_field.md");
 		let file_path: PathBuf = vault_path.join(file.clone());
 		assert!(file_path.is_file());
 		let file_contents = fs::read_to_string(file_path.clone()).unwrap();
@@ -8373,9 +8373,9 @@ mod test_suite {
 	}
 
 	#[test]
-	fn test_suite_stability_conservative_vector_field__linked() {
+	fn test_suite_stability_conservative_vector_field_linked() {
 		let vault_path: PathBuf = PathBuf::from("test_vaults\\reference_linked_noself");
-		let file: PathBuf = PathBuf::from("conservative_vector_field_.md");
+		let file: PathBuf = PathBuf::from("conservative_vector_field.md");
 		let file_path: PathBuf = vault_path.join(file.clone());
 		assert!(file_path.is_file());
 		let file_contents = fs::read_to_string(file_path.clone()).unwrap();
@@ -8386,11 +8386,11 @@ mod test_suite {
 	}
 
 	#[test]
-	fn test_suite_conservative_vector_field__link() {
+	fn test_suite_conservative_vector_field_link() {
 		let vault_path_clean: PathBuf = PathBuf::from("test_vaults\\reference_clean");
 		let vault_path_linked: PathBuf = PathBuf::from("test_vaults\\reference_linked_noself");
 
-		let file = PathBuf::from("conservative_vector_field_.md");
+		let file = PathBuf::from("conservative_vector_field.md");
 
 		let file_path_clean: PathBuf = vault_path_clean.join(file.clone());
 		let file_path_linked: PathBuf = vault_path_linked.join(file.clone());
@@ -8407,12 +8407,12 @@ mod test_suite {
 	}
 
 	#[test]
-	fn test_suite_conservative_vector_field__unlink() {
+	fn test_suite_conservative_vector_field_unlink() {
 
 		let vault_path_clean: PathBuf = PathBuf::from("test_vaults\\reference_clean");
 		let vault_path_linked: PathBuf = PathBuf::from("test_vaults\\reference_linked_noself");
 
-		let file = PathBuf::from("conservative_vector_field_.md");
+		let file = PathBuf::from("conservative_vector_field.md");
 
 		let file_path_clean: PathBuf = vault_path_clean.join(file.clone());
 		let file_path_linked: PathBuf = vault_path_linked.join(file.clone());
@@ -9200,9 +9200,9 @@ mod test_suite {
 
 
     #[test]
-	fn test_suite_stability_converse_logic__clean() {
+	fn test_suite_stability_converse_logic_clean() {
 		let vault_path: PathBuf = PathBuf::from("test_vaults\\reference_clean");
-		let file: PathBuf = PathBuf::from("converse_logic_.md");
+		let file: PathBuf = PathBuf::from("converse_logic.md");
 		let file_path: PathBuf = vault_path.join(file.clone());
 		assert!(file_path.is_file());
 		let file_contents = fs::read_to_string(file_path.clone()).unwrap();
@@ -9213,9 +9213,9 @@ mod test_suite {
 	}
 
 	#[test]
-	fn test_suite_stability_converse_logic__linked() {
+	fn test_suite_stability_converse_logic_linked() {
 		let vault_path: PathBuf = PathBuf::from("test_vaults\\reference_linked_noself");
-		let file: PathBuf = PathBuf::from("converse_logic_.md");
+		let file: PathBuf = PathBuf::from("converse_logic.md");
 		let file_path: PathBuf = vault_path.join(file.clone());
 		assert!(file_path.is_file());
 		let file_contents = fs::read_to_string(file_path.clone()).unwrap();
@@ -9226,11 +9226,11 @@ mod test_suite {
 	}
 
 	#[test]
-	fn test_suite_converse_logic__link() {
+	fn test_suite_converse_logic_link() {
 		let vault_path_clean: PathBuf = PathBuf::from("test_vaults\\reference_clean");
 		let vault_path_linked: PathBuf = PathBuf::from("test_vaults\\reference_linked_noself");
 
-		let file = PathBuf::from("converse_logic_.md");
+		let file = PathBuf::from("converse_logic.md");
 
 		let file_path_clean: PathBuf = vault_path_clean.join(file.clone());
 		let file_path_linked: PathBuf = vault_path_linked.join(file.clone());
@@ -9247,12 +9247,12 @@ mod test_suite {
 	}
 
 	#[test]
-	fn test_suite_converse_logic__unlink() {
+	fn test_suite_converse_logic_unlink() {
 
 		let vault_path_clean: PathBuf = PathBuf::from("test_vaults\\reference_clean");
 		let vault_path_linked: PathBuf = PathBuf::from("test_vaults\\reference_linked_noself");
 
-		let file = PathBuf::from("converse_logic_.md");
+		let file = PathBuf::from("converse_logic.md");
 
 		let file_path_clean: PathBuf = vault_path_clean.join(file.clone());
 		let file_path_linked: PathBuf = vault_path_linked.join(file.clone());
@@ -18860,9 +18860,9 @@ mod test_suite {
 
 
     #[test]
-	fn test_suite_stability_group_group_theory__clean() {
+	fn test_suite_stability_group_group_theory_clean() {
 		let vault_path: PathBuf = PathBuf::from("test_vaults\\reference_clean");
-		let file: PathBuf = PathBuf::from("group_group_theory_.md");
+		let file: PathBuf = PathBuf::from("group_group_theory.md");
 		let file_path: PathBuf = vault_path.join(file.clone());
 		assert!(file_path.is_file());
 		let file_contents = fs::read_to_string(file_path.clone()).unwrap();
@@ -18873,9 +18873,9 @@ mod test_suite {
 	}
 
 	#[test]
-	fn test_suite_stability_group_group_theory__linked() {
+	fn test_suite_stability_group_group_theory_linked() {
 		let vault_path: PathBuf = PathBuf::from("test_vaults\\reference_linked_noself");
-		let file: PathBuf = PathBuf::from("group_group_theory_.md");
+		let file: PathBuf = PathBuf::from("group_group_theory.md");
 		let file_path: PathBuf = vault_path.join(file.clone());
 		assert!(file_path.is_file());
 		let file_contents = fs::read_to_string(file_path.clone()).unwrap();
@@ -18886,11 +18886,11 @@ mod test_suite {
 	}
 
 	#[test]
-	fn test_suite_group_group_theory__link() {
+	fn test_suite_group_group_theory_link() {
 		let vault_path_clean: PathBuf = PathBuf::from("test_vaults\\reference_clean");
 		let vault_path_linked: PathBuf = PathBuf::from("test_vaults\\reference_linked_noself");
 
-		let file = PathBuf::from("group_group_theory_.md");
+		let file = PathBuf::from("group_group_theory.md");
 
 		let file_path_clean: PathBuf = vault_path_clean.join(file.clone());
 		let file_path_linked: PathBuf = vault_path_linked.join(file.clone());
@@ -18907,12 +18907,12 @@ mod test_suite {
 	}
 
 	#[test]
-	fn test_suite_group_group_theory__unlink() {
+	fn test_suite_group_group_theory_unlink() {
 
 		let vault_path_clean: PathBuf = PathBuf::from("test_vaults\\reference_clean");
 		let vault_path_linked: PathBuf = PathBuf::from("test_vaults\\reference_linked_noself");
 
-		let file = PathBuf::from("group_group_theory_.md");
+		let file = PathBuf::from("group_group_theory.md");
 
 		let file_path_clean: PathBuf = vault_path_clean.join(file.clone());
 		let file_path_linked: PathBuf = vault_path_linked.join(file.clone());
@@ -21240,76 +21240,6 @@ mod test_suite {
 
 
     #[test]
-	fn test_suite_stability_independence_clean() {
-		let vault_path: PathBuf = PathBuf::from("test_vaults\\reference_clean");
-		let file: PathBuf = PathBuf::from("independence.md");
-		let file_path: PathBuf = vault_path.join(file.clone());
-		assert!(file_path.is_file());
-		let file_contents = fs::read_to_string(file_path.clone()).unwrap();
-		let md_file = TEST_SUITE_REF_CLEAN_VAULT.get_md_file(&file).expect(&format!("Failed to get MDFile from {}", file_path.display()));
-		let result = md_file.to_string();
-		let expected = file_contents;
-		assert_eq!(result, expected, "Failed on file: {}", file_path.display());
-	}
-
-	#[test]
-	fn test_suite_stability_independence_linked() {
-		let vault_path: PathBuf = PathBuf::from("test_vaults\\reference_linked_noself");
-		let file: PathBuf = PathBuf::from("independence.md");
-		let file_path: PathBuf = vault_path.join(file.clone());
-		assert!(file_path.is_file());
-		let file_contents = fs::read_to_string(file_path.clone()).unwrap();
-		let md_file = TEST_SUITE_REF_LINKED_VAULT.get_md_file(&file).expect(&format!("Failed to get MDFile from {}", file_path.display()));
-		let result = md_file.to_string();
-		let expected = file_contents;
-		assert_eq!(result, expected, "Failed on file: {}", file_path.display());
-	}
-
-	#[test]
-	fn test_suite_independence_link() {
-		let vault_path_clean: PathBuf = PathBuf::from("test_vaults\\reference_clean");
-		let vault_path_linked: PathBuf = PathBuf::from("test_vaults\\reference_linked_noself");
-
-		let file = PathBuf::from("independence.md");
-
-		let file_path_clean: PathBuf = vault_path_clean.join(file.clone());
-		let file_path_linked: PathBuf = vault_path_linked.join(file.clone());
-
-		assert!(file_path_clean.is_file());
-		assert!(file_path_linked.is_file());
-
-		let md_file_clean_to_linked = TEST_SUITE_REF_CLEAN_TO_LINKED_VAULT.get_md_file(&file).expect(&format!("Failed to get MDFile from {}", file_path_clean.display()));
-		let md_file_linked = TEST_SUITE_REF_LINKED_VAULT.get_md_file(&file).expect(&format!("Failed to get MDFile from {}", file_path_linked.display()));
-
-		let result = md_file_clean_to_linked.to_string();
-		let expected = md_file_linked.to_string();
-		assert_eq!(result, expected, "Failed on file: {}", file_path_clean.display());
-	}
-
-	#[test]
-	fn test_suite_independence_unlink() {
-
-		let vault_path_clean: PathBuf = PathBuf::from("test_vaults\\reference_clean");
-		let vault_path_linked: PathBuf = PathBuf::from("test_vaults\\reference_linked_noself");
-
-		let file = PathBuf::from("independence.md");
-
-		let file_path_clean: PathBuf = vault_path_clean.join(file.clone());
-		let file_path_linked: PathBuf = vault_path_linked.join(file.clone());
-
-		assert!(file_path_clean.is_file());
-		assert!(file_path_linked.is_file());
-
-		let md_file_clean = TEST_SUITE_REF_CLEAN_VAULT.get_md_file(&file).expect(&format!("Failed to get MDFile from {}", file_path_clean.display()));
-		let md_file_linked_to_clean = TEST_SUITE_REF_LINKED_TO_CLEAN_VAULT.get_md_file(&file).expect(&format!("Failed to get MDFile from {}", file_path_clean.display()));
-
-		let result = md_file_linked_to_clean.to_string();
-		let expected = md_file_clean.to_string();
-		assert_eq!(result, expected, "Failed on file: {}", file_path_clean.display());
-	}
-
-
-    #[test]
 	fn test_suite_stability_independent_events_clean() {
 		let vault_path: PathBuf = PathBuf::from("test_vaults\\reference_clean");
 		let file: PathBuf = PathBuf::from("independent_events.md");
@@ -21660,9 +21590,9 @@ mod test_suite {
 
 
     #[test]
-	fn test_suite_stability_inline_keyword_c__clean() {
+	fn test_suite_stability_inline_keyword_c_clean() {
 		let vault_path: PathBuf = PathBuf::from("test_vaults\\reference_clean");
-		let file: PathBuf = PathBuf::from("inline_keyword_c_.md");
+		let file: PathBuf = PathBuf::from("inline_keyword_c.md");
 		let file_path: PathBuf = vault_path.join(file.clone());
 		assert!(file_path.is_file());
 		let file_contents = fs::read_to_string(file_path.clone()).unwrap();
@@ -21673,9 +21603,9 @@ mod test_suite {
 	}
 
 	#[test]
-	fn test_suite_stability_inline_keyword_c__linked() {
+	fn test_suite_stability_inline_keyword_c_linked() {
 		let vault_path: PathBuf = PathBuf::from("test_vaults\\reference_linked_noself");
-		let file: PathBuf = PathBuf::from("inline_keyword_c_.md");
+		let file: PathBuf = PathBuf::from("inline_keyword_c.md");
 		let file_path: PathBuf = vault_path.join(file.clone());
 		assert!(file_path.is_file());
 		let file_contents = fs::read_to_string(file_path.clone()).unwrap();
@@ -21686,11 +21616,11 @@ mod test_suite {
 	}
 
 	#[test]
-	fn test_suite_inline_keyword_c__link() {
+	fn test_suite_inline_keyword_c_link() {
 		let vault_path_clean: PathBuf = PathBuf::from("test_vaults\\reference_clean");
 		let vault_path_linked: PathBuf = PathBuf::from("test_vaults\\reference_linked_noself");
 
-		let file = PathBuf::from("inline_keyword_c_.md");
+		let file = PathBuf::from("inline_keyword_c.md");
 
 		let file_path_clean: PathBuf = vault_path_clean.join(file.clone());
 		let file_path_linked: PathBuf = vault_path_linked.join(file.clone());
@@ -21707,12 +21637,12 @@ mod test_suite {
 	}
 
 	#[test]
-	fn test_suite_inline_keyword_c__unlink() {
+	fn test_suite_inline_keyword_c_unlink() {
 
 		let vault_path_clean: PathBuf = PathBuf::from("test_vaults\\reference_clean");
 		let vault_path_linked: PathBuf = PathBuf::from("test_vaults\\reference_linked_noself");
 
-		let file = PathBuf::from("inline_keyword_c_.md");
+		let file = PathBuf::from("inline_keyword_c.md");
 
 		let file_path_clean: PathBuf = vault_path_clean.join(file.clone());
 		let file_path_linked: PathBuf = vault_path_linked.join(file.clone());
@@ -23200,9 +23130,9 @@ mod test_suite {
 
 
     #[test]
-	fn test_suite_stability_kernel_operating_systems__clean() {
+	fn test_suite_stability_kernel_operating_systems_clean() {
 		let vault_path: PathBuf = PathBuf::from("test_vaults\\reference_clean");
-		let file: PathBuf = PathBuf::from("kernel_operating_systems_.md");
+		let file: PathBuf = PathBuf::from("kernel_operating_systems.md");
 		let file_path: PathBuf = vault_path.join(file.clone());
 		assert!(file_path.is_file());
 		let file_contents = fs::read_to_string(file_path.clone()).unwrap();
@@ -23213,9 +23143,9 @@ mod test_suite {
 	}
 
 	#[test]
-	fn test_suite_stability_kernel_operating_systems__linked() {
+	fn test_suite_stability_kernel_operating_systems_linked() {
 		let vault_path: PathBuf = PathBuf::from("test_vaults\\reference_linked_noself");
-		let file: PathBuf = PathBuf::from("kernel_operating_systems_.md");
+		let file: PathBuf = PathBuf::from("kernel_operating_systems.md");
 		let file_path: PathBuf = vault_path.join(file.clone());
 		assert!(file_path.is_file());
 		let file_contents = fs::read_to_string(file_path.clone()).unwrap();
@@ -23226,11 +23156,11 @@ mod test_suite {
 	}
 
 	#[test]
-	fn test_suite_kernel_operating_systems__link() {
+	fn test_suite_kernel_operating_systems_link() {
 		let vault_path_clean: PathBuf = PathBuf::from("test_vaults\\reference_clean");
 		let vault_path_linked: PathBuf = PathBuf::from("test_vaults\\reference_linked_noself");
 
-		let file = PathBuf::from("kernel_operating_systems_.md");
+		let file = PathBuf::from("kernel_operating_systems.md");
 
 		let file_path_clean: PathBuf = vault_path_clean.join(file.clone());
 		let file_path_linked: PathBuf = vault_path_linked.join(file.clone());
@@ -23247,12 +23177,12 @@ mod test_suite {
 	}
 
 	#[test]
-	fn test_suite_kernel_operating_systems__unlink() {
+	fn test_suite_kernel_operating_systems_unlink() {
 
 		let vault_path_clean: PathBuf = PathBuf::from("test_vaults\\reference_clean");
 		let vault_path_linked: PathBuf = PathBuf::from("test_vaults\\reference_linked_noself");
 
-		let file = PathBuf::from("kernel_operating_systems_.md");
+		let file = PathBuf::from("kernel_operating_systems.md");
 
 		let file_path_clean: PathBuf = vault_path_clean.join(file.clone());
 		let file_path_linked: PathBuf = vault_path_linked.join(file.clone());
@@ -31740,76 +31670,6 @@ mod test_suite {
 
 
     #[test]
-	fn test_suite_stability_programs_to_install_on_new_pc_clean() {
-		let vault_path: PathBuf = PathBuf::from("test_vaults\\reference_clean");
-		let file: PathBuf = PathBuf::from("programs_to_install_on_new_pc.md");
-		let file_path: PathBuf = vault_path.join(file.clone());
-		assert!(file_path.is_file());
-		let file_contents = fs::read_to_string(file_path.clone()).unwrap();
-		let md_file = TEST_SUITE_REF_CLEAN_VAULT.get_md_file(&file).expect(&format!("Failed to get MDFile from {}", file_path.display()));
-		let result = md_file.to_string();
-		let expected = file_contents;
-		assert_eq!(result, expected, "Failed on file: {}", file_path.display());
-	}
-
-	#[test]
-	fn test_suite_stability_programs_to_install_on_new_pc_linked() {
-		let vault_path: PathBuf = PathBuf::from("test_vaults\\reference_linked_noself");
-		let file: PathBuf = PathBuf::from("programs_to_install_on_new_pc.md");
-		let file_path: PathBuf = vault_path.join(file.clone());
-		assert!(file_path.is_file());
-		let file_contents = fs::read_to_string(file_path.clone()).unwrap();
-		let md_file = TEST_SUITE_REF_LINKED_VAULT.get_md_file(&file).expect(&format!("Failed to get MDFile from {}", file_path.display()));
-		let result = md_file.to_string();
-		let expected = file_contents;
-		assert_eq!(result, expected, "Failed on file: {}", file_path.display());
-	}
-
-	#[test]
-	fn test_suite_programs_to_install_on_new_pc_link() {
-		let vault_path_clean: PathBuf = PathBuf::from("test_vaults\\reference_clean");
-		let vault_path_linked: PathBuf = PathBuf::from("test_vaults\\reference_linked_noself");
-
-		let file = PathBuf::from("programs_to_install_on_new_pc.md");
-
-		let file_path_clean: PathBuf = vault_path_clean.join(file.clone());
-		let file_path_linked: PathBuf = vault_path_linked.join(file.clone());
-
-		assert!(file_path_clean.is_file());
-		assert!(file_path_linked.is_file());
-
-		let md_file_clean_to_linked = TEST_SUITE_REF_CLEAN_TO_LINKED_VAULT.get_md_file(&file).expect(&format!("Failed to get MDFile from {}", file_path_clean.display()));
-		let md_file_linked = TEST_SUITE_REF_LINKED_VAULT.get_md_file(&file).expect(&format!("Failed to get MDFile from {}", file_path_linked.display()));
-
-		let result = md_file_clean_to_linked.to_string();
-		let expected = md_file_linked.to_string();
-		assert_eq!(result, expected, "Failed on file: {}", file_path_clean.display());
-	}
-
-	#[test]
-	fn test_suite_programs_to_install_on_new_pc_unlink() {
-
-		let vault_path_clean: PathBuf = PathBuf::from("test_vaults\\reference_clean");
-		let vault_path_linked: PathBuf = PathBuf::from("test_vaults\\reference_linked_noself");
-
-		let file = PathBuf::from("programs_to_install_on_new_pc.md");
-
-		let file_path_clean: PathBuf = vault_path_clean.join(file.clone());
-		let file_path_linked: PathBuf = vault_path_linked.join(file.clone());
-
-		assert!(file_path_clean.is_file());
-		assert!(file_path_linked.is_file());
-
-		let md_file_clean = TEST_SUITE_REF_CLEAN_VAULT.get_md_file(&file).expect(&format!("Failed to get MDFile from {}", file_path_clean.display()));
-		let md_file_linked_to_clean = TEST_SUITE_REF_LINKED_TO_CLEAN_VAULT.get_md_file(&file).expect(&format!("Failed to get MDFile from {}", file_path_clean.display()));
-
-		let result = md_file_linked_to_clean.to_string();
-		let expected = md_file_clean.to_string();
-		assert_eq!(result, expected, "Failed on file: {}", file_path_clean.display());
-	}
-
-
-    #[test]
 	fn test_suite_stability_proof_by_contradiction_clean() {
 		let vault_path: PathBuf = PathBuf::from("test_vaults\\reference_clean");
 		let file: PathBuf = PathBuf::from("proof_by_contradiction.md");
@@ -36640,9 +36500,9 @@ mod test_suite {
 
 
     #[test]
-	fn test_suite_stability_satisfiability_logic__clean() {
+	fn test_suite_stability_satisfiability_logic_clean() {
 		let vault_path: PathBuf = PathBuf::from("test_vaults\\reference_clean");
-		let file: PathBuf = PathBuf::from("satisfiability_logic_.md");
+		let file: PathBuf = PathBuf::from("satisfiability_logic.md");
 		let file_path: PathBuf = vault_path.join(file.clone());
 		assert!(file_path.is_file());
 		let file_contents = fs::read_to_string(file_path.clone()).unwrap();
@@ -36653,9 +36513,9 @@ mod test_suite {
 	}
 
 	#[test]
-	fn test_suite_stability_satisfiability_logic__linked() {
+	fn test_suite_stability_satisfiability_logic_linked() {
 		let vault_path: PathBuf = PathBuf::from("test_vaults\\reference_linked_noself");
-		let file: PathBuf = PathBuf::from("satisfiability_logic_.md");
+		let file: PathBuf = PathBuf::from("satisfiability_logic.md");
 		let file_path: PathBuf = vault_path.join(file.clone());
 		assert!(file_path.is_file());
 		let file_contents = fs::read_to_string(file_path.clone()).unwrap();
@@ -36666,11 +36526,11 @@ mod test_suite {
 	}
 
 	#[test]
-	fn test_suite_satisfiability_logic__link() {
+	fn test_suite_satisfiability_logic_link() {
 		let vault_path_clean: PathBuf = PathBuf::from("test_vaults\\reference_clean");
 		let vault_path_linked: PathBuf = PathBuf::from("test_vaults\\reference_linked_noself");
 
-		let file = PathBuf::from("satisfiability_logic_.md");
+		let file = PathBuf::from("satisfiability_logic.md");
 
 		let file_path_clean: PathBuf = vault_path_clean.join(file.clone());
 		let file_path_linked: PathBuf = vault_path_linked.join(file.clone());
@@ -36687,12 +36547,12 @@ mod test_suite {
 	}
 
 	#[test]
-	fn test_suite_satisfiability_logic__unlink() {
+	fn test_suite_satisfiability_logic_unlink() {
 
 		let vault_path_clean: PathBuf = PathBuf::from("test_vaults\\reference_clean");
 		let vault_path_linked: PathBuf = PathBuf::from("test_vaults\\reference_linked_noself");
 
-		let file = PathBuf::from("satisfiability_logic_.md");
+		let file = PathBuf::from("satisfiability_logic.md");
 
 		let file_path_clean: PathBuf = vault_path_clean.join(file.clone());
 		let file_path_linked: PathBuf = vault_path_linked.join(file.clone());
@@ -38530,9 +38390,9 @@ mod test_suite {
 
 
     #[test]
-	fn test_suite_stability_static_keyword_c__clean() {
+	fn test_suite_stability_static_keyword_c_clean() {
 		let vault_path: PathBuf = PathBuf::from("test_vaults\\reference_clean");
-		let file: PathBuf = PathBuf::from("static_keyword_c_.md");
+		let file: PathBuf = PathBuf::from("static_keyword_c.md");
 		let file_path: PathBuf = vault_path.join(file.clone());
 		assert!(file_path.is_file());
 		let file_contents = fs::read_to_string(file_path.clone()).unwrap();
@@ -38543,9 +38403,9 @@ mod test_suite {
 	}
 
 	#[test]
-	fn test_suite_stability_static_keyword_c__linked() {
+	fn test_suite_stability_static_keyword_c_linked() {
 		let vault_path: PathBuf = PathBuf::from("test_vaults\\reference_linked_noself");
-		let file: PathBuf = PathBuf::from("static_keyword_c_.md");
+		let file: PathBuf = PathBuf::from("static_keyword_c.md");
 		let file_path: PathBuf = vault_path.join(file.clone());
 		assert!(file_path.is_file());
 		let file_contents = fs::read_to_string(file_path.clone()).unwrap();
@@ -38556,11 +38416,11 @@ mod test_suite {
 	}
 
 	#[test]
-	fn test_suite_static_keyword_c__link() {
+	fn test_suite_static_keyword_c_link() {
 		let vault_path_clean: PathBuf = PathBuf::from("test_vaults\\reference_clean");
 		let vault_path_linked: PathBuf = PathBuf::from("test_vaults\\reference_linked_noself");
 
-		let file = PathBuf::from("static_keyword_c_.md");
+		let file = PathBuf::from("static_keyword_c.md");
 
 		let file_path_clean: PathBuf = vault_path_clean.join(file.clone());
 		let file_path_linked: PathBuf = vault_path_linked.join(file.clone());
@@ -38577,12 +38437,12 @@ mod test_suite {
 	}
 
 	#[test]
-	fn test_suite_static_keyword_c__unlink() {
+	fn test_suite_static_keyword_c_unlink() {
 
 		let vault_path_clean: PathBuf = PathBuf::from("test_vaults\\reference_clean");
 		let vault_path_linked: PathBuf = PathBuf::from("test_vaults\\reference_linked_noself");
 
-		let file = PathBuf::from("static_keyword_c_.md");
+		let file = PathBuf::from("static_keyword_c.md");
 
 		let file_path_clean: PathBuf = vault_path_clean.join(file.clone());
 		let file_path_linked: PathBuf = vault_path_linked.join(file.clone());
@@ -38653,76 +38513,6 @@ mod test_suite {
 		let vault_path_linked: PathBuf = PathBuf::from("test_vaults\\reference_linked_noself");
 
 		let file = PathBuf::from("static_lifetime.md");
-
-		let file_path_clean: PathBuf = vault_path_clean.join(file.clone());
-		let file_path_linked: PathBuf = vault_path_linked.join(file.clone());
-
-		assert!(file_path_clean.is_file());
-		assert!(file_path_linked.is_file());
-
-		let md_file_clean = TEST_SUITE_REF_CLEAN_VAULT.get_md_file(&file).expect(&format!("Failed to get MDFile from {}", file_path_clean.display()));
-		let md_file_linked_to_clean = TEST_SUITE_REF_LINKED_TO_CLEAN_VAULT.get_md_file(&file).expect(&format!("Failed to get MDFile from {}", file_path_clean.display()));
-
-		let result = md_file_linked_to_clean.to_string();
-		let expected = md_file_clean.to_string();
-		assert_eq!(result, expected, "Failed on file: {}", file_path_clean.display());
-	}
-
-
-    #[test]
-	fn test_suite_stability_static_linker_clean() {
-		let vault_path: PathBuf = PathBuf::from("test_vaults\\reference_clean");
-		let file: PathBuf = PathBuf::from("static_linker.md");
-		let file_path: PathBuf = vault_path.join(file.clone());
-		assert!(file_path.is_file());
-		let file_contents = fs::read_to_string(file_path.clone()).unwrap();
-		let md_file = TEST_SUITE_REF_CLEAN_VAULT.get_md_file(&file).expect(&format!("Failed to get MDFile from {}", file_path.display()));
-		let result = md_file.to_string();
-		let expected = file_contents;
-		assert_eq!(result, expected, "Failed on file: {}", file_path.display());
-	}
-
-	#[test]
-	fn test_suite_stability_static_linker_linked() {
-		let vault_path: PathBuf = PathBuf::from("test_vaults\\reference_linked_noself");
-		let file: PathBuf = PathBuf::from("static_linker.md");
-		let file_path: PathBuf = vault_path.join(file.clone());
-		assert!(file_path.is_file());
-		let file_contents = fs::read_to_string(file_path.clone()).unwrap();
-		let md_file = TEST_SUITE_REF_LINKED_VAULT.get_md_file(&file).expect(&format!("Failed to get MDFile from {}", file_path.display()));
-		let result = md_file.to_string();
-		let expected = file_contents;
-		assert_eq!(result, expected, "Failed on file: {}", file_path.display());
-	}
-
-	#[test]
-	fn test_suite_static_linker_link() {
-		let vault_path_clean: PathBuf = PathBuf::from("test_vaults\\reference_clean");
-		let vault_path_linked: PathBuf = PathBuf::from("test_vaults\\reference_linked_noself");
-
-		let file = PathBuf::from("static_linker.md");
-
-		let file_path_clean: PathBuf = vault_path_clean.join(file.clone());
-		let file_path_linked: PathBuf = vault_path_linked.join(file.clone());
-
-		assert!(file_path_clean.is_file());
-		assert!(file_path_linked.is_file());
-
-		let md_file_clean_to_linked = TEST_SUITE_REF_CLEAN_TO_LINKED_VAULT.get_md_file(&file).expect(&format!("Failed to get MDFile from {}", file_path_clean.display()));
-		let md_file_linked = TEST_SUITE_REF_LINKED_VAULT.get_md_file(&file).expect(&format!("Failed to get MDFile from {}", file_path_linked.display()));
-
-		let result = md_file_clean_to_linked.to_string();
-		let expected = md_file_linked.to_string();
-		assert_eq!(result, expected, "Failed on file: {}", file_path_clean.display());
-	}
-
-	#[test]
-	fn test_suite_static_linker_unlink() {
-
-		let vault_path_clean: PathBuf = PathBuf::from("test_vaults\\reference_clean");
-		let vault_path_linked: PathBuf = PathBuf::from("test_vaults\\reference_linked_noself");
-
-		let file = PathBuf::from("static_linker.md");
 
 		let file_path_clean: PathBuf = vault_path_clean.join(file.clone());
 		let file_path_linked: PathBuf = vault_path_linked.join(file.clone());
@@ -43640,9 +43430,9 @@ mod test_suite {
 
 
     #[test]
-	fn test_suite_stability_unrar_linux__clean() {
+	fn test_suite_stability_unrar_linux_clean() {
 		let vault_path: PathBuf = PathBuf::from("test_vaults\\reference_clean");
-		let file: PathBuf = PathBuf::from("unrar_linux_.md");
+		let file: PathBuf = PathBuf::from("unrar_linux.md");
 		let file_path: PathBuf = vault_path.join(file.clone());
 		assert!(file_path.is_file());
 		let file_contents = fs::read_to_string(file_path.clone()).unwrap();
@@ -43653,9 +43443,9 @@ mod test_suite {
 	}
 
 	#[test]
-	fn test_suite_stability_unrar_linux__linked() {
+	fn test_suite_stability_unrar_linux_linked() {
 		let vault_path: PathBuf = PathBuf::from("test_vaults\\reference_linked_noself");
-		let file: PathBuf = PathBuf::from("unrar_linux_.md");
+		let file: PathBuf = PathBuf::from("unrar_linux.md");
 		let file_path: PathBuf = vault_path.join(file.clone());
 		assert!(file_path.is_file());
 		let file_contents = fs::read_to_string(file_path.clone()).unwrap();
@@ -43666,11 +43456,11 @@ mod test_suite {
 	}
 
 	#[test]
-	fn test_suite_unrar_linux__link() {
+	fn test_suite_unrar_linux_link() {
 		let vault_path_clean: PathBuf = PathBuf::from("test_vaults\\reference_clean");
 		let vault_path_linked: PathBuf = PathBuf::from("test_vaults\\reference_linked_noself");
 
-		let file = PathBuf::from("unrar_linux_.md");
+		let file = PathBuf::from("unrar_linux.md");
 
 		let file_path_clean: PathBuf = vault_path_clean.join(file.clone());
 		let file_path_linked: PathBuf = vault_path_linked.join(file.clone());
@@ -43687,12 +43477,12 @@ mod test_suite {
 	}
 
 	#[test]
-	fn test_suite_unrar_linux__unlink() {
+	fn test_suite_unrar_linux_unlink() {
 
 		let vault_path_clean: PathBuf = PathBuf::from("test_vaults\\reference_clean");
 		let vault_path_linked: PathBuf = PathBuf::from("test_vaults\\reference_linked_noself");
 
-		let file = PathBuf::from("unrar_linux_.md");
+		let file = PathBuf::from("unrar_linux.md");
 
 		let file_path_clean: PathBuf = vault_path_clean.join(file.clone());
 		let file_path_linked: PathBuf = vault_path_linked.join(file.clone());

@@ -27,7 +27,7 @@ Both of these slices would be `he`.
 
 Slices are useful because they prevent you from creating bugs with off-by-one errors, which are common when dealing with direct indexing. They also increase the readability of your code.
 
-Slices are a reference to a part of the memory. Therefore, just like references, slices are read-only by default. You can make them [[Mutability|mutable]] by declaring the reference as mutable:
+Slices are a reference to a part of the memory. Therefore, just like references, slices are read-only by default. You can make them [[Mutability|mutable]] by declaring the reference as [[mutability.md|mutable]]:
 
 ```rust
 let mut s = String::from("hello world");

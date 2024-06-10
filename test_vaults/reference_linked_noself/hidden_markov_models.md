@@ -18,7 +18,7 @@ At the heart of HMMs lies the Markov process, which is a memoryless stochastic p
 An HMM comprises the following components:
 
 - **States**: Hidden states that the model can be in. The states themselves are not directly visible.
-- **Observations**: Each state emits an observation, which can be seen. The observation might be discrete (e.g., words in a sentence) or continuous (e.g., stock prices).
+- **Observations**: Each state emits an observation, which can be seen. The observation might be discrete (e.g., words in a sentence) or [[continuity.md|continuous]] (e.g., stock prices).
 - **Transition Probabilities**: The probability of transitioning from one state to another. This forms the core of the Markov process.
 - **Emission Probabilities**: The probability of an observation being emitted from a state.
 - **Initial State Probabilities**: The probability of the system starting in a particular state.

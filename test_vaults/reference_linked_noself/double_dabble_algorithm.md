@@ -8,7 +8,7 @@ tags:
 ---
 # Double Dabble Algorithm
 
-The Double Dabble Algorithm is a binary-to-decimal conversion method used in digital computing. It works by shifting binary digits from the source binary number to the destination BCD ([[Binary Coded Decimal|Binary-coded decimal]]) number. This algorithm treats individual digit calculations as separate [[Binary Operation|binary operations]], which are then combined to form the final decimal output. The "double" refers to the doubling of the BCD number during each shift, while "dabble" refers to the adjustment made when a digit reaches or exceeds 5. This algorithm is often used in computer systems due to its efficiency and simplicity in implementation.
+The Double Dabble Algorithm is a binary-to-decimal conversion method used in digital computing. It works by shifting binary digits from the source binary number to the destination [[binary_coded_decimal.md|BCD]] ([[Binary Coded Decimal|Binary-coded decimal]]) number. This algorithm treats individual digit calculations as separate [[Binary Operation|binary operations]], which are then combined to form the final decimal output. The "double" refers to the doubling of the [[binary_coded_decimal.md|BCD]] number during each shift, while "dabble" refers to the adjustment made when a digit reaches or exceeds 5. This algorithm is often used in computer systems due to its efficiency and simplicity in implementation.
 
 ```pseudo
 \begin{algorithm}
@@ -31,4 +31,4 @@ The Double Dabble Algorithm is a binary-to-decimal conversion method used in dig
   \end{algorithmic}
 \end{algorithm}
 ```
-In this pseudocode, $n$ represents the number of bits in the binary number to be converted and $BCD$ is an array representing the [[Binary Coded Decimal|Binary Coded Decimal]] result. The algorithm works by shifting bits from the binary number into the BCD array and adding three to any digit in the BCD array that exceeds four after a shift. This continues until all bits from the binary number have been shifted into the BCD array.
+In this pseudocode, $n$ represents the number of bits in the binary number to be converted and $BCD$ is an array representing the [[Binary Coded Decimal|Binary Coded Decimal]] result. The algorithm works by shifting bits from the binary number into the [[binary_coded_decimal.md|BCD]] array and adding three to any digit in the [[binary_coded_decimal.md|BCD]] array that exceeds four after a shift. This continues until all bits from the binary number have been shifted into the [[binary_coded_decimal.md|BCD]] array.

@@ -11,7 +11,7 @@ bad_links: [Continuity.md]
 
 A Ping Pong Buffer, also known as a double buffer, is a technique used in computer science to handle data processing and transfer. It involves two buffers, often referred to as the "front" and "back" buffers, or "ping" and "pong" buffers. The idea is to alternate between these two buffers for reading and writing operations, allowing one buffer to be used for reading while the other is being written to, and vice versa. This technique is particularly useful in real-time systems where data processing must continue without interruption.
 
-The Ping Pong Buffer technique is often used in data streaming applications, where continuous data flow is required. It can also be found in graphics rendering (double buffering), where one buffer holds the frame being displayed while the other is being prepared.
+The Ping Pong Buffer technique is often used in data streaming applications, where [[continuity.md|continuous]] data flow is required. It can also be found in graphics rendering (double buffering), where one buffer holds the frame being displayed while the other is being prepared.
 
 The basic operation of a Ping Pong Buffer can be described by the following pseudocode:
 

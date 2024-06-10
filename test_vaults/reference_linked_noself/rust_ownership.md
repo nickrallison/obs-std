@@ -29,7 +29,7 @@ let s2 = s1; // s1 has been moved into s2
 
 After the move, you can no longer use `s1`. This prevents double free error because when `s2` and `s1` go out of scope, only `s2` will attempt to free the memory.
 
-Rust also has a feature called *borrowing*. You can have unlimited borrows for read-only access (immutable borrows), or one borrow for write access (mutable borrow). But you can't have both at the same time. This is enforced at compile time and is known as Rust's borrow checker. Here's an example:
+Rust also has a feature called *borrowing*. You can have unlimited borrows for read-only access ([[mutability.md|immutable]] borrows), or one borrow for write access ([[mutability.md|mutable]] borrow). But you can't have both at the same time. This is enforced at compile time and is known as Rust's borrow checker. Here's an example:
 
 ```rust
 let mut s = String::from("hello");

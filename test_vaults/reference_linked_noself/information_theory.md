@@ -19,7 +19,7 @@ In the context of computer architecture, information is primarily concerned with
 
 ### Memory Organization
 
-The organization of memory in a computer system is a critical aspect of computer architecture that directly influences how information is accessed and processed. Computer memory is hierarchically structured into registers, cache, main memory, and secondary storage, forming a memory hierarchy that balances cost, speed, and capacity to optimize overall system performance.
+The organization of memory in a computer system is a critical aspect of computer architecture that directly influences how information is accessed and processed. Computer memory is hierarchically structured into registers, [[caching.md|cache]], main memory, and secondary storage, forming a memory hierarchy that balances cost, speed, and capacity to optimize overall system performance.
 
 ### Data Path and Control
 
@@ -35,7 +35,7 @@ Data structures such as arrays, linked lists, trees, and graphs are used to orga
 
 ### Communication and Security
 
-Information theory also plays a pivotal role in communication and security within computer networks. Techniques that measure the information content and redundancy in data are used to optimize data transmission over limited bandwidth and to formulate cryptographic methods that protect information from unauthorized access and tamkey integrity.
+Information theory also plays a pivotal role in communication and security within computer networks. Techniques that measure the information content and redundancy in data are used to optimize data transmission over limited [[signal_bandwidth.md|bandwidth]] and to formulate cryptographic methods that protect information from unauthorized access and tamkey integrity.
 
 ### Artificial Intelligence and Machine Learning
 

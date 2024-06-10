@@ -21,7 +21,7 @@ Here's a step-by-step breakdown of how the Bucket Sort algorithm works:
 4. **Gather**: Visit the buckets in order and put all elements back into the original array.
    - This is done by concatenating the elements of the buckets in the order of the buckets.
 
-The [[Big-O Notation.md|time complexity]] of Bucket Sort is interesting to note. In the best case, where the input is uniformly distributed, the time complexity $O(n + k)$, where `n` is the number of elements to be sorted and `k` is the number of buckets. In the worst case, where all elements end up in the same bucket, the [[Big-O Notation.md|time complexity ]] is $O(n^2)$, as would need to use a comparison sort like insertion sort on the elements.
+The [[Big-O Notation.md|time complexity]] of Bucket Sort is interesting to note. In the best case, where the input is uniformly distributed, the [[big_o_notation.md|time complexity]] $O(n + k)$, where `n` is the number of elements to be sorted and `k` is the number of buckets. In the worst case, where all elements end up in the same bucket, the [[Big-O Notation.md|time complexity ]] is $O(n^2)$, as would need to use a comparison sort like insertion sort on the elements.
 
 >]]
 >For more in-depth reading, you can refer to the following resources:

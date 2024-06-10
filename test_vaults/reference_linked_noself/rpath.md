@@ -24,7 +24,7 @@ In the above command:
 
 ## Advantages of Using RPath
 
-1. **Portability**: By embedding library paths directly into executables, it enhances the portability of the application. It can be run on different machines without needing to adjust the `LD_LIBRARY_PATH` environment variable or modify global configuration files.
+1. **Portability**: By [[embedding.md|embedding]] library paths directly into executables, it enhances the portability of the application. It can be run on different machines without needing to adjust the `LD_LIBRARY_PATH` environment variable or modify global configuration files.
 
 2. **Control**: It gives developers control over which library versions their applications link against, reducing risks associated with library version conflicts or mismatches.
 

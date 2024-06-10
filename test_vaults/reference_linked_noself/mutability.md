@@ -36,7 +36,7 @@ y = 6; // This is allowed because `y` is mutable
 Rusts ownership system ensures safe memory management. Ownership, along with the rules for [[Rust Ownership|borrowing]] and lifetimes, plays a crucial role in how mutability is managed.
 
 - **Ownership**: Each value in Rust has a single owner, and when the owner goes out of scope, the value is dropped.
-- **Borrowing**: Rust allows references to values, and these can be either mutable or immutable.
+- **[[rust_ownership.md|Borrowing]]**: Rust allows references to values, and these can be either mutable or immutable.
 - **Lifetimes**: Lifetimes ensure that references are always valid as long as they are in use.
 
 ### Mutable References

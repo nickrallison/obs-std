@@ -7,7 +7,7 @@ bad_links:
 ---
 # Volatile Keyword in C
 
-In the C programming language, the `volatile` keyword is a qualifier that is applied to a variable when it is declared. It tells the compiler that the value of the variable may change at any time, without any action being taken by the code the compiler finds nearby. The keyword is intended to prevent the compiler from applying any optimizations on the variable that are based on assumptions about its value's stability over time.
+In the C programming language, the `volatile` keyword is a qualifier that is applied to a variable when it is declared. It tells the compiler that the value of the variable may change at any time, without any action being taken by the code the compiler finds nearby. The keyword is intended to prevent the compiler from applying any optimizations on the variable that are based on assumptions about its value's [[lti_system_stability.md|stability]] over time.
 
 ## Understanding Volatility
 

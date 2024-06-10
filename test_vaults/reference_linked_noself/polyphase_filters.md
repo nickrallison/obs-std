@@ -16,7 +16,7 @@ In computer graphics, polyphase filters are employed in image and texture resizi
 
 ### Application:
 - **Image/Texture Resizing:** Polyphase filters are used to [[Linear Interpolation|interpolate]] between pixel values, allowing for smoother transitions and minimizing loss of detail.
-- **Anti-Aliasing:** They help in blending colors at edges, reducing the jaggedness and improving the visual quality of images.
+- **[[anti_aliasing.md|Anti-Aliasing]]:** They help in blending colors at edges, reducing the jaggedness and improving the visual quality of images.
 - **Rendering:** Enhancing the performance and quality of advanced rendering techniques like mipmapping by efficiently generating lower-resolution textures.
 
 ## Computer Architecture
@@ -34,6 +34,6 @@ The design and analysis of algorithms involving polyphase filters often focus on
 ### Focus Areas:
 - **Optimization:** Developing algorithms to determine the optimal polyphase filter coefficients for desired performance characteristics.
 - **Computational Efficiency:** Designing algorithms that minimize computational load by taking advantage of the polyphase structure.
-- **Stability and Precision:** Ensuring that algorithmic implementations maintain signal integrity and minimize errors.
+- **[[lti_system_stability.md|Stability]] and Precision:** Ensuring that algorithmic implementations maintain signal integrity and minimize errors.
 
 In conclusion, polyphase filters serve as a versatile tool across computer graphics, computer architecture, and algorithms, facilitating efficient and high-quality processing of signals and images. The adaptation of polyphase filtering techniques in these areas highlights its foundational importance in both theoretical and applied aspects of computer science and engineering.

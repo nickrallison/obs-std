@@ -10,9 +10,9 @@ title: Syntax of Truth Functional Logic
 
 [[Truth Functional Logic|Truth-functional logic]], also known as [[Truth Functional Logic|propositional logic]], is a type of formal logic that deals with propositions and their combinations. The syntax of [[Truth Functional Logic|truth-functional logic]] is concerned with the rules for constructing well-formed formulas (wffs) from [[Atomic Sentences.md|atomic propositions]] and [[Logical Connectives|logical connectives]].
 
-**Atomic Propositions**
+**[[atomic_sentences.md|Atomic Propositions]]**
 
-Atomic propositions are the fundamental units in [[Truth Functional Logic|truth-functional logic]]. They are often represented by lowercase letters such as $p$, $q$, and $r$. Each atomic proposition can be either true or false.
+[[atomic_sentences.md|Atomic propositions]] are the fundamental units in [[Truth Functional Logic|truth-functional logic]]. They are often represented by lowercase letters such as $p$, $q$, and $r$. Each [[atomic_types.md|atomic]] proposition can be either true or false.
 
 **[[Logical Connectives|Logical Connectives]]**
 
@@ -32,7 +32,7 @@ Atomic propositions are the fundamental units in [[Truth Functional Logic|truth-
 
 A well-formed formula is a string of symbols that is constructed according to the syntax rules of [[Truth Functional Logic|truth-functional logic]]. The rules for constructing wffs are as follows:
 
-1. Every atomic proposition is a wff.
+1. Every [[atomic_types.md|atomic]] proposition is a wff.
 2. If $P$ is a wff, then so is $\neg P$.
 3. If $P$ and $Q$ are wffs, then so are $(P \land Q)$, $(P \lor Q)$, $(P \rightarrow Q)$, and $(P \leftrightarrow Q)$.
 4. Nothing else is a wff.

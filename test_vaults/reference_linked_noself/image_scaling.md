@@ -47,6 +47,6 @@ An even more sophisticated method, bicubic scaling, goes beyond bilinear by cons
 
 - **Preserving Aspect Ratio**: Maintaining the original aspect ratio of the image is crucial to avoid distortion; hence, the scaling factors for width and height need to be chosen carefully.
 
-- **Anti-aliasing**: Especially in reduction, applying [[Anti Aliasing|anti-aliasing]] can help prevent the loss of detail and the Moir� pattern.
+- **[[anti_aliasing.md|Anti-aliasing]]**: Especially in reduction, applying [[Anti Aliasing|anti-aliasing]] can help prevent the loss of detail and the Moir� pattern.
 
 In summary, image scaling is a vital process in image processing, with various techniques available catering to different needs and priorities. Whether the aim is to quickly downsize an image for web use or to carefully enlarge an image for printing, the right scaling method can make a significant difference in the outcome.

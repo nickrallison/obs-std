@@ -13,7 +13,7 @@ A Multiplexer, commonly abbreviated as MUX or multiplex, is an essential compone
 
 ## In Electronics
 
-In the realm of electronics, a multiplexer plays a pivotal role in circuit design and signal processing. It�s widely used in scenarios where the aggregation of data from different sources is needed without the requirement for multiple dedicated lines. For example, in analog-to-digital conversion circuits, multiplexers are deployed to select one of the many analog signals and forward it to the single analog-to-digital converter (ADC).
+In the realm of electronics, a multiplexer plays a pivotal role in circuit design and signal processing. It�s widely used in scenarios where the aggregation of data from different sources is needed without the requirement for multiple dedicated lines. For example, in analog-to-digital conversion circuits, multiplexers are deployed to select one of the many analog signals and forward it to the single analog-to-digital converter ([[analog_to_digital_converters.md|ADC]]).
 
 ### Structure
 
@@ -37,7 +37,7 @@ Multiplexers are employed to route the bits of an instruction to different parts
 
 ### Memory Management
 
-In systems with virtual memory, multiplexers are used to select the correct physical memory address from either the physical address directly or the output of the memory management unit (MMU), depending on the mode of operation and the nature of the address reference.
+In systems with [[virtual_address_space.md|virtual memory]], multiplexers are used to select the correct physical [[pointer.md|memory address]] from either the physical address directly or the output of the memory management unit ([[memory_management_unit.md|MMU]]), depending on the mode of operation and the nature of the address reference.
 
 ### Data Path Control
 

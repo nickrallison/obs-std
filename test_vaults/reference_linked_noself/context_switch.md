@@ -11,7 +11,7 @@ A **Context Switch** is a fundamental feature in modern operating systems that e
 
 ## How Context Switch Works
 
-At its core, a context switch involves storing the current state of a Process or Thread so that it can be resumed later. This state, often referred to as the _context_, usually includes the process's register values, program counter, stack pointer, and memory allocation states, among other pertinent information.
+At its core, a context switch involves storing the current state of a Process or Thread so that it can be resumed later. This state, often referred to as the _context_, usually includes the process's register values, program counter, stack [[pointer.md|pointer]], and memory allocation states, among other pertinent information.
 
 When the OS decides to perform a context switch, it follows this general sequence of steps:
 

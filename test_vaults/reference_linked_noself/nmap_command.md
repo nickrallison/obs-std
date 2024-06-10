@@ -20,7 +20,7 @@ Here are some common scan types and options:
 
 - `-sS` (TCP SYN scan): This is the default and most popular scan option. It can be performed quickly, scanning thousands of ports per second on a fast network not hampered by restrictive firewalls. It's also relatively unobtrusive and stealthy since it never completes TCP connections.
 
-- `-sU` (UDP scan): This scan can be used to find open [[UDP Communication|UDP]] ports. It's slower and requires more packets than TCP scanning.
+- `-sU` ([[udp_communication.md|UDP]] scan): This scan can be used to find open [[UDP Communication|UDP]] ports. It's slower and requires more packets than TCP scanning.
 
 - `-sV` (Version detection): After `nmap` has found some open ports, you can use this option to determine what application is running on those ports, and sometimes even what version of that application.
 

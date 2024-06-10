@@ -20,7 +20,7 @@ $$
 where:
 - $t$ is the [[Random Variable|random variable]],
 - $v$ is the degrees of freedom (which is related to the sample size, $n$, by $v = n - 1$),
-- $\Gamma$ is the gamma function.
+- $\Gamma$ is the [[gamma_encoding_and_decoding.md|gamma]] function.
 
 The T Distribution approaches the standard [[Normal Distribution|normal distribution]] as the degrees of freedom increase. This is due to the Law of Large Numbers, which states that as the size of a sample increases, the estimate of the sample mean will be closer to the population mean.
 

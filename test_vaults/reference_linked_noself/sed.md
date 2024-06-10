@@ -29,6 +29,6 @@ SED operates in a cycle. It reads an input line into a buffer, called the patter
 
 > For more in-depth information, you can refer to the [GNU SED Manual](https://www.gnu.org/software/sed/manual/sed.html).
 
-As for relevant formulas, derivations, or proofs, these are not typically associated with SED, as it is a practical tool for text manipulation rather than a theoretical concept. However, the efficiency of SED can be understood in terms of Big O notation, which is used in computer science to describe the performance or complexity of an algorithm. SED's one-pass approach gives it a linear [[Big-O Notation|time complexity]], or O(n), where n is the size of the input. This means that the time it takes to process the input grows linearly with the size of the input.
+As for relevant formulas, derivations, or proofs, these are not typically associated with SED, as it is a practical tool for text manipulation rather than a theoretical concept. However, the efficiency of SED can be understood in terms of [[big_o_notation.md|Big O notation]], which is used in computer science to describe the performance or complexity of an algorithm. SED's one-pass approach gives it a linear [[Big-O Notation|time complexity]], or O(n), where n is the size of the input. This means that the time it takes to process the input grows linearly with the size of the input.
 
-> For more information on Big O notation and [[Big-O Notation|time complexity]], you can refer to this [Google search](https://www.google.com/search?q=Big+O+notation+and+time+complexity).
+> For more information on [[big_o_notation.md|Big O notation]] and [[Big-O Notation|time complexity]], you can refer to this [Google search](https://www.google.com/search?q=Big+O+notation+and+time+complexity).

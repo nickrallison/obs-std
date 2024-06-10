@@ -31,6 +31,6 @@ To determine if one set has a greater cardinality than another, mathematicians a
 
 ## Applications and Implications
 
-The concept of cardinality finds applications across various fields of mathematics and computer science, especially in understanding the properties of different types of infinities, in the theory of computability, and in the analysis of algorithms and data structures. Its implications reach into philosophy and logic, provoking fundamental questions about the nature of mathematics and reality.
+The concept of cardinality finds applications across various fields of mathematics and computer science, especially in understanding the properties of different types of infinities, in the theory of [[computability.md|computability]], and in the analysis of algorithms and data structures. Its implications reach into philosophy and logic, provoking fundamental questions about the nature of mathematics and reality.
 
 Cardinality not only serves as a foundational concept in set theory but also illustrates the beauty and depth of mathematical thought, revealing a universe where even infinity itself is distinguished and categorized.

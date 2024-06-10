@@ -6,7 +6,7 @@ bad_links:
 ---
 # Chroma Subsampling
 
-Chroma subsampling is a technique used in **image processing** to encode images and videos by reducing the color information in the signal, aiming to reduce the file size or the [[Signal Bandwidth|bandwidth]] required for transmission without significantly affecting the perceived quality. This technique leverages the human visual system's lower sensitivity to color detail compared to brightness (luminance).
+Chroma subsampling is a technique used in **image processing** to encode images and videos by reducing the color information in the signal, aiming to reduce the file size or the [[Signal Bandwidth|bandwidth]] required for transmission without significantly affecting the perceived quality. This technique leverages the human visual system's lower sensitivity to color detail compared to brightness ([[luminance.md|luminance]]).
 
 ## How It Works
 
@@ -26,7 +26,7 @@ Common chroma subsampling formats include 4:4:4, 4:2:2, and 4:2:0.
 
 Chroma subsampling is crucial in various **image processing** applications, including:
 
-- **Digital Video:** Many video codecs, such as H.264 and HEVC, use 4:2:0 chroma subsampling to reduce the bitrate while maintaining acceptable visual quality.
+- **Digital Video:** Many video codecs, such as H.264 and [[h264_vs_h265.md|HEVC]], use 4:2:0 chroma subsampling to reduce the bitrate while maintaining acceptable visual quality.
 - **Broadcast Television:** Broadcast standards often utilize chroma subsampling to fit more channels into limited [[Signal Bandwidth|bandwidth.]]
 - **Photography and Printing:** Some high-end digital cameras and printing processes use chroma subsampling to reduce file sizes without noticeably impacting image quality.
 

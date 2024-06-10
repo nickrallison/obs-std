@@ -65,7 +65,7 @@ This makes the class an abstract class, meaning it cannot be instantiated on its
 
 ## Virtual Destructors
 
-When a base class [[Pointer.md|pointer]] or reference is used to delete a derived class object, having a virtual destructor ensures that the derived class's destructor is called first, followed by the base class's destructor. This is crucial for proper resource management and avoiding memory leaks.
+When a base class [[Pointer.md|pointer]] or reference is used to delete a derived class object, having a virtual destructor ensures that the derived class's destructor is called first, followed by the base class's destructor. This is crucial for proper resource management and avoiding [[memory_leak.md|memory leaks]].
 
 ```cpp
 class Base {

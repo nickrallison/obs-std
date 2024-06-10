@@ -5,7 +5,7 @@ tags: [coding, operatingsystems]
 ---
 # [[Heap Data Structure|Heap]] Memory
 
-[[Heap Data Structure|Heap]] memory, also known as dynamic memory, is a region of a computer's memory that is used for [[Dynamic Memory Allocation|dynamic memory allocation]]. It is called a "heap" because it is a pile of memory space available to programmers to allocated and de-allocate. If a program uses more memory space, it can request more from the [[Heap Data Structure|heap]]; if it uses less, it can return memory back to the [[Heap Data Structure|heap]].
+[[Heap Data Structure|Heap]] memory, also known as dynamic memory, is a region of a computer's memory that is used for [[Dynamic Memory Allocation|dynamic memory allocation]]. It is called a "[[heap_data_structure.md|heap]]" because it is a pile of memory space available to programmers to allocated and de-allocate. If a program uses more memory space, it can request more from the [[Heap Data Structure|heap]]; if it uses less, it can return memory back to the [[Heap Data Structure|heap]].
 
 [[Heap Data Structure|Heap]] memory is managed via two key operations: allocation and deallocation. Allocation involves reserving a block of memory on the [[Heap Data Structure|heap]] for use by the program, while deallocation involves returning a previously allocated block back to the [[Heap Data Structure|heap]]. These operations are typically performed using functions such as `malloc()`, `calloc()`, `realloc()`, and `free()` in C and C++.
 

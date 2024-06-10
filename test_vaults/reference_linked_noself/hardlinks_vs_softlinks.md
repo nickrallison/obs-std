@@ -37,7 +37,7 @@ symlink ----> inode ----> data blocks (containing path to target file)
 target file ----> inode ----> data blocks
 ```
 
-**Differences between [[Hardlinks|Hardlinks]] and Softlinks**:
+**Differences between [[Hardlinks|Hardlinks]] and [[softlinks.md|Softlinks]]**:
 
 1. **Referential Integrity**: [[Hardlinks|Hardlinks]] maintain referential integrity. Even if the original filename is deleted, the [[Hardlinks|hardlink]] still provides access to the file content. In contrast, if the target of a symlink is deleted, the symlink becomes a dangling link.
 

@@ -5,7 +5,7 @@ bad_links:
 ---
 # Rust [[RegEx|Regex]] Capture Groups
 
-In Rust, regular expressions (regex) are used to match patterns in strings. A [[RegEx|regex]] engine is used to parse and execute these patterns. The `regex` crate in Rust provides functionality for working with regular expressions.
+In Rust, regular expressions ([[regular_expression.md|regex]]) are used to match patterns in strings. A [[RegEx|regex]] engine is used to parse and execute these patterns. The `[[regular_expression.md|regex]]` crate in Rust provides functionality for working with regular expressions.
 
 Capture groups are a part of regular expressions that allow you to not only match text but also extract [[Information Theory|information]] for further processing. They are denoted by parentheses `()`. The text that matches the pattern inside the parentheses can be extracted for further use.
 

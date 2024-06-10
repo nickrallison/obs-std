@@ -11,7 +11,7 @@ Convolution is a mathematical operation that is fundamental to many areas of bot
 
 In simple terms, convolution involves two functions producing a third function that expresses how the shape of one is modified by the other. The term 'convolution' refers to the way we combine these two functions to obtain a third function. It's like blending two things together to get a new thing, where the output is influenced by both inputs.
 
-In practical applications like image processing, convolution can be used for operations such as edge detection or blur by applying a filter (also known as a kernel) across an image. This filter is moved across the entire image, applying a mathematical calculation at each point to transform the image.
+In practical applications like image processing, convolution can be used for operations such as edge detection or blur by applying a filter (also known as a [[kernel.md|kernel]]) across an image. This filter is moved across the entire image, applying a mathematical calculation at each point to transform the image.
 
 In machine learning and specifically in Convolutional Neural Networks (CNNs), convolution plays an essential role. CNNs use convolution in their first layer to extract features from input like images. These features are then used for tasks such as image classification or object detection.
 

@@ -6,7 +6,7 @@ bad_links:
 ---
 # Parallel [[Grep.md|Grep]]
 
-**Parallel Grep** in the context of Linux refers to the method used to search for strings or patterns within files across the filesystem with the higher efficiency provided by executing multiple [[Grep.md|grep]] processes in parallel. This is particularly useful for large filesystems or when dealing with a huge number of files. By leveraging the capability of modern multi-core processors, [[Grep.md|grep]] operations that would normally take a significant amount of time can be executed more swiftly.
+**Parallel [[grep.md|Grep]]** in the context of Linux refers to the method used to search for strings or patterns within files across the filesystem with the higher efficiency provided by executing multiple [[Grep.md|grep]] processes in parallel. This is particularly useful for large filesystems or when dealing with a huge number of files. By leveraging the capability of modern multi-core processors, [[Grep.md|grep]] operations that would normally take a significant amount of time can be executed more swiftly.
 
 Here is the command to run [[Grep.md|grep]] in parallel:
 

@@ -8,7 +8,7 @@ bad_links:
 ---
 # Signal To Noise Ratio
 
-Signal To Noise Ratio (SNR) is a fundamental concept in the field of signal processing. It measures the level of signal power in relation to the level of noise power and is usually expressed in decibels (dB). Understanding SNR is crucial because it can significantly affect the performance of communication systems, audio and video processing, and various electronic instruments.
+Signal To Noise Ratio (SNR) is a fundamental concept in the field of signal processing. It measures the level of signal power in [[binary_relation.md|relation]] to the level of noise power and is usually expressed in decibels (dB). Understanding SNR is crucial because it can significantly affect the performance of communication systems, audio and video processing, and various electronic instruments.
 
 ## Definition
 The SNR is defined as the ratio of the power of a signal (meaningful information) to the power of background noise (unwanted signal):

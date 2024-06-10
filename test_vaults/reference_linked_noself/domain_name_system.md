@@ -26,7 +26,7 @@ The DNS resolution process involves several steps:
 
 1. The user's device sends a DNS query to a recursive resolver, requesting the [[IP Address|IP address]] for a specific domain name.
 
-2. The recursive resolver checks its cache to see if it has the [[IP Address|IP address]] for the requested domain name. If not, it starts the resolution process.
+2. The recursive resolver checks its [[caching.md|cache]] to see if it has the [[IP Address|IP address]] for the requested domain name. If not, it starts the resolution process.
 
 3. The recursive resolver sends a query to the root servers, asking for the authoritative server for the TLD of the requested domain name.
 

@@ -10,13 +10,13 @@ bad_links:
 
 Rust Unsafe Blocks allows developers to perform operations that are normally disallowed by the Rust compiler's safety guarantees. These operations include:
 
-1. **Dereferencing a raw pointer**: Raw pointers in Rust, indicated by `*const T` and `*mut T`, can be used to directly access memory without the borrowing rules enforced by the compiler.
+1. **Dereferencing a raw [[pointer.md|pointer]]**: Raw pointers in Rust, indicated by `*const T` and `*[[mutability.md|mut]] T`, can be used to directly access memory without the [[rust_ownership.md|borrowing]] rules enforced by the compiler.
 
 2. **Calling unsafe functions or methods**: Some system-level functions, or "unsafe" functions, involve operations that cannot be checked for safety by the compiler. Declaring these functions as `unsafe` alerts the developer to the need for manual guarantees of safety.
 
-3. **Accessing or modifying a mutable static variable**: Rust enforces strict rules about accessing global variables to ensure thread safety and prevent data races. In `unsafe` blocks, these rules can be bypassed to allow direct access to global mutable state.
+3. **Accessing or modifying a [[mutability.md|mutable]] [[static_variables.md|static variable]]**: Rust enforces strict rules about accessing global variables to ensure thread safety and prevent data races. In `unsafe` blocks, these rules can be bypassed to allow direct access to global [[mutability.md|mutable]] state.
 
-4. **Implementing an unsafe trait**: Certain traits in Rust can only be implemented with an `unsafe` keyword, typically because the trait itself makes certain assumptions that can't be enforced by the Rust compiler. Implementing these traits requires an `unsafe` block to acknowledge the potential danger.
+4. **Implementing an unsafe [[rust_traits.md|trait]]**: Certain traits in Rust can only be implemented with an `unsafe` keyword, typically because the [[rust_traits.md|trait]] itself makes certain assumptions that can't be enforced by the Rust compiler. Implementing these traits requires an `unsafe` block to acknowledge the potential danger.
 
 ## Syntax of Unsafe Blocks
 

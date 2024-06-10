@@ -32,7 +32,7 @@ bad_links:
 
 2. **Selective noise reduction:** Applying noise reduction selectively, perhaps using layer masks in Photoshop, allows you to reduce noise in problem areas without affecting areas with important details.
 
-3. **Luminance Slider:** Some noise reduction tools have a dedicated [[Luminance.md|luminance]] noise slider that specifically targets this type of noise, allowing for a balance between noise reduction and detail retention.
+3. **[[luminance.md|Luminance]] Slider:** Some noise reduction tools have a dedicated [[Luminance.md|luminance]] noise slider that specifically targets this type of noise, allowing for a balance between noise reduction and detail retention.
 
 ## Final Thoughts
 

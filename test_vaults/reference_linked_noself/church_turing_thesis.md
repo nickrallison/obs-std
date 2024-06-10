@@ -11,4 +11,4 @@ The Church-Turing Thesis, named after mathematicians Alonzo Church and [[Alan Tu
 
 This thesis laid the foundation for the field of computation theory. More broadly, it suggests that anything that can be computed by any physical system can also be computed by a [[Turing Machine|Turing machine]]. Essentially, it proposes that all realistic models of computation yield the same class of problems they can solve or decide.
 
-Its important to note that this is not a proven theorem but rather a definition regarding what we mean when we say something is "computable".
+Its important to note that this is not a proven theorem but rather a definition regarding what we mean when we say something is "[[computability.md|computable]]".

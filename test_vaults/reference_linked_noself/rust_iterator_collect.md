@@ -13,7 +13,7 @@ let v: Vec<_> = (0..10).collect();
 
 In this example, `collect` is used to transform a range (which is an iterator) into a vector. The type of the vector is inferred from the context.
 
-The `collect` function is defined as follows in the Iterator trait:
+The `collect` function is defined as follows in the Iterator [[rust_traits.md|trait]]:
 
 ```rust
 fn collect<B: FromIterator<Self::Item>>(self) -> B

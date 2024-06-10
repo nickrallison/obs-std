@@ -6,7 +6,7 @@ bad_links:
 ---
 # Function Signature
 
-Function Signatures are a functionality of the compiler for the linker. If a function is defined in multiple locations, the [[Linker.md|linker]] needs to know which function to link, so a random array of characters are added to the function, this is the function signature.
+Function Signatures are a functionality of the compiler for the [[linker.md|linker]]. If a function is defined in multiple locations, the [[Linker.md|linker]] needs to know which function to link, so a random array of characters are added to the function, this is the function signature.
 
 The process of creating unique identifiers for function definitions through such alterations is known as "name mangling". This is especially crucial in languages like C++ where function overloading and namespaces make it possible to have functions with the same name but with different operational contexts or parameters.
 
@@ -48,7 +48,7 @@ The compiler might translate these to mangled names like:
 - `add_int_int`
 - `add_double_double`
 
-This mangled name ensures that each function is uniquely identified by the linker, preventing conflicts and ensuring correct program behavior.
+This mangled name ensures that each function is uniquely identified by the [[linker.md|linker]], preventing conflicts and ensuring correct program behavior.
 
 ## Summary
 

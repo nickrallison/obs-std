@@ -13,9 +13,9 @@ The primary purpose of a Detile Buffer is to store pixel or sample [[Information
 
 ## Advantages
 
-1. **Reduced Memory Bandwidth**: Since only the data for the current tile is processed and stored in on-chip memory, the amount of data transferred between the main memory and the GPU is significantly reduced. This alleviates the [[Signal Bandwidth|bandwidth]] bottleneck, allowing for higher performance, especially in high-resolution rendering.
+1. **Reduced Memory [[signal_bandwidth.md|Bandwidth]]**: Since only the data for the current tile is processed and stored in on-chip memory, the amount of data transferred between the main memory and the GPU is significantly reduced. This alleviates the [[Signal Bandwidth|bandwidth]] bottleneck, allowing for higher performance, especially in high-resolution rendering.
    
-2. **Enhanced [[Caching|Cache]] Efficiency**: Processing images in tiles improves [[Caching|cache]] hit rates because the data for a given tile is more likely to be located in the faster, on-chip cache. This reduces the need to access slower off-chip memory, speeding up the rendering process.
+2. **Enhanced [[Caching|Cache]] Efficiency**: Processing images in tiles improves [[Caching|cache]] hit rates because the data for a given tile is more likely to be located in the faster, on-chip [[caching.md|cache]]. This reduces the need to access slower off-chip memory, speeding up the rendering process.
 
 3. **Support for Early Z-Culling**: Tile buffers enable efficient early Z-culling, where pixels that are not visible in the final image (due to being occluded by other geometry) are quickly discarded before performing more complex per-pixel operations, saving both processing time and power.
 

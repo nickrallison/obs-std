@@ -15,10 +15,10 @@ Memory management in these languages is largely the responsibility of the progra
    Frequently, memory leaks occur because allocated memory is not released after it is no longer needed. This is often due to bugs in the code where `free` or similar deallocation functions are not called.
 
 ### 2. Dangling References:
-   A dangling reference occurs when a pointer that points to a piece of memory continues to be used after that piece of memory has been deallocated. While not a memory leak in itself, it often leads to memory leaks as the programmer may lose track of whether the memory has already been deallocated.
+   A dangling reference occurs when a [[pointer.md|pointer]] that points to a piece of memory continues to be used after that piece of memory has been deallocated. While not a memory leak in itself, it often leads to memory leaks as the programmer may lose track of whether the memory has already been deallocated.
 
 ### 3. Scope Mismanagement:
-   Incorrect handling of the scope of variables can lead to memory that cannot be cleaned up because references are lost. For example, if a pointer to allocated memory is defined inside a function without returning it or storing it elsewhere for later deallocation.
+   Incorrect handling of the scope of variables can lead to memory that cannot be cleaned up because references are lost. For example, if a [[pointer.md|pointer]] to allocated memory is defined inside a function without returning it or storing it elsewhere for later deallocation.
 
 ### 4. Data Structure Issues:
    Complex data structures like linked lists or trees can cause memory leaks if individual elements are removed from the structure without properly freeing the memory they occupy.
@@ -40,4 +40,4 @@ Memory management in these languages is largely the responsibility of the progra
 ### 4. Testing:
    Develop extensive testing procedures to ensure all memory allocations are matched with appropriate deallocations. Stress tests and performance tests can help expose leaks under load conditions.
 
-In summary, managing memory efficiently is vital for maintaining the performance and reliability of applications written in languages that require manual memory management. By understanding the causes of memory leaks and employing strategies to detect and prevent them, developers can significantly enhance the stability of their codebases.
+In summary, managing memory efficiently is vital for maintaining the performance and reliability of applications written in languages that require manual memory management. By understanding the causes of memory leaks and employing strategies to detect and prevent them, developers can significantly enhance the [[lti_system_stability.md|stability]] of their codebases.

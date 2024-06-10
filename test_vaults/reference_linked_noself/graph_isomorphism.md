@@ -18,7 +18,7 @@ G1 has vertices V1 = {a, b, c, d} and edges E1 = {(a,b), (b,c), (c,d), (d,a)}.
 
 G2 has vertices V2 = {w, x, y, z} and edges E2 = {(w,x), (x,y), (y,z), (z,w)}.
 
-Are these two graphs isomorphic?
+Are these two graphs [[isomorphism.md|isomorphic]]?
 
 Solution:  
 To check if the two graphs are [[Isomorphism|isomorphic]], we need to find a one-to-one correspondence between the vertices and edges of the two graphs such that the adjacency relationships are preserved.

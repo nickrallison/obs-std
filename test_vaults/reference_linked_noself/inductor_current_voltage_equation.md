@@ -5,7 +5,7 @@ bad_links:
 ---
 # Inductor Current [[Voltage|Voltage]] Equation
 
-An inductor is a passive electrical component that stores energy in its magnetic field. The current-voltage relationship in an inductor is described by [[Faraday's Law.md|Faraday's law]] of electromagnetic induction, which states that the induced electromotive force (EMF) in any closed circuit is equal to the rate of change of the magnetic flux through the circuit.
+An inductor is a passive electrical component that stores energy in its magnetic field. The current-voltage relationship in an inductor is described by [[Faraday's Law.md|Faraday's law]] of electromagnetic [[induction_proofs.md|induction]], which states that the induced electromotive force (EMF) in any closed circuit is equal to the rate of change of the magnetic flux through the circuit.
 **
 The [[Voltage|voltage]] across an inductor $L$ is directly proportional to the rate of change of current through it. This relationship is mathematically represented as:
 
@@ -18,7 +18,7 @@ where:
 - $L$ is the inductance of the inductor, and
 - $\frac{di(t)}{dt}$ is the rate of change of current through the inductor.
 
-The above equation is a differential equation, and its solution gives the current $i(t)$ as a function of time. If the [[Voltage|voltage]] $v(t)$ is known, the current can be found by integrating the above equation:
+The above equation is a [[differential_equations.md|differential equation]], and its solution gives the current $i(t)$ as a function of time. If the [[Voltage|voltage]] $v(t)$ is known, the current can be found by integrating the above equation:
 
 $$
 i(t) = \frac{1}{L} \int v(t) dt

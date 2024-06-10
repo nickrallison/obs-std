@@ -6,18 +6,18 @@ tags:
 bad_links:
 ---
 # Memory Management Unit
-(MMU) is a critical component of modern computing systems found at the heart of a computer's architecture. It is responsible for handling all memory and caching operations between the processor and the physical RAM, effectively managing how data is stored, accessed, and manipulated within the computer.
+(MMU) is a critical component of modern computing systems found at the heart of a computer's architecture. It is responsible for handling all memory and [[caching.md|caching]] operations between the processor and the physical RAM, effectively managing how data is stored, accessed, and manipulated within the computer.
 
 ## Functionality
 
-The primary function of the MMU is to translate virtual addresses into physical addresses. Virtual memory is a technique that allows a computer to compensate for physical memory shortages by temporarily transferring data from RAM to disk storage. This process creates an illusion for users that they have more memory than what is physically available. The MMU plays a crucial role in this virtual memory system by handling the address translation and protection of memory access, ensuring that processes do not interfere with each other�s memory.
+The primary function of the MMU is to translate [[virtual_address_space.md|virtual addresses]] into physical addresses. [[virtual_address_space.md|Virtual memory]] is a technique that allows a computer to compensate for physical memory shortages by temporarily transferring data from RAM to disk storage. This process creates an illusion for users that they have more memory than what is physically available. The MMU plays a crucial role in this [[virtual_address_space.md|virtual memory]] system by handling the address translation and protection of memory access, ensuring that processes do not interfere with each other�s memory.
 
 ## Types of MMUs
 
 MMUs can largely be classified into two types:
 
 1. **Hardware MMU**: 
-   This type is integrated into the processor itself, providing high-speed memory management. The hardware MMU is responsible for tasks such as caching, virtual-to-physical address translation, and access protection. Its performance is critical for overall system speed and efficiency.
+   This type is integrated into the processor itself, providing high-speed memory management. The hardware MMU is responsible for tasks such as [[caching.md|caching]], virtual-to-physical address translation, and access protection. Its performance is critical for overall system speed and efficiency.
 
 2. **Software MMU**: 
    In systems where a hardware MMU is absent or limited, software-based memory management is implemented, typically at the cost of lower performance. Software MMUs handle similar tasks but rely on the operating system to provide the necessary algorithms for memory management, which can lead to increased CPU usage and slower response times.
@@ -27,9 +27,9 @@ MMUs can largely be classified into two types:
 An MMU consists of several key components, each serving a specific function in memory management:
 
 - **Translation Lookaside Buffer (TLB)**: 
-  A cache specifically used by the MMU to improve the speed of virtual address translation.
+  A [[caching.md|cache]] specifically used by the MMU to improve the speed of [[virtual_address_space.md|virtual address]] translation.
 - **Memory Protection Unit (MPU)**: 
-  A component used to safeguard memory sections, preventing unauthorized access and maintaining system stability.
+  A component used to safeguard memory sections, preventing unauthorized access and maintaining [[lti_system_stability.md|system stability]].
 - **Page Tables**: 
   Data structures used to store mappings between virtual and physical addresses. These can be managed and updated dynamically as applications run and access memory.
 
@@ -53,4 +53,4 @@ While MMUs offer numerous benefits, they also introduce complexities in system d
 - **Complexity in System Design**: 
   Implementing an efficient and robust MMU requires careful architectural planning and considerable expertise, particularly in integrating it seamlessly with other system components.
 
-By managing the complicated interactions between hardware and software with respect to memory, the MMU plays a pivotal role in enhancing the performance and stability of computer systems. Its ongoing development continues to be fundamental to advancements in computer architecture.
+By managing the complicated interactions between hardware and software with respect to memory, the MMU plays a pivotal role in enhancing the performance and [[lti_system_stability.md|stability]] of computer systems. Its ongoing development continues to be fundamental to advancements in computer architecture.

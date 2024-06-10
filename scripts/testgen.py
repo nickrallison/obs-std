@@ -133,6 +133,7 @@ if __name__ == '__main__':
                 file_title_lower = (file.removesuffix('.md').lower().replace(' ', '_').replace('-', '_'))
                 file_title_lower = ''.join([c if c.isalnum() or c == '_' else '_' for c in file_title_lower])
                 file_title_lower = re.sub(r'_+', '_', file_title_lower)
+                file_title_lower = file_title_lower.strip('_')
 
                 file_path = os.path.join(root, file).replace("\\\\", "\\")
                 file_path_lower = (os.path.join(root, file_title_lower + '.md').replace("\\\\", "\\")
@@ -149,6 +150,7 @@ if __name__ == '__main__':
                     file_title_lower = (file.removesuffix('.md').lower().replace(' ', '_').replace('-', '_'))
                     file_title_lower = ''.join([c if c.isalnum() or c == '_' else '_' for c in file_title_lower])
                     file_title_lower = re.sub(r'_+', '_', file_title_lower)
+                    file_title_lower = file_title_lower.strip('_')
 
                     file_path = os.path.join(root, file).replace("\\\\", "\\")
                     file_path_lower = (os.path.join(root, file_title_lower + '.md').replace("\\\\", "\\")

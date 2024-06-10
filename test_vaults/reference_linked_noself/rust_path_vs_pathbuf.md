@@ -23,7 +23,7 @@ let mut path_buf = PathBuf::new(); // `path_buf` is a `PathBuf`
 path_buf.push("/tmp/bar"); // You can modify `path_buf`
 ```
 
-In this example, `path` is a `&Path` that cannot be modified (because `Path` is immutable), while `path_buf` is a `PathBuf` that can be modified.
+In this example, `path` is a `&Path` that cannot be modified (because `Path` is [[mutability.md|immutable]]), while `path_buf` is a `PathBuf` that can be modified.
 
 As for tangentially related items, it's worth noting that `Path` and `PathBuf` are designed to be used with Rust's `std::fs` module, which provides functions for working with the file system. For example, you might use `Path` or `PathBuf` with `std::fs::read_to_string` to read the contents of a file into a string.
 

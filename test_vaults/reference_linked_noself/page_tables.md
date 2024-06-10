@@ -6,7 +6,7 @@ bad_links:
 ---
 # Page Tables
 
-Page Tables are a crucial component in a computer's memory management unit (MMU) that facilitate virtual memory. They allow the system's CPU to quickly translate virtual addresses into physical addresses used in RAM. The use of page tables helps optimize both the utilization of physical memory and the performance of applications by enabling efficient access to data pages whether they reside in physical memory or secondary storage.
+Page Tables are a crucial component in a computer's memory management unit ([[memory_management_unit.md|MMU]]) that facilitate [[virtual_address_space.md|virtual memory]]. They allow the system's CPU to quickly translate [[virtual_address_space.md|virtual addresses]] into physical addresses used in RAM. The use of page tables helps optimize both the utilization of physical memory and the performance of applications by enabling efficient access to data pages whether they reside in physical memory or secondary storage.
 
 ## Organization of Page Tables
 
@@ -22,7 +22,7 @@ This model uses a hash table to store mappings of virtual to physical addresses.
 
 ### Inverted Page Tables
 
-Inverted page tables are designed to minimize the memory consumption of page tables for large address spaces. Unlike traditional page tables which have an entry for every page in the virtual address space, an inverted page table has one entry for each frame of physical memory. These entries then store the information about which virtual address is mapped to the physical frame, requiring additional computation time for reverse-lookup of the virtual address during the translation process.
+Inverted page tables are designed to minimize the memory consumption of page tables for large address spaces. Unlike traditional page tables which have an entry for every page in the [[virtual_address_space.md|virtual address]] space, an inverted page table has one entry for each frame of physical memory. These entries then store the information about which [[virtual_address_space.md|virtual address]] is mapped to the physical frame, requiring additional computation time for reverse-lookup of the [[virtual_address_space.md|virtual address]] during the translation process.
 
 ## Page Table Entries (PTEs)
 
@@ -34,14 +34,14 @@ Efficient management of page tables is necessary for fast memory access. Modern 
 
 ### Translation Lookaside Buffers (TLB)
 
-TLBs are special cache used in CPUs to reduce the time of virtual address translation, storing the recent translations of virtual memory addresses to physical addresses. Since accessing the TLB is much quicker than traversing multiple levels of a page table, this can greatly accelerate the address resolution process.
+TLBs are special [[caching.md|cache]] used in CPUs to reduce the time of [[virtual_address_space.md|virtual address]] translation, storing the recent translations of [[virtual_address_space.md|virtual memory]] addresses to physical addresses. Since accessing the TLB is much quicker than traversing multiple levels of a page table, this can greatly accelerate the address resolution process.
 
 ### Page Table Base Register (PTBR)
 
-The Page Table Base Register holds the pointer to the page table base address in memory, which helps in speeding up the initial access to the page table structure.
+The Page Table Base Register holds the [[pointer.md|pointer]] to the page table base address in memory, which helps in speeding up the initial access to the page table structure.
 
 ### Page Size
 
 Increasing the page size can reduce the depth of the page table and also decrease the number of pages required for covering a particular address space. Larger pages, however, might increase internal fragmentation and waste memory when a process does not require a full page of data.
 
-In conclusion, page tables are key to the implementation of virtual memory, influencing crucial aspects of system functionality and performance. Optimizing their structure and management is central to the effective operation of contemporary computing systems.
+In conclusion, page tables are key to the implementation of [[virtual_address_space.md|virtual memory]], influencing crucial aspects of system functionality and performance. Optimizing their structure and management is central to the effective operation of contemporary computing systems.

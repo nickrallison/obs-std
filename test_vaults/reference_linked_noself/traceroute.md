@@ -11,7 +11,7 @@ Traceroute is a network diagnostic tool used to trace the path that a packet tak
 
 ## How Traceroute Works
 
-When you run a traceroute command, the tool sends out a sequence of ICMP (Internet Control Message Protocol) echo request packets or [[UDP Communication.md|UDP]] (User Datagram Protocol) packets to the destination. Each packet has a progressively increasing Time to Live (TTL) value, starting from 1. The TTL value determines the maximum number of hops (routers crossed) that the packet is allowed before it is returned to the sender. 
+When you run a traceroute command, the tool sends out a sequence of ICMP (Internet Control Message Protocol) echo request packets or [[UDP Communication.md|UDP]] ([[udp_communication.md|User Datagram Protocol]]) packets to the destination. Each packet has a progressively increasing Time to Live (TTL) value, starting from 1. The TTL value determines the maximum number of hops (routers crossed) that the packet is allowed before it is returned to the sender. 
 
 Here is what happens at each step:
 
@@ -32,7 +32,7 @@ traceroute [options] destination
 ```
 
 - `destination` can be either an [[IP Address.md|IP]] address or a domain name.
-- `[options]` can include various flags to modify the behavior of traceroute, such as `-I` to use ICMP echo requests instead of UDP, `-n` to display numerical addresses without name resolution, or `-m` to specify the maximum number of hops.
+- `[options]` can include various flags to modify the behavior of traceroute, such as `-I` to use ICMP echo requests instead of [[udp_communication.md|UDP]], `-n` to display numerical addresses without name resolution, or `-m` to specify the maximum number of hops.
 
 ## Practical Applications
 

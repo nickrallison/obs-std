@@ -17,7 +17,7 @@ The expected value of a random variable $X$, denoted as $E(X)$, is given by the 
 $$
 E(X) = \sum_{x} x \cdot P(X = x)
 $$
-where $x$ represents a possible outcome and $P(X = x)$ is the probability of $X$ taking the value $x$. This formula applies to discrete cases. For continuous variables, the expected value is calculated as an integral over all possible outcomes.
+where $x$ represents a possible outcome and $P(X = x)$ is the probability of $X$ taking the value $x$. This formula applies to discrete cases. For [[continuity.md|continuous]] variables, the expected value is calculated as an integral over all possible outcomes.
 
 ## Example in Probability
 
@@ -39,7 +39,7 @@ This suggests that, on average, the project is expected to generate $100,000, he
 
 ## Limitations of Expected Value
 
-While the expected relevance and utility of expected value are immense, it has limitations. It does not reflect the variability or risk involved in any given situation. For example, two different investments might have the same expected value but very different levels of risk. Additional measures like the variance and standard deviation are often used alongside the expected property to assess the variability of outcomes.
+While the expected relevance and utility of expected value are immense, it has limitations. It does not reflect the variability or risk involved in any given situation. For example, two different investments might have the same expected value but very different levels of risk. Additional measures like the [[variance.md|variance]] and standard deviation are often used alongside the expected property to assess the variability of outcomes.
 
 In risk management, for instance, understanding both the expected losses and the probability distribution of these losses is crucial. This is why other concepts such as Expected Shortfall (ES) or Value at Risk (VaR) are commonly used in financial sectors to complement the insights provided by expected values.
 

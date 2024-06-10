@@ -31,11 +31,11 @@ Filtering algorithms apply operations over a region surrounding each pixel, rath
 
 ### Smoothing Filters
 
-Smoothing filters, such as the Gaussian blur or box blur, are used to reduce image noise and details by averaging the colors of pixels within a specified kernel size.
+Smoothing filters, such as the Gaussian blur or box blur, are used to reduce image noise and details by averaging the colors of pixels within a specified [[kernel.md|kernel]] size.
 
 ### Sharpening Filters
 
-Sharpening filters enhance the edges within an image by emphasizing the difference between adjacent pixels. The most common approach is to apply a kernel that boosts the center pixel while reducing the surrounding pixels.
+Sharpening filters enhance the edges within an image by emphasizing the difference between adjacent pixels. The most common approach is to apply a [[kernel.md|kernel]] that boosts the center pixel while reducing the surrounding pixels.
 
 ### Edge Detection Filters
 

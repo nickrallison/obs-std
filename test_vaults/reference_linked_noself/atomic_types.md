@@ -7,7 +7,7 @@ bad_links:
 ---
 # Atomic Types
 
-Atomic types refer to types of variables that operations, such as assignment, read, or write, can be performed on atomically. This means that such operations are indivisible and uninterrupted (usually done in a single clock cycle), ensuring data integrity even in the presence of concurrent operations by multiple threads. Atomicity is crucial in multithreaded applications to prevent race conditions, where the outcome depends on the non-deterministic ordering of thread execution.
+Atomic types refer to types of variables that operations, such as assignment, read, or write, can be performed on atomically. This means that such operations are indivisible and uninterrupted (usually done in a single clock cycle), ensuring data integrity even in the presence of concurrent operations by multiple threads. Atomicity is crucial in multithreaded applications to prevent race conditions, where the outcome depends on the non-deterministic [[ordering.md|ordering]] of thread execution.
 
 ## Characteristics of Atomic Types
 
@@ -38,7 +38,7 @@ Different programming languages provide various mechanisms to work with atomic t
 
 ## Considerations
 
-- **Memory Ordering:** When dealing with atomic types, especially in C++ with the `<atomic>` header, developers must be aware of different memory orderings (e.g., `memory_order_relaxed`, `memory_order_acquire`, `memory_order_release`). These orderings allow developers to fine-tune the synchronization between threads, trading off between strict data consistency and performance.
+- **Memory [[ordering.md|Ordering]]:** When dealing with atomic types, especially in C++ with the `<atomic>` header, developers must be aware of different memory orderings (e.g., `memory_order_relaxed`, `memory_order_acquire`, `memory_order_release`). These orderings allow developers to fine-tune the synchronization between threads, trading off between strict data consistency and performance.
 - **Overhead:** While often faster than lock-based concurrency, atomic operations can still carry more overhead than non-atomic operations. This factor should be considered when designing performance-critical code.
 
 In summary, atomic types and operations play a vital role in the development of concurrent and multithreaded applications, offering a way to manage shared data safely and efficiently. Understanding and correctly applying atomic types is a critical skill for developers working on systems where data integrity and performance in concurrent environments are priorities.

@@ -5,11 +5,11 @@ tags:
   - linux
 bad_links:
 ---
-# How to Use Perl Like SED
+# How to Use Perl Like [[sed.md|SED]]
 
 ## Piped Input
 
-Where sed might be used like this with piped input:
+Where [[sed.md|sed]] might be used like this with piped input:
 
 ```
 command | sed 's/pattern/replace/g'
@@ -23,7 +23,7 @@ command | perl -p -e 's/pattern/replace/g'
 
 ## In Place
 
-Where sed might be used like this:
+Where [[sed.md|sed]] might be used like this:
 
 ```
 sed -i 's/pattern/replace/g'

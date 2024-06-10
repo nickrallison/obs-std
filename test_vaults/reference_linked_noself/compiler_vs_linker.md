@@ -24,14 +24,14 @@ The compilation phase, managed by the compiler, involves several steps:
 5. **Code Generation**: Generates intermediate or machine code specific to a target architecture, resulting in object files.
 
 ### Linking Process
-The linker's process involves:
+The [[linker.md|linker]]'s process involves:
 1. **Symbol Resolution**: The [[Linker.md|linker]] identifies external symbols in the object files and matches with their definitions.
 2. **Relocation**: Adjusts code and data in [[Object Files.md|object files]] to their assigned memory locations.
 3. **Library Linking**: Includes linking static libraries and, sometimes, dynamic libraries as per the references made.
 
 ## Key Differences
 - **Scope of operation**: The compiler operates on a file-by-file basis, whereas the [[Linker.md|linker]] operates on the entire program.
-- **Output**: The compiler outputs object files while the linker outputs an executable file by combining all object files.
+- **Output**: The compiler outputs object files while the [[linker.md|linker]] outputs an executable file by combining all object files.
 - **Error Handling**: Compilation errors are usually syntax or semantic errors in the code. [[Linker.md|Linker]] errors are mainly due to missing symbols or functions, which are not found during the linking process.
 
 ## Conclusion

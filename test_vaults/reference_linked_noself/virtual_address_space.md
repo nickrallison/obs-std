@@ -11,7 +11,7 @@ bad_links:
 ---
 # Virtual Address Space
 
-Virtual Address Spaces help to manage memory more efficiently and allows multiple programs to be executed simultaneously without interference. This layer of abstraction provides each program with the illusion that it is the only one accessing the physical memory, enhancing system stability and security.
+Virtual Address Spaces help to manage memory more efficiently and allows multiple programs to be executed simultaneously without interference. This layer of abstraction provides each program with the illusion that it is the only one accessing the physical memory, enhancing [[lti_system_stability.md|system stability]] and security.
 
 ## Components of Virtual Address Space
 
@@ -19,9 +19,9 @@ Virtual address space includes several key components:
 
 - **Virtual Addresses:** These are addresses used by the software running on the system. Each process running on the system sees its own set of addresses that map to physical addresses in the main memory.
 
-- **Page Tables:** These are data structures used by the operating system to store the mapping between virtual addresses and physical addresses. Each instantiated process contains its own page table, which the CPU's memory management unit (MMU) uses to translate virtual addresses to physical addresses during program execution.
+- **Page Tables:** These are data structures used by the operating system to store the mapping between virtual addresses and physical addresses. Each instantiated process contains its own page table, which the CPU's memory management unit ([[memory_management_unit.md|MMU]]) uses to translate virtual addresses to physical addresses during program execution.
 
-- **Memory Management Unit (MMU):** This is a hardware component within the CPU responsible for handling all memory and [[Caching.md|caching]] operations associated with address translation from virtual to physical addresses.
+- **Memory Management Unit ([[memory_management_unit.md|MMU]]):** This is a hardware component within the CPU responsible for handling all memory and [[Caching.md|caching]] operations associated with address translation from virtual to physical addresses.
 
 ## Benefits of Virtual Address Space
 
@@ -45,4 +45,4 @@ While virtual address spaces are beneficial, they also pose some challenges:
 
 ## Conclusion
 
-The virtual address space is a fundamental concept in both computer architecture and operating systems, forming the backbone of modern computing environments. It enables the efficient and secure execution of multiple processes, optimizes the use of physical memory resources, and provides a platform for the implementation of advanced memory management techniques. By managing the complexities of memory allocation and protection, virtual address space plays a crucial role in enhancing the stability and functionality of computers.
+The virtual address space is a fundamental concept in both computer architecture and operating systems, forming the backbone of modern computing environments. It enables the efficient and secure execution of multiple processes, optimizes the use of physical memory resources, and provides a platform for the implementation of advanced memory management techniques. By managing the complexities of memory allocation and protection, virtual address space plays a crucial role in enhancing the [[lti_system_stability.md|stability]] and functionality of computers.

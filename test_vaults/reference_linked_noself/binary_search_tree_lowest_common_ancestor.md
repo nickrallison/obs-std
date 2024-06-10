@@ -17,7 +17,7 @@ One of the method to find the Lowest Common Ancestor (LCA) of two nodes in a [[B
 
 The key understanding is when the input nodes split into different subtrees, the node where the split happens is the LCA.
 
-The [[Big-O Notation.md|time complexity ]]complexity of this problem is O(log n), since we only visit one node per level in the tree (assuming that tree is reasonably balanced). The tree height is typically log n levels. The space complexity is O(1), no additional data structures are required.
+The [[Big-O Notation.md|time complexity ]]complexity of this problem is O(log n), since we only visit one node per level in the tree (assuming that tree is reasonably balanced). The tree height is typically log n levels. The [[big_o_notation.md|space complexity]] is O(1), no additional data structures are required.
 
 ## Sources
 <https://www.youtube.com/watch?v=gs2LMfuOR9k>

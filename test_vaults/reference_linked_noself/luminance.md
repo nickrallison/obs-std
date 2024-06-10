@@ -23,11 +23,11 @@ Image processing often involves perceptual models that mimic the human visual sy
 
 ### 4. **Segmentation And Feature Detection**
 
-Luminance values are used in segmentation and feature detection algorithms to identify objects, edges, or regions within an image. The variance in luminance across an image can help in distinguishing between different features or objects based on their brightness levels, aiding in tasks such as edge detection, object recognition, and scene understanding.
+Luminance values are used in segmentation and feature detection algorithms to identify objects, edges, or regions within an image. The [[variance.md|variance]] in luminance across an image can help in distinguishing between different features or objects based on their brightness levels, aiding in tasks such as edge detection, object recognition, and scene understanding.
 
 ### 5. **Color To Grayscale Conversion**
 
-In converting color images to grayscale, luminance provides a means of retaining the perceptual characteristics of the image despite the loss of color information. A weighted average of the RGB components, where the weights reflect human sensitivity to different colors (i.e., more weight given to green than to red or blue), can compute a grayscale image that maintains the original image's perceived brightness.
+In converting color images to grayscale, luminance provides a means of retaining the perceptual characteristics of the image despite the loss of color information. A weighted [[expected_value.md|average]] of the RGB components, where the weights reflect human sensitivity to different colors (i.e., more weight given to green than to red or blue), can compute a grayscale image that maintains the original image's perceived brightness.
 
 ## Conclusion
 

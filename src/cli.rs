@@ -224,7 +224,7 @@ mod cli_tests {
 
     #[test]
     fn test_cli_folder_does_exist() {
-        let cli_res = CLI::from_str("alias_tree", "preview", "test_vaults/full_vault");
+        let cli_res = CLI::from_str("alias_tree", "preview", "test_vaults/reference_clean");
         let cli = match cli_res {
             Ok(cli) => cli,
             Err(e) => {
@@ -251,7 +251,7 @@ mod cli_tests {
     }
     #[test]
     fn test_cli_folder_does_not_exist() {
-        let cli_res = CLI::from_str("alias_tree", "preview", "test_vaults/bad_vault");
+        let cli_res = CLI::from_str("alias_tree", "preview", "test_vaults/reference_bad");
         let cli = match cli_res {
             Ok(cli) => cli,
             Err(e) => {

@@ -15,7 +15,7 @@ The YUV pixel format is a color encoding system used in various applications rel
 ## Understanding YUV Components
 
 ### [[Luminance|Luminance]] (Y)
-The Y component represents the brightness level (luminance) of a pixel. This is the grayscale representation of the image, where higher values indicate brighter pixels. The human eye is more sensitive to variations in brightness than to variations in color, which is why [[Luminance|luminance]] is kept as a separate component in the YUV format.
+The Y component represents the brightness level ([[luminance.md|luminance]]) of a pixel. This is the grayscale representation of the image, where higher values indicate brighter pixels. The human eye is more sensitive to variations in brightness than to variations in color, which is why [[Luminance|luminance]] is kept as a separate component in the YUV format.
 
 ### Chrominance (U and V)
 The U and V components represent the color [[Information Theory|information]] of the image, also known as chrominance. The U component measures the blue projection of the color minus the [[Luminance|luminance,]] while the V component measures the red projection minus the [[Luminance|luminance.]] These components allow the representation of colors in the image. By combining the U and V values with the Y value, it is possible to reconstruct the original color information.
@@ -30,7 +30,7 @@ The U and V components represent the color [[Information Theory|information]] of
 
 ## Applications of YUV Format
 
-- **Video Compression**: Most video codecs (H.264, HEVC) operate on YUV data to efficiently compress video content.
+- **Video Compression**: Most video codecs (H.264, [[h264_vs_h265.md|HEVC]]) operate on YUV data to efficiently compress video content.
 - **Image Processing**: Tasks such as noise reduction, color balancing, and contrast adjustment can be more intuitively performed in the YUV space.
 - **Broadcasting**: Television signals are often broadcasted in YUV format to optimize [[Signal Bandwidth.md|bandwidth]] use while maintaining picture quality.
 

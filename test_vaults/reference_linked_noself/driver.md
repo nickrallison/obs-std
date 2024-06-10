@@ -14,10 +14,10 @@ A normal computer program can crash without affecting the computer, but when a d
 In the context of operating systems, drivers are crucial for the basic functionality of any computing device. Operating systems come with a set of drivers for commonly used hardware devices, but for specialized or newer devices, drivers may need to be installed separately. There are several types of drivers in operating systems, including:
 
 - **Device drivers**: These are the most common type of drivers, designed to allow the operating system to communicate with hardware peripherals.
-- **Kernel drivers**: Operating at the core of the operating system, these drivers provide functionality needed by the [[Kernel|kernel]] itself to manage hardware or system resources.
-- **User-space drivers**: Although less common, some drivers are run not in the [[Kernel|kernel]] but in user space. This can improve stability since crashes in user-space drivers do not necessarily crash the entire system.
+- **[[kernel.md|Kernel]] drivers**: Operating at the core of the operating system, these drivers provide functionality needed by the [[Kernel|kernel]] itself to manage hardware or system resources.
+- **User-space drivers**: Although less common, some drivers are run not in the [[Kernel|kernel]] but in user space. This can improve [[lti_system_stability.md|stability]] since crashes in user-space drivers do not necessarily crash the entire system.
 
-Drivers in operating systems often require high privileges to operate directly with the hardware, which means they have the potential to impact system stability and security. This is why driver development is considered a specialized area of software development, requiring a deep understanding of both hardware and software.
+Drivers in operating systems often require high privileges to operate directly with the hardware, which means they have the potential to impact system [[lti_system_stability.md|stability]] and security. This is why driver development is considered a specialized area of software development, requiring a deep understanding of both hardware and software.
 
 ## In Coding
 
@@ -29,4 +29,4 @@ Writing a driver includes:
 - **Using the Right APIs**: Operating systems provide APIs (Application Programming Interfaces) for interacting with hardware. It's crucial to understand these APIs to develop effective drivers.
 - **Testing and Debugging**: Driver development requires rigorous testing and debugging since errors can cause system instability. Specialized tools and techniques are often used in this process.
 
-Driver development is a niche area in coding because of its complexity and the requirement for hardware and operating system knowledge. However, it is an essential skill for developing new hardware or custom devices and is a fascinating intersection between software and hardware engineering.
+Driver development is a niche area in coding because of its complexity and the requirement for hardware and operating system knowledge. However, it is an essential skill for developing new hardware or custom devices and is a fascinating [[intersection.md|intersection]] between software and hardware engineering.

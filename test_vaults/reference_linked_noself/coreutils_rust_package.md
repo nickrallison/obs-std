@@ -13,7 +13,7 @@ The Coreutils Rust package is a collection of Rust implementations for the GNU C
 
 In the Rust programming language context, the Coreutils Rust package is a testament to Rust's capabilities in system-level programming. Rust provides memory safety guarantees through its ownership model, meaning fewer crashes and security vulnerabilities, which is crucial for system utilities that are used extensively. The move to reimplement these utilities in Rust can be seen as part of a larger effort within the Rust community to bring Rust's benefits to more foundational aspects of computing, such as operating system development and command-line tools.
 
-- **Safety**: Rust's strict compile-time checks ensure memory safety without the overhead of garbage collection, which is highly beneficial for low-level utilities that need to be both fast and reliable.
+- **Safety**: Rust's strict compile-time checks ensure memory safety without the overhead of [[garbage_collector.md|garbage collection]], which is highly beneficial for low-level utilities that need to be both fast and reliable.
 - **Concurrency**: Rust's approach to concurrency is both powerful and safe, enabling the development of utilities that are more efficient on modern multicore processors.
 - **Ecosystem**: The Rust ecosystem, with its package manager `cargo` and a growing collection of libraries (`crates`), makes it easier to develop, share, and maintain code, including system utilities.
 

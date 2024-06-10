@@ -20,11 +20,11 @@ The `Debug` trait enables easy debugging of struct and enum types, usually by de
 
 ### PartialEq and Eq
 
-`PartialEq` allows for partial equality testing of types, enabling the use of `==` and `!=` operators. `Eq` is a marker trait that indicates that a type's equality is reflexive, symmetric, and transitive.
+`PartialEq` allows for partial equality testing of types, enabling the use of `==` and `!=` operators. `Eq` is a marker trait that indicates that a type's equality is [[reflexive_relation.md|reflexive]], symmetric, and [[transitive_relation.md|transitive]].
 
 ### Ord and PartialOrd
 
-These traits are for types that have a total (`Ord`) or partial (`PartialOrd`) ordering. This enables comparison operations like `<`, `>`, `<=`, and `>=`.
+These traits are for types that have a total (`Ord`) or partial (`PartialOrd`) [[ordering.md|ordering]]. This enables comparison operations like `<`, `>`, `<=`, and `>=`.
 
 ### Iterator
 

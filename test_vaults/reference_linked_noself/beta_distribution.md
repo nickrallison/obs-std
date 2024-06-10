@@ -10,7 +10,7 @@ The Beta distribution is a [[Continuous Distribution.md|continuous probability d
 
 ## Mathematical Definition
 
-The probability density function (pdf) of the for a [[Random Variable.md|random variable ]]variable\(X \) in the interval\( [0, 1] \) is given by:
+The probability density function ([[probability_density_function.md|pdf]]) of the for a [[Random Variable.md|random variable ]]variable\(X \) in the interval\( [0, 1] \) is given by:
 
 $$
 f(x; \alpha, \beta) = \frac{x^{\alpha - 1} (1 - x)^{\beta - 1}}{B(\alpha, \beta)}
@@ -38,7 +38,7 @@ The shape of the Beta distribution is determined by the parameters \( \alpha \) 
 The expected value [[Expected Value.md|(mean)]] of a Beta-distributed random are given by:
 
 - **Mean**: $\mu = \frac{\alpha}{\alpha + \beta}$
-- **Variance**: $\sigma^2 = \frac{\alpha \beta}{(\alpha + \beta)^2 (\alpha + \beta + 1)}$
+- **[[variance.md|Variance]]**: $\sigma^2 = \frac{\alpha \beta}{(\alpha + \beta)^2 (\alpha + \beta + 1)}$
 
 This equation helps quantify the spread or dispersion of the distribution around its mean.
 
