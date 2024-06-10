@@ -18,6 +18,7 @@ Meant to be a library to interact with obsidian and markdown files in an efficie
    - sqlite?
 - [ ] Better Profiling
 - [ ] Optimize mdparser
+  - Give File Bufreader so it can read as it parses
 
 ### Phase 3 - Organization
 

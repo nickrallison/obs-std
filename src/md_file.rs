@@ -1,5 +1,8 @@
 use std::fmt::Display;
-use std::path::PathBuf;
+use std::fs::File;
+use std::io;
+use std::io::{BufRead, BufReader};
+use std::path::{Path, PathBuf};
 use crate::linking::Link;
 use crate::parse::{AST, Line, Node};
 
@@ -17,27 +20,37 @@ pub struct MDFile {
 impl MDFile {
 
 	// Constructor Methods
-	pub fn from(file_path: PathBuf) -> Result<Self, String> {
-		assert!(file_path.is_file(), "Path is not a file: {}", file_path.display());
-		let file_contents = match std::fs::read_to_string(&file_path) {
-			Ok(contents) => contents,
-			Err(_) => return Err(format!("Error reading file: {}", file_path.display())),
-		};
-
-		let title: String = file_path.file_stem().unwrap().to_str().unwrap_or_else(|| panic!("Can't convert path to &str: {}", file_path.display())).to_string();
+	pub fn from(file_path: PathBuf) -> Self {
 		let last_modified = match std::fs::metadata(&file_path) {
 			Ok(metadata) => metadata.modified().unwrap(),
-			Err(_) => return Err(format!("Error getting last modified time from file: {}", file_path.display())),
+			Err(e) => panic!("Error getting file metadata: {e}") ,
+		};
+		let file_contents = match std::fs::read_to_string(&file_path) {
+			Ok(contents) => contents,
+			Err(e) => panic!("Error reading file: {e}"),
 		};
 
+		let title: String = file_path.clone().file_stem().unwrap().to_str().unwrap_or_else(|| panic!("Can't convert path to &str: {}", file_path.display())).to_string();
 		let mut md_file = Self::new(file_path, title, file_contents);
-
 		md_file.set_last_modified(Some(last_modified));
-
-		Ok(md_file)
+		md_file
 	}
 
 	pub fn new(path: PathBuf, title: String, string: String) -> Self {
+
+		let ast: AST = AST::new(string);
+		let aliases: Vec<String> = ast.get_aliases();
+
+		Self {
+			path,
+			title,
+			aliases,
+			ast,
+			last_modified: None,
+		}
+	}
+
+	pub fn new_from_buf_reader(buf_reader: io::Lines<io::BufReader<File>>, path: PathBuf, title: String, string: String) -> Self {
 
 		let ast: AST = AST::new(string);
 		let aliases: Vec<String> = ast.get_aliases();
@@ -169,4 +182,10 @@ impl Display for MDFile {
 	fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
 		write!(f, "{}", self.ast)
 	}
+}
+
+fn read_lines<P>(filename: P) -> io::Result<io::Lines<io::BufReader<File>>>
+	where P: AsRef<Path>, {
+	let file = File::open(filename)?;
+	Ok(io::BufReader::new(file).lines())
 }

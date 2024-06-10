@@ -66,11 +66,11 @@ impl Vault {
 
 		let data: HashMap<PathBuf, MDFile> = entries.into_iter().map(|path| {
 			let md_file_path = vault_path.join(&path);
-			let md_file = MDFile::from(md_file_path).unwrap_or_else(|_| panic!("Should be able to create MDFile: {}", path.display()));
+			let md_file = MDFile::from(md_file_path);
 			(path, md_file)
 		}).collect();
 
-		let mut alias_tree: crate::stringtree::StringTree<PathBuf> = crate::stringtree::StringTree::new();
+		let mut alias_tree: StringTree<PathBuf> = StringTree::new();
 		for md_file in data.values() {
 			let mut aliases = md_file.get_aliases();
 			aliases.push(md_file.get_title());

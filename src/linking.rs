@@ -43,11 +43,11 @@ pub fn add_link_to_nodes(nodes: Vec<Node>, link: Link) -> Vec<Node> {
 			}
 			Node::String(string) => {
 				if string.contains(text) {
-					let string_clone: String = (*string).to_string();
+					// let string_clone: String = (*string).to_string();
 					let dest_str: String = dest.to_str().unwrap().to_string();
 
 					let split_reg = Regex::new(&format!(r"\b{text}\b")).unwrap();
-					let split = split_reg.split(&string_clone);
+					let split = split_reg.split(&string);
 					let mut nodes_after: Vec<Node> = Vec::new();
 
 					for split_text in split {
