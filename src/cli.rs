@@ -44,7 +44,7 @@ impl Display for Action {
 // String is the export path
 /// Safety level when linking / unlinking files
 #[derive(Debug, Copy, Clone, PartialEq, Eq, Default, ValueEnum)]
-pub enum Options {
+pub enum Option {
     #[default]
     Preview,
     Safe,
@@ -53,7 +53,7 @@ pub enum Options {
     Time
 }
 
-impl Options {
+impl Option {
     #[allow(dead_code)]
     pub fn new(options: &str) -> Result<Self, String> {
         match options {
@@ -66,7 +66,7 @@ impl Options {
     }
 }
 
-impl Display for Options {
+impl Display for Option {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
             Self::Preview => write!(f, "Preview"),
@@ -87,7 +87,7 @@ pub struct CLI {
 
     /// Safety level (Ignored for `AliasTree`)
     #[arg(short, long)]
-    pub options: Options,
+    pub options: Option,
 
     /// Target file / folder
     #[arg(short, long)]
@@ -96,7 +96,7 @@ pub struct CLI {
 
 impl CLI {
     #[allow(dead_code)]
-    pub fn new(action: Action, options: Options, target_path: String) -> Self {
+    pub fn new(action: Action, options: Option, target_path: String) -> Self {
         Self {
             action,
             options,
@@ -107,7 +107,7 @@ impl CLI {
     #[allow(dead_code)]
     pub fn from_str(action: &str, options: &str, target_path: &str) -> Result<Self, String> {
         let action = Action::new(action);
-        let options = Options::new(options);
+        let options = Option::new(options);
         match (action, options) {
             (Ok(action), Ok(options)) => Ok(Self::new(action, options, target_path.to_string())),
             (Err(e1), Err(e2)) => Err(format!("{e1}\n{e2}")),
@@ -158,12 +158,12 @@ pub fn run_cli(cli: CLI) -> Result<(), CLIError> {
     }
 
     match options {
-        Options::Preview => {
+        Option::Preview => {
             for (_, mdfile) in &vault.data {
                 println!("{mdfile}\n##########################");
             }
         }
-        Options::Safe => {
+        Option::Safe => {
             for (_, mdfile) in &vault.data {
                 let path = mdfile.path.clone();
                 let expected = fs::read_to_string(&path).unwrap();
@@ -194,7 +194,7 @@ pub fn run_cli(cli: CLI) -> Result<(), CLIError> {
                 }
             }
         }
-        Options::Force => {
+        Option::Force => {
             println!("\nYou are about to modify these files under this path: {}. Are you sure you want to do this? yes, or no [y/n]: ", vault.get_path().display());
             let mut input = String::new();
             while input.trim() != "y" && input.trim() != "n" {
@@ -212,7 +212,7 @@ pub fn run_cli(cli: CLI) -> Result<(), CLIError> {
                 }
             }
         }
-        Options::Time => {}
+        Option::Time => {}
     }
 
     Ok(())

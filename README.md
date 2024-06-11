@@ -2,6 +2,40 @@
 
 Meant to be a library to interact with obsidian and markdown files in an efficient way.
 
+## Directions
+
+### Run Tests
+
+You have to generate the tests first before running them they are dynamically generated so they are not commited to git.
+```bash
+python3 scripts/testgen.py test_vaults/reference_linked_noself test_vaults/reference_clean src/test_suite.rs
+cargo test 
+```
+
+## Run Binary
+
+The binary has a few actions to run it with. It supports the following:
+- `none` - Does nothing
+- `link` - Links all the files in the vault
+- `unlink` - Unlinks all the files in the vault
+- `alias-tree` - Prints the alias tree
+
+It supports the following options as well:
+- `preview` - Does not write to disk, just prints the changes
+- `safe` - Writes to disk, after prompting the user to confirm the changes
+- `force` - Writes to disk, without prompting the user to confirm the changes
+- `time` - Does not write to disk, does not print changes, just prints the time it took to run the action
+
+It also needs a target path to the vault to run on.
+
+```bash
+# Run the binary with the link action, the safe option, and the target path of test_vaults/reference_linked_noself
+cargo run --release -- --action link --option safe --target-path test_vaults/reference_linked_noself
+
+# Run the binary with the alias-tree action, the option is silently ignored here, and the target path of test_vaults/reference_linked_noself
+cargo run --release -- --action alias-tree --option preview --target-path test_vaults/reference_linked_noself
+```
+
 ## TODO
 
 ### Phase 1 - Functionality
@@ -51,6 +85,7 @@ Other Features
   - eg. outgoing must match tag or this other tag...
   - eg. incoming must be at least this distance in embedding space
   - User Customizable?
+- Check for broken links
 
 ## Documentation
 

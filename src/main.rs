@@ -2,7 +2,7 @@
 use crate::cli::{CLI, CLIError, run_cli};
 
 use clap::Parser;
-use crate::cli::Options::Time;
+use crate::cli::Option::Time;
 
 mod parse;
 mod md_file;
