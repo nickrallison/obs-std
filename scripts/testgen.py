@@ -16,10 +16,10 @@ lazy_static! {
 	};
 	static ref TEST_SUITE_CLEAN_VAULT_PATH: PathBuf = PathBuf::from("[VAULT_PATH_CLEAN]");
 	static ref TEST_SUITE_LINKED_VAULT_PATH: PathBuf = PathBuf::from("[VAULT_PATH_LINKED]");
-	static ref TEST_SUITE_REF_CLEAN_VAULT: Vault = Vault::new(TEST_SUITE_CLEAN_VAULT_PATH.clone(), TEST_SUITE_IGNORE.clone(), TEST_SUITE_LINKER_OPTIONS.clone());
-	static ref TEST_SUITE_REF_LINKED_VAULT: Vault = Vault::new(TEST_SUITE_LINKED_VAULT_PATH.clone(), TEST_SUITE_IGNORE.clone(), TEST_SUITE_LINKER_OPTIONS.clone());
-	static ref TEST_SUITE_REF_CLEAN_TO_LINKED_VAULT: Vault = Vault::new(TEST_SUITE_LINKED_VAULT_PATH.clone(), TEST_SUITE_IGNORE.clone(), TEST_SUITE_LINKER_OPTIONS.clone()).link_all_files();
-	static ref TEST_SUITE_REF_LINKED_TO_CLEAN_VAULT: Vault = Vault::new(TEST_SUITE_CLEAN_VAULT_PATH.clone(), TEST_SUITE_IGNORE.clone(), TEST_SUITE_LINKER_OPTIONS.clone()).unlink_all_files();
+	static ref TEST_SUITE_REF_CLEAN_VAULT: Vault = Vault::new(TEST_SUITE_CLEAN_VAULT_PATH.clone(), TEST_SUITE_IGNORE.clone(), TEST_SUITE_LINKER_OPTIONS.clone(), None);
+	static ref TEST_SUITE_REF_LINKED_VAULT: Vault = Vault::new(TEST_SUITE_LINKED_VAULT_PATH.clone(), TEST_SUITE_IGNORE.clone(), TEST_SUITE_LINKER_OPTIONS.clone(), None);
+	static ref TEST_SUITE_REF_CLEAN_TO_LINKED_VAULT: Vault = Vault::new(TEST_SUITE_LINKED_VAULT_PATH.clone(), TEST_SUITE_IGNORE.clone(), TEST_SUITE_LINKER_OPTIONS.clone(), None).link_all_files();
+	static ref TEST_SUITE_REF_LINKED_TO_CLEAN_VAULT: Vault = Vault::new(TEST_SUITE_CLEAN_VAULT_PATH.clone(), TEST_SUITE_IGNORE.clone(), TEST_SUITE_LINKER_OPTIONS.clone(), None).unlink_all_files();
 }
 
 

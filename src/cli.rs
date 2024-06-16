@@ -44,7 +44,7 @@ impl Display for Action {
 // String is the export path
 /// Safety level when linking / unlinking files
 #[derive(Debug, Copy, Clone, PartialEq, Eq, Default, ValueEnum)]
-pub enum Option {
+pub enum RunOption {
     #[default]
     Preview,
     Safe,
@@ -53,7 +53,7 @@ pub enum Option {
     Time
 }
 
-impl Option {
+impl RunOption {
     #[allow(dead_code)]
     pub fn new(options: &str) -> Result<Self, String> {
         match options {
@@ -66,7 +66,7 @@ impl Option {
     }
 }
 
-impl Display for Option {
+impl Display for RunOption {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
             Self::Preview => write!(f, "Preview"),
@@ -87,29 +87,34 @@ pub struct CLI {
 
     /// Safety level (Ignored for `AliasTree`)
     #[arg(short, long)]
-    pub options: Option,
+    pub options: RunOption,
 
     /// Target file / folder
     #[arg(short, long)]
-    pub target_path: String
+    pub target_path: String,
+
+    /// db path
+    #[arg(short, long)]
+    pub db_path: Option<String>
 }
 
 impl CLI {
     #[allow(dead_code)]
-    pub fn new(action: Action, options: Option, target_path: String) -> Self {
+    pub fn new(action: Action, options: RunOption, target_path: String, db_path: Option<String>) -> Self {
         Self {
             action,
             options,
-            target_path
+            target_path,
+            db_path
         }
     }
 
     #[allow(dead_code)]
     pub fn from_str(action: &str, options: &str, target_path: &str) -> Result<Self, String> {
         let action = Action::new(action);
-        let options = Option::new(options);
+        let options = RunOption::new(options);
         match (action, options) {
-            (Ok(action), Ok(options)) => Ok(Self::new(action, options, target_path.to_string())),
+            (Ok(action), Ok(options)) => Ok(Self::new(action, options, target_path.to_string(), None)),
             (Err(e1), Err(e2)) => Err(format!("{e1}\n{e2}")),
             (Err(e), _) => Err(e),
             (_, Err(e)) => Err(e)
@@ -118,10 +123,11 @@ impl CLI {
 
 }
 
-#[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Default)]
+#[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord)]
 pub enum CLIError {
-    #[default]
-    InvalidTarget
+    InvalidTarget,
+    InvalidDB(String),
+    DBWriteError(String)
 }
 
 #[allow(dead_code)]
@@ -129,6 +135,40 @@ pub fn run_cli(cli: CLI) -> Result<(), CLIError> {
     let action = cli.action;
     let options = cli.options;
     let target = cli.target_path;
+    let db_path = cli.db_path;
+
+    let db_path: Option<PathBuf> = match db_path {
+        Some(path) => {
+            let path = PathBuf::from(path);
+
+            // if path is a file, Some(path)
+            if path.is_file() {
+                Some(path)
+            }
+            // if path is a directory, return Err(
+            else if path.is_dir() {
+                return Err(CLIError::InvalidDB(format!("DB path must not be an existing Directory, {} is directory.", path.display())));
+            }
+
+            // if path does not exist but parent directory does, return Some(path)
+            else if path.parent().unwrap().is_dir() {
+                Some(path)
+            }
+
+            // if path does not exist but parent is file, return Err
+            else if path.parent().unwrap().is_file() {
+                let parent = path.parent().unwrap();
+                return Err(CLIError::InvalidDB(format!("DB path must be a valid path, {} is a file.", parent.display())));
+            }
+
+            // if path does not exist and parent directory does not exist, return Err
+            else {
+                let parent = path.parent().unwrap();
+                return Err(CLIError::InvalidDB(format!("DB path must be a valid path, parent directory does not exist: {}", parent.display())));
+            }
+        }
+        None => None
+    };
 
     let path = PathBuf::from(target);
     if !path.exists() {
@@ -141,7 +181,11 @@ pub fn run_cli(cli: CLI) -> Result<(), CLIError> {
         link_share_tag: false,
         link_self: false
     };
-    let mut vault = Vault::new(vault_path, ignore, linker_options);
+
+
+
+
+    let mut vault = Vault::new(vault_path, ignore, linker_options, db_path.clone());
 
     match action {
         Action::None => {}
@@ -158,12 +202,12 @@ pub fn run_cli(cli: CLI) -> Result<(), CLIError> {
     }
 
     match options {
-        Option::Preview => {
+        RunOption::Preview => {
             for (_, mdfile) in &vault.data {
                 println!("{mdfile}\n##########################");
             }
         }
-        Option::Safe => {
+        RunOption::Safe => {
             for (_, mdfile) in &vault.data {
                 let path = mdfile.path.clone();
                 let expected = fs::read_to_string(&path).unwrap();
@@ -194,7 +238,7 @@ pub fn run_cli(cli: CLI) -> Result<(), CLIError> {
                 }
             }
         }
-        Option::Force => {
+        RunOption::Force => {
             println!("\nYou are about to modify these files under this path: {}. Are you sure you want to do this? yes, or no [y/n]: ", vault.get_path().display());
             let mut input = String::new();
             while input.trim() != "y" && input.trim() != "n" {
@@ -212,7 +256,22 @@ pub fn run_cli(cli: CLI) -> Result<(), CLIError> {
                 }
             }
         }
-        Option::Time => {}
+        RunOption::Time => {}
+    }
+
+    match db_path {
+        Some(path) => {
+            let db_path = path;
+            let db_path = PathBuf::from(db_path);
+            let res = vault.to_json(&db_path);
+            match res {
+                Ok(_) => {}
+                Err(e) => {
+                    return Err(CLIError::DBWriteError(format!("{e}")));
+                }
+            }
+        }
+        None => {}
     }
 
     Ok(())
@@ -250,6 +309,12 @@ mod cli_tests {
                     CLIError::InvalidTarget => {
                         panic!("Test got invalid target error when it should not have.");
                     }
+                    CLIError::InvalidDB(_) => {
+                        panic!("Test got invalid db error when it should not have.");
+                    }
+                    CLIError::DBWriteError(_) => {
+                        panic!("Test got db write error when it should not have.");
+                    }
                 }
             }
         }
@@ -271,6 +336,12 @@ mod cli_tests {
             Err(e) => {
                 match e {
                     CLIError::InvalidTarget => {}
+                    CLIError::InvalidDB(_) => {
+                        panic!("Test got invalid db error when it should not have.");
+                    }
+                    CLIError::DBWriteError(_) => {
+                        panic!("Test got db write error when it should not have.");
+                    }
                 }
             }
         }

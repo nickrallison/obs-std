@@ -1,5 +1,6 @@
 use std::path::PathBuf;
 use regex::Regex;
+use serde::{Deserialize, Serialize};
 use crate::parse::Node;
 
 #[derive(Debug, Clone, PartialEq, Eq, Default)]
@@ -94,7 +95,7 @@ pub fn add_link_to_nodes(nodes: Vec<Node>, link: Link) -> Vec<Node> {
 	nodes
 }
 
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq)]
 #[derive(Default)]
 pub struct LinkerOptions {
 	pub link_share_tag: bool,

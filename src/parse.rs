@@ -2,6 +2,7 @@ use std::cmp::PartialEq;
 use std::fmt::Display;
 use lazy_static::lazy_static;
 use regex::Regex;
+use serde::{Deserialize, Serialize};
 
 lazy_static! {
 	static ref INLINE_LATEX_REGEX: Regex = Regex::new(r"(?m)^\$\$.*?\$\$").unwrap();
@@ -24,7 +25,7 @@ lazy_static! {
 
 }
 
-#[derive(Debug, Clone, PartialEq, Eq, Default)]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, Default)]
 pub struct AST {
 	pub blocks: Vec<Block>,
 	pub line_sep: NewlineType
@@ -115,14 +116,14 @@ impl Display for AST {
 
 }
 
-#[derive(Debug, Clone, PartialEq, Eq, Default)]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, Default)]
 pub enum NewlineType {
 	#[default]
 	Unix,
 	Windows,
 }
 
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq)]
 pub enum Block {
 	YAML(serde_yaml::Value, Vec<String>),
 	CodeBlock(Vec<String>),
@@ -211,7 +212,7 @@ impl Display for Block {
 	}
 }
 
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq)]
 pub enum Line {
 	Heading(Vec<Node>, u8),
 	BulletPoint(Vec<Node>, String), // string is indentation
@@ -355,7 +356,7 @@ impl Display for Line {
 	}
 }
 
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq)]
 pub enum Node {
 
 	InlineCode(String),

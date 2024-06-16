@@ -3,11 +3,12 @@ use std::fs::File;
 use std::io;
 use std::io::{BufRead, BufReader};
 use std::path::{Path, PathBuf};
+use serde::{Deserialize, Serialize};
 use crate::linking::Link;
 use crate::parse::{AST, Line, Node};
 
 #[allow(dead_code)]
-#[derive(Debug, Clone, PartialEq, Eq, Default)]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, Default)]
 pub struct MDFile {
 	pub path: PathBuf,
 	pub title: String,
@@ -50,19 +51,19 @@ impl MDFile {
 		}
 	}
 
-	pub fn new_from_buf_reader(buf_reader: io::Lines<io::BufReader<File>>, path: PathBuf, title: String, string: String) -> Self {
-
-		let ast: AST = AST::new(string);
-		let aliases: Vec<String> = ast.get_aliases();
-
-		Self {
-			path,
-			title,
-			aliases,
-			ast,
-			last_modified: None,
-		}
-	}
+	// pub fn new_from_buf_reader(buf_reader: io::Lines<io::BufReader<File>>, path: PathBuf, title: String, string: String) -> Self {
+	//
+	// 	let ast: AST = AST::new(string);
+	// 	let aliases: Vec<String> = ast.get_aliases();
+	//
+	// 	Self {
+	// 		path,
+	// 		title,
+	// 		aliases,
+	// 		ast,
+	// 		last_modified: None,
+	// 	}
+	// }
 
 
 	// Getter Methods
@@ -175,6 +176,26 @@ impl MDFile {
 
 	pub fn export(&self) -> Result<(), String>  {
 		self.export_to_file(self.get_path())
+	}
+
+	pub fn update(&mut self) {
+
+
+		// if file has been modified since last read, update the file
+		let last_modified = match std::fs::metadata(&self.path) {
+			Ok(metadata) => metadata.modified().unwrap(),
+			Err(e) => panic!("Error getting file metadata: {e}") ,
+		};
+		if last_modified > self.last_modified.unwrap() {
+			println!("Updating file: {}", self.path.display());
+			let file_contents = match std::fs::read_to_string(&self.path) {
+				Ok(contents) => contents,
+				Err(e) => panic!("Error reading file: {e}"),
+			};
+			self.ast = AST::new(file_contents);
+			self.set_last_modified(Some(last_modified));
+		}
+
 	}
 }
 

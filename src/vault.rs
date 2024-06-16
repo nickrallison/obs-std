@@ -1,9 +1,14 @@
 #![allow(dead_code)]
 use crate::parse::Node;
-use std::collections::HashMap;
+use std::collections::{BTreeMap, HashMap};
+use std::fs;
 use std::path::{Path, PathBuf};
+use itertools::Itertools;
+use normpath::PathExt;
+// use normpath::PathExt;
 use rand::Rng;
 use walkdir::WalkDir;
+use serde::{Deserialize, Serialize, Serializer};
 use crate::md_file::MDFile;
 use crate::parse::Line;
 use crate::linking::{add_link_to_nodes, Link, LinkerOptions};
@@ -13,7 +18,7 @@ use crate::stringtree::StringTree;
 // use rayon::prelude::*;
 
 
-#[derive(Debug, Clone, PartialEq, Eq, Default)]
+#[derive(Serialize, Deserialize, Clone, PartialEq, Eq, Default, Debug)]
 pub struct Vault {
 	// Absolute path to the full_vault
 	pub path: PathBuf,
@@ -28,20 +33,49 @@ pub struct Vault {
 	pub ignore: Vec<PathBuf>,
 
 	// link options
-	pub options: LinkerOptions
+	pub options: LinkerOptions,
+
+	// db path
+	pub db_path: Option<PathBuf>
 }
 
 impl Vault {
-	pub fn new(vault_path: PathBuf, ignore: Vec<PathBuf>, options: LinkerOptions) -> Self {
-		// if path is relative, convert to absolute
+	pub fn new(vault_path: PathBuf, ignore: Vec<PathBuf>, options: LinkerOptions, db_path: Option<PathBuf>) -> Self {
+
+		// if db_path is relative, convert to absolute
+		let db_path: Option<PathBuf> = match db_path {
+			Some(db_path) => {
+				match db_path.is_absolute() {
+					true => Some(db_path),
+					false => Some(std::env::current_dir().unwrap().join(db_path))
+				}
+			}
+			None => None
+		};
+
+		// if db_path contains a valid file, deserialize it into a vault
+		if !db_path.is_none() && db_path.as_ref().unwrap().exists() {
+			let vault = Self::from_json(db_path.as_ref().unwrap());
+			match vault {
+				Ok(mut vault) => {
+					let vault = vault.update();
+					return vault;
+				}
+				Err(e) => {
+					println!("Error deserializing db_path: {db_path:?}\nerror: {e}");
+				}
+			}
+		}
+
+		// if vault_path is relative, convert to absolute
 		let vault_path = match vault_path.is_absolute() {
-			true => vault_path,
+			true => vault_path.clone(),
 			false => std::env::current_dir().unwrap().join(vault_path)
 		};
+		let vault_path = PathBuf::from(vault_path.normalize().expect("Failed to normalize vault_path"));
 
 		// entries should be relative to the full_vault
 		let ignore: Vec<PathBuf> = ignore.into_iter().map(|path| {
-			
 			match path.is_absolute() {
 				true => path,
 				false => std::env::current_dir().unwrap().join(path)
@@ -60,7 +94,7 @@ impl Vault {
 					return None;
 				}
 			}
-			let path = path.strip_prefix(&vault_path).unwrap().to_path_buf();
+			let path: PathBuf = path.strip_prefix(&vault_path).unwrap().to_path_buf();
 			Some(path)
 		}).collect();
 
@@ -87,8 +121,20 @@ impl Vault {
 			data,
 			alias_tree,
 			ignore,
-			options
+			options,
+			db_path
 		}
+	}
+
+	pub fn from_json(path_to_json: &Path) -> Result<Self, Box<dyn std::error::Error>> {
+		let vault: Self = serde_json::from_str(&std::fs::read_to_string(path_to_json)?)?;
+		Ok(vault)
+	}
+
+	pub fn to_json(self, path_to_json: &Path) -> Result<(), Box<dyn std::error::Error>> {
+		let vault = self;
+		std::fs::write(path_to_json, serde_json::to_string_pretty(&vault)?).unwrap();
+		Ok(())
 	}
 
 	pub fn get_links(&self) -> Vec<Link> {
@@ -385,9 +431,58 @@ impl Vault {
 		}
 	}
 
+	pub fn update(self) -> Self {
+		let mut vault = self;
+		let mut removals: Vec<PathBuf> = Vec::new();
+		for (path, md_file) in &mut vault.data {
+			// if path does not exist as a file, remove it from the vault
+			if !path.exists() {
+				removals.push(path.clone());
+				continue;
+			}
+			md_file.update();
+		}
+		for path in removals {
+			vault.data.remove(&path);
+		}
+		vault
+	}
+
 	pub fn alias_tree_string(&self) -> String {
 		format!("{}", self.alias_tree)
 	}
 
 }
 
+// #[cfg(test)]
+// mod vault_tests {
+// 	use super::*;
+// 	use std::path::PathBuf;
+// 	use crate::md_file::MDFile;
+// 	use crate::linking::LinkerOptions;
+//
+// 	#[test]
+// 	fn test_deserialize_vault() {
+// 		let vault_path = PathBuf::from("test_vaults/reference_clean");
+// 		let ignore = vec![];
+// 		let options = LinkerOptions::default();
+// 		let db_path = None;
+// 		let vault = Vault::new(vault_path, ignore, options, db_path);
+// 		let vault_json = serde_json::to_string_pretty(&vault).unwrap();
+// 		let mut vault_deserialized: Vault = serde_json::from_str(&vault_json).unwrap();
+// 		let vault_deserialized = vault_deserialized.update();
+// 		if vault != vault_deserialized {
+// 			for (path, md_file) in &vault.data {
+// 				let md_file_deserialized = vault_deserialized.get_md_file(path).unwrap();
+// 				if md_file != md_file_deserialized {
+// 					println!("MDFiles are not equal: {}", path.display());
+// 				}
+// 			}
+// 			panic!("Vaults are not equal")
+// 		}
+// 		let vault_deserialized_json = serde_json::to_string_pretty(&vault_deserialized).unwrap();
+//
+//
+// 	}
+// }
+//

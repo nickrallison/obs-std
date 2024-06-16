@@ -2,7 +2,7 @@
 use crate::cli::{CLI, CLIError, run_cli};
 
 use clap::Parser;
-use crate::cli::Option::Time;
+use crate::cli::RunOption::Time;
 
 mod parse;
 mod md_file;
@@ -29,8 +29,18 @@ fn main() {
 		Ok(()) => {}
 		Err(e) => {
 			match e {
+				// CLIError::InvalidTarget => {
+				// 	println!("Invalid Target");
+				// }
+
 				CLIError::InvalidTarget => {
 					println!("Invalid Target");
+				}
+				CLIError::InvalidDB(e) => {
+					println!("Invalid DB: {}", e)
+				}
+				CLIError::DBWriteError(e) => {
+					println!("DB Write Error: {}", e)
 				}
 			}
 		}
