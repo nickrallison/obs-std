@@ -431,6 +431,7 @@ impl Vault {
 		}
 	}
 
+
 	pub fn update(self) -> Self {
 		let mut vault = self;
 		let mut removals: Vec<PathBuf> = Vec::new();
