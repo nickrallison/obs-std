@@ -434,16 +434,17 @@ impl Vault {
 	pub fn update(self) -> Self {
 		let mut vault = self;
 		let mut removals: Vec<PathBuf> = Vec::new();
-		for (path, md_file) in &mut vault.data {
+		for (file, md_file) in &mut vault.data {
+			let path = vault.path.join(file);
 			// if path does not exist as a file, remove it from the vault
 			if !path.exists() {
-				removals.push(path.clone());
+				removals.push(file.clone());
 				continue;
 			}
 			md_file.update();
 		}
-		for path in removals {
-			vault.data.remove(&path);
+		for file in removals {
+			vault.data.remove(&file);
 		}
 		vault
 	}

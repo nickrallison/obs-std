@@ -30,16 +30,20 @@ It also needs a target path to the vault to run on.
 
 ```bash
 # Run the binary with the link action, the safe option, and the target path of test_vaults/reference_linked_noself
-cargo run --release -- --action link --option safe --target-path test_vaults/reference_linked_noself
+cargo run --release -- --action link --options safe --target-path test_vaults/reference_linked_noself 
 
 # Run the binary with the alias-tree action, the option is silently ignored here, and the target path of test_vaults/reference_linked_noself
-cargo run --release -- --action alias-tree --option preview --target-path test_vaults/reference_linked_noself
+cargo run --release -- --action alias-tree --options preview --target-path test_vaults/reference_linked_noself
+
+# Run the binary with the link action, the time option, the target path of test_vaults/reference_linked_noself, and the db-path flag set
+cargo run --release -- --action link --options time --target-path test_vaults/reference_linked_noself --db-path db/reference_linked_noself.json
 ```
 
 ## TODO
 
 ### Phase 1 - Functionality
 
+- [ ] Runtime Documentation for db flag
 - [ ] Linker with accepts lambda for whether to link
 - [ ] More Tests
    - No two strings are adjacent in a line, should be linked
@@ -48,15 +52,12 @@ cargo run --release -- --action alias-tree --option preview --target-path test_v
 ### Phase 2 - Optimization
 
 - [ ] Rayon Feature Flag
-- [ ] Serde save & load
-   - sqlite?
 - [ ] Better Profiling
 - [ ] Optimize mdparser
   - Give File Bufreader so it can read as it parses
 
 ### Phase 3 - Organization
 
-- [ ] Restructure Structs & Enums
 - [ ] Add Code Comments to all methods
 - [ ] Get Lint on save working & clippy style guide?
    - Bacon too?
