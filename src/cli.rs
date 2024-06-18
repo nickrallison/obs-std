@@ -95,17 +95,22 @@ pub struct CLI {
 
     /// db path
     #[arg(short, long)]
-    pub db_path: Option<String>
+    pub db_path: Option<String>,
+
+    /// ignored paths
+    #[arg(short, long)]
+    pub ignore: Vec<String>
 }
 
 impl CLI {
     #[allow(dead_code)]
-    pub fn new(action: Action, options: RunOption, target_path: String, db_path: Option<String>) -> Self {
+    pub fn new(action: Action, options: RunOption, target_path: String, db_path: Option<String>, ignore: Vec<String>) -> Self {
         Self {
             action,
             options,
             target_path,
-            db_path
+            db_path,
+            ignore
         }
     }
 
@@ -114,7 +119,7 @@ impl CLI {
         let action = Action::new(action);
         let options = RunOption::new(options);
         match (action, options) {
-            (Ok(action), Ok(options)) => Ok(Self::new(action, options, target_path.to_string(), None)),
+            (Ok(action), Ok(options)) => Ok(Self::new(action, options, target_path.to_string(), None, vec![])),
             (Err(e1), Err(e2)) => Err(format!("{e1}\n{e2}")),
             (Err(e), _) => Err(e),
             (_, Err(e)) => Err(e)
@@ -136,6 +141,7 @@ pub fn run_cli(cli: CLI) -> Result<(), CLIError> {
     let options = cli.options;
     let target = cli.target_path;
     let db_path = cli.db_path;
+    let ignore = cli.ignore;
 
     let db_path: Option<PathBuf> = match db_path {
         Some(path) => {
@@ -176,14 +182,12 @@ pub fn run_cli(cli: CLI) -> Result<(), CLIError> {
     }
 
     let vault_path = path;
-    let ignore: Vec<PathBuf> = vec![];
     let linker_options = LinkerOptions {
         link_share_tag: false,
         link_self: false
     };
 
-
-
+    let ignore: Vec<PathBuf> = ignore.iter().map(|x| PathBuf::from(x)).collect();
 
     let mut vault = Vault::new(vault_path, ignore, linker_options, db_path.clone());
 
@@ -239,21 +243,25 @@ pub fn run_cli(cli: CLI) -> Result<(), CLIError> {
             }
         }
         RunOption::Force => {
-            println!("\nYou are about to modify these files under this path: {}. Are you sure you want to do this? yes, or no [y/n]: ", vault.get_path().display());
-            let mut input = String::new();
-            while input.trim() != "y" && input.trim() != "n" {
-                std::io::stdin().read_line(&mut input).unwrap();
-                if input.trim() == "y" {
-                    for (_, mdfile) in &vault.data {
-                        fs::write(&mdfile.path, mdfile.to_string()).unwrap();
-                    }
-                }
-                else if input.trim() == "n" {
-                    return Ok(());
-                } else {
-                    println!("Invalid input: [{}]. Please enter y, or n: ", input.trim());
-                    input.clear();
-                }
+            // println!("\nYou are about to modify these files under this path: {}. Are you sure you want to do this? yes, or no [y/n]: ", vault.get_path().display());
+            // let mut input = String::new();
+            // while input.trim() != "y" && input.trim() != "n" {
+            //     std::io::stdin().read_line(&mut input).unwrap();
+            //     if input.trim() == "y" {
+            //         for (_, mdfile) in &vault.data {
+            //             fs::write(&mdfile.path, mdfile.to_string()).unwrap();
+            //         }
+            //     }
+            //     else if input.trim() == "n" {
+            //         return Ok(());
+            //     } else {
+            //         println!("Invalid input: [{}]. Please enter y, or n: ", input.trim());
+            //         input.clear();
+            //     }
+            // }
+            for (path, mdfile) in &vault.data {
+                fs::write(&mdfile.path, mdfile.to_string()).unwrap();
+                println!("Wrote to file: {}", path.display());
             }
         }
         RunOption::Time => {}

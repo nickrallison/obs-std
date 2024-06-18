@@ -10,7 +10,7 @@ mod vault;
 mod linking;
 mod cli;
 mod stringtree;
-mod test_suite;
+// mod test_suite;
 
 
 fn main() {

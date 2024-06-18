@@ -15,7 +15,7 @@ use crate::linking::{add_link_to_nodes, Link, LinkerOptions};
 use crate::stringtree::StringTree;
 
 // #[cfg(feature = "parallel")]
-// use rayon::prelude::*;
+use rayon::prelude::*;
 
 
 #[derive(Serialize, Deserialize, Clone, PartialEq, Eq, Default, Debug)]
@@ -82,6 +82,11 @@ impl Vault {
 			}
 		}).collect();
 
+		// ignores should be absolute
+		let ignore: Vec<PathBuf> = ignore.into_iter().map(|path| {
+			PathBuf::from(path.normalize().expect("Failed to normalize ignore path"))
+		}).collect();
+
 		// entries should be relative to the full_vault
 		let entries: Vec<PathBuf> = WalkDir::new(&vault_path).into_iter().filter_map(|entry| {
 			let entry = entry.unwrap();
@@ -90,7 +95,8 @@ impl Vault {
 				return None;
 			}
 			for ignore_path in &ignore {
-				if path.starts_with(ignore_path) {
+				let absolute_path = PathBuf::from(path.normalize().unwrap());
+				if absolute_path.starts_with(ignore_path) {
 					return None;
 				}
 			}
@@ -435,18 +441,29 @@ impl Vault {
 	pub fn update(self) -> Self {
 		let mut vault = self;
 		let mut removals: Vec<PathBuf> = Vec::new();
-		for (file, md_file) in &mut vault.data {
+
+		// for (file, md_file) in &mut vault.data {
+		// 	let path = vault.path.join(file);
+		// 	// if path does not exist as a file, remove it from the vault
+		// 	if !path.exists() {
+		// 		removals.push(file.clone());
+		// 		continue;
+		// 	}
+		// 	md_file.update();
+		// }
+		let _ = vault.data.iter_mut().map(|(file, md_file)| {
 			let path = vault.path.join(file);
 			// if path does not exist as a file, remove it from the vault
 			if !path.exists() {
 				removals.push(file.clone());
-				continue;
+			} else {
+				md_file.update();
 			}
-			md_file.update();
-		}
-		for file in removals {
-			vault.data.remove(&file);
-		}
+		}).collect::<Vec<()>>();
+
+		let _ = removals.iter().map(|file| {
+			vault.data.remove(file);
+		}).collect::<Vec<()>>();
 		vault
 	}
 
